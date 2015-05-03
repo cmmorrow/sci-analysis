@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import scipy.stats as st
 
 
+# Perform a one_way anova on all arguments(groups).
+# Assumption is arguments have equal variance, are normally distributed and > 2
+# ------------------------------------------------------------------------------
 def anova(*groups):
     alpha = 0.05
     copy = []
@@ -30,6 +33,9 @@ def anova(*groups):
     return f_value, p_value
 
 
+# Perform a non-parametric one_way on all arguments(groups).
+# Assumption is arguments > 2
+# ------------------------------------------------------------
 def kruskal(*groups):
     alpha = 0.05
     copy = []
@@ -55,6 +61,8 @@ def kruskal(*groups):
     return h_value, p_value
 
 
+# Tests if data is normally distributed
+# ----------------------------------------
 def norm_test(data, alpha=0.05, display=True):
     if any(is_iterable(i) for i in data):
         data = np.concatenate(data)
@@ -75,6 +83,8 @@ def norm_test(data, alpha=0.05, display=True):
     return w_value, p_value
 
 
+# Tests to see if arguments(groups) have equal variance
+# ------------------------------------------------------
 def equal_variance(*groups):
     alpha = 0.05
     copy = []
@@ -114,6 +124,10 @@ def equal_variance(*groups):
     return statistic, p_value
 
 
+# Performs Student's T-test
+# If variances are not equal, performs Welch's T-test
+# If ydata is not a collection, a 1 sample T-test is performed
+# --------------------------------------------------------------
 def t_test(xdata, ydata, alpha=0.05):
     x = dropnan(xdata)
     if is_iterable(ydata):
@@ -134,6 +148,8 @@ def t_test(xdata, ydata, alpha=0.05):
     return t, p
 
 
+# Performs a linear regression on ydata as dependent on xdata
+# -------------------------------------------------------------
 def linear_regression(xdata, ydata):
     x, y = dropnan_intersect(xdata, ydata)
     if x.size < 3 or y.size < 3:
@@ -150,6 +166,9 @@ def linear_regression(xdata, ydata):
     return slope, intercept, r2, p_value, std_err
 
 
+# Calculates the Pearson correlation coefficient between xdata and ydata
+# If xdata and ydata are not normally distributed, Spearman's is used
+# ------------------------------------------------------------------------
 def correlate(xdata, ydata, alpha=0.05):
     x, y = dropnan_intersect(xdata, ydata)
     if x.size < 3 or y.size < 3:
@@ -168,6 +187,8 @@ def correlate(xdata, ydata, alpha=0.05):
     return r, p
 
 
+# Calculates and displays basic stats of data
+# ---------------------------------------------
 def statistics(data):
     v = dropnan(data)
     if v.size > 1:
@@ -202,6 +223,8 @@ def statistics(data):
     return 1, v[0], 0, 0, 0, v[0], v[0], v[0], v[0], v[0], 0, 0
 
 
+# Removes NaN data from xdata and ydata, only preserving values where xdata and ydata are True
+# ----------------------------------------------------------------------------------------------
 def dropnan_intersect(xdata, ydata):
     x = np.asarray(strip(xdata))[~np.isnan(np.asarray(strip(ydata)))]
     x = x[~np.isnan(x)]
@@ -210,11 +233,15 @@ def dropnan_intersect(xdata, ydata):
     return x, y
 
 
+# Removes NaN values from data
+# ------------------------------
 def dropnan(data):
     d = np.asarray(strip(data))
     return d[~np.isnan(d)]
 
 
+# Removes values that are not of type int or float from data
+# -------------------------------------------------------------
 def strip(data):
     try:
         data.shape
@@ -225,6 +252,8 @@ def strip(data):
     return clean
 
 
+# Tests if data is a collection and not empty
+# --------------------------------------------
 def is_iterable(data):
     try:
         iter(data)
@@ -237,6 +266,8 @@ def is_iterable(data):
             return False
 
 
+# Returns the corresponding color tuple based on a numeric index
+# ----------------------------------------------------------------
 def get_color(num):
     colors = [(0, 0, 1, 1),
               (0, 0.5, 0, 1),
@@ -263,10 +294,14 @@ def get_color(num):
         return selected
 
 
+# Slices groups at the given index
+# -----------------------------------
 def slice_group(groups, index):
     return groups[:index] + groups[index + 1:]
 
 
+# Calculates basic stats for each specified group in groups
+# ----------------------------------------------------------
 def group_stats(data, groups):
     if not is_iterable(data):
         pass
@@ -296,9 +331,13 @@ def group_stats(data, groups):
         pass
 
 
+# Displays a histogram of data
+# ------------------------------
 def graph_histo(data, bins=20, name='Data', color='green', boxplot=True):
     x = dropnan(data)
     plt.figure(figsize=(5, 5))
+    if len(x) < bins:
+        bins = len(x)
     if boxplot:
         plt.subplot(211)
         plt.grid(plt.boxplot(x, vert=False, showmeans=True), which='major')
@@ -312,6 +351,8 @@ def graph_histo(data, bins=20, name='Data', color='green', boxplot=True):
     pass
 
 
+# Displays a scatter plot of xdata and ydata
+# ---------------------------------------------
 def graph_scatter(xdata, ydata, xname='x', yname='y', fit=True, pointstyle='k.', linestyle='r-'):
     x, y = dropnan_intersect(xdata, ydata)
     p = np.polyfit(x, y, 1, full=True)
@@ -324,6 +365,8 @@ def graph_scatter(xdata, ydata, xname='x', yname='y', fit=True, pointstyle='k.',
     pass
 
 
+# Displays box plots and a probability plot of values in each group in groups
+# ----------------------------------------------------------------------------
 def graph_boxplot(values, groups=[], xname='Values', categories='Categories', probplot=True):
     if not is_iterable(values):
         pass
@@ -365,6 +408,8 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
         pass
 
 
+# Main function that will perform an analysis based on the provided data
+# ------------------------------------------------------------------------
 def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, categories='Categories'):
     if any(is_iterable(x) for x in xdata):
         graph_boxplot(xdata, groups, xname, categories)
