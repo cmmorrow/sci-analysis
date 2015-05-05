@@ -23,12 +23,12 @@ def anova(*groups):
     f_value, p_value = st.f_oneway(*tuple(copy))
     print "ANOVA"
     print "--------"
-    print "p value = " + "{:.4f}".format(p_value)
     print "f value = " + "{:.4f}".format(f_value)
+    print "p value = " + "{:.4f}".format(p_value)
     if p_value < alpha:
-        print "Groups are not matched"
+        print "Group means are not matched"
     else:
-        print "Groups are matched"
+        print "Group means are matched"
     print ""
     return f_value, p_value
 
@@ -51,12 +51,12 @@ def kruskal(*groups):
     h_value, p_value = st.kruskal(*tuple(copy))
     print "Wilcoxon/Kruskal-Wallis"
     print "--------"
-    print "p value = " + "{:.4f}".format(p_value)
     print "H value = " + "{:.4f}".format(h_value)
+    print "p value = " + "{:.4f}".format(p_value)
     if p_value < alpha:
-        print "Groups are not matched"
+        print "Group means are not matched"
     else:
-        print "Groups are matched"
+        print "Group means are matched"
     print ""
     return h_value, p_value
 
@@ -73,8 +73,8 @@ def norm_test(data, alpha=0.05, display=True):
     if display:
         print "Shapiro-Wilk test for normality"
         print "--------"
-        print "p value = " + "{:.4f}".format(p_value)
         print "W value = " + "{:.4f}".format(w_value)
+        print "p value = " + "{:.4f}".format(p_value)
         if p_value < alpha:
             print "Data is not normally distributed"
         else:
@@ -102,9 +102,9 @@ def equal_variance(*groups):
         statistic, p_value = st.levene(*tuple(copy))
         print "Levene Test"
         print "-" * 8
-        print "p value = " + "{:.4f}".format(p_value)
         print "W value = " + "{:.4f}".format(statistic)
-        if p_value < alpha:
+        print "p value = " + "{:.4f}".format(p_value)
+        if p_value > alpha:
             print "Variances are not equal"
         else:
             print "Variances are equal"
@@ -114,9 +114,9 @@ def equal_variance(*groups):
         statistic, p_value = st.bartlett(*tuple(copy))
         print "Bartlett Test"
         print "-" * 8
-        print "p value = " + "{:.4f}".format(p_value)
         print "T value = " + "{:.4f}".format(statistic)
-        if p_value < alpha:
+        print "p value = " + "{:.4f}".format(p_value)
+        if p_value > alpha:
             print "Variances are not equal"
         else:
             print "Variances are equal"
@@ -132,7 +132,7 @@ def t_test(xdata, ydata, alpha=0.05):
     x = dropnan(xdata)
     if is_iterable(ydata):
         y = dropnan(ydata)
-        if equal_variance(xdata, ydata)[1] > alpha:
+        if equal_variance(xdata, ydata)[1] < alpha:
             t, p = st.ttest_ind(x, y, equal_var=True)
             print "t-test"
         else:
@@ -175,7 +175,8 @@ def correlate(xdata, ydata, alpha=0.05):
         return 0, 0
     print "Correlation"
     print "-" * 8
-    if norm_test(x, display=False, alpha=alpha)[1] > alpha and norm_test(y, display=False, alpha=alpha)[1] > alpha:
+#    if norm_test(x, display=False, alpha=alpha)[1] > alpha and norm_test(y, display=False, alpha=alpha)[1] > alpha:
+    if norm_test(np.concatenate([x,y]), display=False, alpha=alpha)[1] > alpha:
         r, p = st.pearsonr(x, y)
         print "Pearson Coeff:"
     else:
@@ -416,6 +417,7 @@ def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, catego
         group_stats(xdata, groups)
         equal_variance(*xdata)
         if norm_test(xdata, display=False)[1] < alpha:
+            #TODO: Change the logic to use anova if normal and equal variance
             kruskal(*xdata)
         else:
             anova(*xdata)
