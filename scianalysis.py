@@ -18,7 +18,7 @@ def anova(*groups):
         if len(v) == 0:
             continue
         copy.append(v)
-    if len(copy) < 2:
+    if len(copy) < 3:
         return 0, 0
     f_value, p_value = st.f_oneway(*tuple(copy))
     print "ANOVA"
@@ -46,7 +46,7 @@ def kruskal(*groups):
         if len(v) == 0:
             continue
         copy.append(v)
-    if len(copy) < 2:
+    if len(copy) < 3:
         return 0, 0
     h_value, p_value = st.kruskal(*tuple(copy))
     print "Wilcoxon/Kruskal-Wallis"
@@ -67,7 +67,7 @@ def norm_test(data, alpha=0.05, display=True):
     if any(is_iterable(i) for i in data):
         data = np.concatenate(data)
     x = dropnan(data)
-    if x.size < 3:
+    if x.size < 4:
         return 0, 0
     w_value, p_value = st.shapiro(x)
     if display:
@@ -95,7 +95,7 @@ def equal_variance(*groups):
         if len(v) == 0:
             continue
         copy.append(v)
-    if len(copy) < 2:
+    if len(copy) < 3:
         return 0, 0
     if norm_test(copy, display=False)[1] < alpha:
         # print "Data is not normally distributed"
@@ -104,7 +104,7 @@ def equal_variance(*groups):
         print "-" * 8
         print "W value = " + "{:.4f}".format(statistic)
         print "p value = " + "{:.4f}".format(p_value)
-        if p_value > alpha:
+        if p_value < alpha:
             print "Variances are not equal"
         else:
             print "Variances are equal"
@@ -116,7 +116,7 @@ def equal_variance(*groups):
         print "-" * 8
         print "T value = " + "{:.4f}".format(statistic)
         print "p value = " + "{:.4f}".format(p_value)
-        if p_value > alpha:
+        if p_value < alpha:
             print "Variances are not equal"
         else:
             print "Variances are equal"
@@ -152,7 +152,7 @@ def t_test(xdata, ydata, alpha=0.05):
 # -------------------------------------------------------------
 def linear_regression(xdata, ydata):
     x, y = dropnan_intersect(xdata, ydata)
-    if x.size < 3 or y.size < 3:
+    if x.size < 4 or y.size < 4:
         return 0, 0, 0, 0, 0
     slope, intercept, r2, p_value, std_err = st.linregress(x, y)
     print "Linear Regression"
@@ -171,7 +171,7 @@ def linear_regression(xdata, ydata):
 # ------------------------------------------------------------------------
 def correlate(xdata, ydata, alpha=0.05):
     x, y = dropnan_intersect(xdata, ydata)
-    if x.size < 3 or y.size < 3:
+    if x.size < 4 or y.size < 4:
         return 0, 0
     print "Correlation"
     print "-" * 8
@@ -238,7 +238,8 @@ def dropnan_intersect(xdata, ydata):
 # ------------------------------
 def dropnan(data):
     d = np.asarray(strip(data))
-    return d[~np.isnan(d)]
+    d = d[~np.isnan(d)]
+    return d
 
 
 # Removes values that are not of type int or float from data
