@@ -8,9 +8,15 @@ import scipy.stats as st
 # Perform a one_way anova on all arguments(groups).
 # Assumption is arguments have equal variance, are normally distributed and > 2
 # ------------------------------------------------------------------------------
-def anova(*groups):
+def anova(*groups, **parms):
     alpha = 0.05
     copy = []
+
+    parm_list = sorted(parms.keys())
+    for parm in parm_list:
+        if parm == "alpha":
+            alpha = parm
+
     for group in groups:
         if len(group) == 0:
             continue
@@ -26,9 +32,9 @@ def anova(*groups):
     print "f value = " + "{:.4f}".format(f_value)
     print "p value = " + "{:.4f}".format(p_value)
     if p_value < alpha:
-        print "Group means are not matched"
+        print "HA: Group means are not matched"
     else:
-        print "Group means are matched"
+        print "H0: Group means are matched"
     print ""
     return f_value, p_value
 
@@ -36,9 +42,15 @@ def anova(*groups):
 # Perform a non-parametric one_way on all arguments(groups).
 # Assumption is arguments > 2
 # ------------------------------------------------------------
-def kruskal(*groups):
+def kruskal(*groups, **parms):
     alpha = 0.05
     copy = []
+
+    parm_list = sorted(parms.keys())
+    for parm in parm_list:
+        if parm == 'alpha':
+            alpha = parm
+
     for group in groups:
         if len(group) == 0:
             continue
@@ -54,9 +66,9 @@ def kruskal(*groups):
     print "H value = " + "{:.4f}".format(h_value)
     print "p value = " + "{:.4f}".format(p_value)
     if p_value < alpha:
-        print "Group means are not matched"
+        print "HA: Group means are not matched"
     else:
-        print "Group means are matched"
+        print "H0: Group means are matched"
     print ""
     return h_value, p_value
 
@@ -76,18 +88,24 @@ def norm_test(data, alpha=0.05, display=True):
         print "W value = " + "{:.4f}".format(w_value)
         print "p value = " + "{:.4f}".format(p_value)
         if p_value < alpha:
-            print "Data is not normally distributed"
+            print "HA: Data is not normally distributed"
         else:
-            print "Data is normally distributed"
+            print "H0: Data is normally distributed"
         print ""
     return w_value, p_value
 
 
 # Tests to see if arguments(groups) have equal variance
 # ------------------------------------------------------
-def equal_variance(*groups):
+def equal_variance(*groups, **parms):
     alpha = 0.05
     copy = []
+
+    parm_list = sorted(parms.keys())
+    for parm in parm_list:
+        if parm == 'alpha':
+            alpha = parm
+
     for group in groups:
         if len(group) == 0:
             continue
@@ -105,9 +123,9 @@ def equal_variance(*groups):
         print "W value = " + "{:.4f}".format(statistic)
         print "p value = " + "{:.4f}".format(p_value)
         if p_value < alpha:
-            print "Variances are not equal"
+            print "HA: Variances are not equal"
         else:
-            print "Variances are equal"
+            print "H0: Variances are equal"
         print ""
     else:
         # print "Data is normal"
@@ -117,9 +135,9 @@ def equal_variance(*groups):
         print "T value = " + "{:.4f}".format(statistic)
         print "p value = " + "{:.4f}".format(p_value)
         if p_value < alpha:
-            print "Variances are not equal"
+            print "HA: Variances are not equal"
         else:
-            print "Variances are equal"
+            print "H0: Variances are equal"
         print ""
     return statistic, p_value
 
@@ -144,13 +162,17 @@ def t_test(xdata, ydata, alpha=0.05):
     print "-" * 8
     print "t = " + str(t)
     print "p = " + str(p)
+    if p < alpha:
+        print "Reject H0: Means are different"
+    else:
+        print "H0: Means are matched"
     print ""
     return t, p
 
 
 # Performs a linear regression on ydata as dependent on xdata
 # -------------------------------------------------------------
-def linear_regression(xdata, ydata):
+def linear_regression(xdata, ydata, alpha=0.05):
     x, y = dropnan_intersect(xdata, ydata)
     if x.size < 4 or y.size < 4:
         return 0, 0, 0, 0, 0
@@ -162,6 +184,10 @@ def linear_regression(xdata, ydata):
     print "R^2 = " + "{:.4f}".format(r2)
     print "p = " + "{:.4f}".format(p_value)
     print "std err = " + "{:.4f}".format(std_err)
+    if p_value < alpha:
+        print "HA: The relationship between predictor and response is significant"
+    else:
+        print "H0: There is no significant relationship between predictor and response"
     print ""
     return slope, intercept, r2, p_value, std_err
 
@@ -176,7 +202,7 @@ def correlate(xdata, ydata, alpha=0.05):
     print "Correlation"
     print "-" * 8
 #    if norm_test(x, display=False, alpha=alpha)[1] > alpha and norm_test(y, display=False, alpha=alpha)[1] > alpha:
-    if norm_test(np.concatenate([x,y]), display=False, alpha=alpha)[1] > alpha:
+    if norm_test(np.concatenate([x, y]), display=False, alpha=alpha)[1] > alpha:
         r, p = st.pearsonr(x, y)
         print "Pearson Coeff:"
     else:
@@ -184,16 +210,21 @@ def correlate(xdata, ydata, alpha=0.05):
         print "Spearman Coeff:"
     print "r = " + "{:.4f}".format(r)
     print "p = " + "{:.4f}".format(p)
+    if p < alpha:
+        print "HA: There is a relationship between response and predictor"
+    else:
+        print "H0: There is no significant relationship between response and predictor"
     print ""
     return r, p
 
 
 # Calculates and displays basic stats of data
 # ---------------------------------------------
-def statistics(data):
+def statistics(data, sample=True):
     v = dropnan(data)
     if v.size > 1:
-        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v)
+        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=1)
+        #TODO: Implement ddof code
         # count = v.size
         #		mean = np.mean(v)
         #		std = np.std(v)
@@ -237,35 +268,41 @@ def dropnan_intersect(xdata, ydata):
 # Removes NaN values from data
 # ------------------------------
 def dropnan(data):
-    d = np.asarray(strip(data))
-    d = d[~np.isnan(d)]
-    return d
+    data = strip(data)
+    return data[~np.isnan(data)]
 
 
-# Removes values that are not of type int or float from data
-# -------------------------------------------------------------
+# Removes strings in data and returns data as an array of floats
+# --------------------------------------------------------------
 def strip(data):
-    try:
-        data.shape
-        clean = data
-    except AttributeError:
-        l = list(data)
-        clean = filter(lambda x: type(x) == int or type(x) == float, l)
-    return clean
+    if not isarray(data):
+        data = np.array(data)
+    if data.dtype.num == 18:
+        data = np.where([str(x).isdigit() for x in data], data, float("nan")).astype('float')
+#   clean = [x if str(x).isdigit() else float('nan') for x in data]
+    return data
 
 
 # Tests if data is a collection and not empty
 # --------------------------------------------
 def is_iterable(data):
     try:
-        iter(data)
-    except TypeError:
-        return False
-    else:
         if len(data) > 0:
             return True
         else:
             return False
+    except TypeError:
+        return False
+
+
+# Tests if data is a numPy array object
+# -------------------------------------
+def isarray(data):
+    try:
+        data.shape
+        return True
+    except AttributeError:
+        return False
 
 
 # Returns the corresponding color tuple based on a numeric index
@@ -281,7 +318,7 @@ def get_color(num):
               (0.5, 0, 1, 1),
               (0.5, 1, 0, 1),
               (1, 1, 1, 1)
-    ]
+              ]
     desired_color = []
     if num < 0:
         num *= -1
@@ -323,7 +360,7 @@ def group_stats(data, groups):
                     continue
                 count = len(clean)
                 mean = "{:.3f}".format(np.mean(clean))
-                std = "{:.3f}".format(np.std(clean))
+                std = "{:.3f}".format(np.std(clean, ddof=1))
                 vmax = "{:.3f}".format(np.amax(clean))
                 median = "{:.3f}".format(np.median(clean))
                 vmin = "{:.3f}".format(np.amin(clean))
@@ -416,8 +453,8 @@ def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, catego
     if any(is_iterable(x) for x in xdata):
         graph_boxplot(xdata, groups, xname, categories)
         group_stats(xdata, groups)
-        equal_variance(*xdata)
-        if norm_test(xdata, display=False)[1] < alpha:
+        stat, p = equal_variance(*xdata)
+        if norm_test(xdata, display=False)[1] < alpha or p < alpha:
             #TODO: Change the logic to use anova if normal and equal variance
             kruskal(*xdata)
         else:
