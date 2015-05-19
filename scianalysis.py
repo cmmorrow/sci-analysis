@@ -258,11 +258,10 @@ def statistics(data, sample=True):
 # Removes NaN data from xdata and ydata, only preserving values where xdata and ydata are True
 # ----------------------------------------------------------------------------------------------
 def dropnan_intersect(xdata, ydata):
-    x = np.asarray(strip(xdata))[~np.isnan(np.asarray(strip(ydata)))]
-    x = x[~np.isnan(x)]
-    y = np.asarray(strip(ydata))[~np.isnan(np.asarray(strip(xdata)))]
-    y = y[~np.isnan(y)]
-    return x, y
+    x = strip(xdata)
+    y = strip(ydata)
+    c = np.logical_and(~np.isnan(x), ~np.isnan(y))
+    return x[c], y[c]
 
 
 # Removes NaN values from data
