@@ -222,9 +222,11 @@ def correlate(xdata, ydata, alpha=0.05):
 # ---------------------------------------------
 def statistics(data, sample=True):
     v = clean(data)
+    dof = 1
     if v.size > 1:
-        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=1)
-        #TODO: Implement ddof code
+        if sample:
+            dof = 2
+        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=dof)
         # count = v.size
         #		mean = np.mean(v)
         #		std = np.std(v)
@@ -274,8 +276,8 @@ def dropnan(data):
 # Removes strings in data and returns data as an array of floats
 # --------------------------------------------------------------
 def strip(data):
-#    if not isarray(data):
-#        data = np.array(data)
+    if not isarray(data):
+        data = np.array(data)
     if data.dtype.num == 18:
         data = np.where([str(x).isdigit() for x in data], data, float("nan")).astype('float')
 #   clean = [x if str(x).isdigit() else float('nan') for x in data]
@@ -307,12 +309,12 @@ def isarray(data):
 # Cleans the data and returns a numPy array-like object
 # -------------------------------------------------------
 def clean(xdata, ydata = []):
-    if not isarray(xdata):
-        xdata = np.array(xdata)
+#    if not isarray(xdata):
+#        xdata = np.array(xdata)
     # TODO: Check xdata and ydata object type for equivalence
     if len(ydata) > 0:
-        if not isarray(ydata):
-            ydata = np.array(ydata)
+ #       if not isarray(ydata):
+ #           ydata = np.array(ydata)
         return dropnan_intersect(strip(xdata), strip(ydata))
     else:
         return dropnan(strip(xdata))
@@ -468,11 +470,10 @@ def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, catego
         graph_boxplot(xdata, groups, xname, categories)
         group_stats(xdata, groups)
         stat, p = equal_variance(*xdata)
-        if norm_test(xdata, display=False)[1] < alpha or p < alpha:
-            #TODO: Change the logic to use anova if normal and equal variance
-            kruskal(*xdata)
-        else:
+        if norm_test(xdata, display=False)[1] > alpha and p > alpha:
             anova(*xdata)
+        else:
+            kruskal(*xdata)
         pass
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
