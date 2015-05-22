@@ -222,10 +222,10 @@ def correlate(xdata, ydata, alpha=0.05):
 # ---------------------------------------------
 def statistics(data, sample=True):
     v = clean(data)
-    dof = 1
+    dof = 0
     if v.size > 1:
         if sample:
-            dof = 2
+            dof = 1
         count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=dof)
         # count = v.size
         #		mean = np.mean(v)
