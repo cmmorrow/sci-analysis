@@ -18,10 +18,10 @@ def anova(*groups, **parms):
             alpha = parm
 
     for group in groups:
-        if len(group) == 0:
+        if len(group) < 2:
             continue
         v = clean(group)
-        if len(v) == 0:
+        if len(v) < 2:
             continue
         copy.append(v)
     if len(copy) < 3:
@@ -52,10 +52,10 @@ def kruskal(*groups, **parms):
             alpha = parm
 
     for group in groups:
-        if len(group) == 0:
+        if len(group) < 2:
             continue
         v = clean(group)
-        if len(v) == 0:
+        if len(v) < 2:
             continue
         copy.append(v)
     if len(copy) < 3:
@@ -107,10 +107,10 @@ def equal_variance(*groups, **parms):
             alpha = parm
 
     for group in groups:
-        if len(group) == 0:
+        if len(group) < 2:
             continue
         v = clean(group)
-        if len(v) == 0:
+        if len(v) < 2:
             continue
         copy.append(v)
     if len(copy) < 3:
