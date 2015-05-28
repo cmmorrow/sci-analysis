@@ -226,15 +226,17 @@ def statistics(data, sample=True):
     if v.size > 1:
         if sample:
             dof = 1
-        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=dof)
-        # count = v.size
-        #		mean = np.mean(v)
-        #		std = np.std(v)
-        std = np.sqrt(variance)
+#        count, (vmin, vmax), mean, variance, skew, kurt = st.describe(v, ddof=dof)
+        count = v.size
+        mean = np.mean(v)
+        std = np.std(v, ddof=dof)
+        #std = np.sqrt(variance)
         median = np.median(v)
-        #		vmin = np.amin(v)
-        #		vmax = np.amax(v)
+        vmin = np.amin(v)
+        vmax = np.amax(v)
         vrange = vmax - vmin
+        skew = st.skew(v)
+        kurt = st.kurtosis(v)
         q1 = np.percentile(v, 25)
         q3 = np.percentile(v, 75)
         iqr = q3 - q1
