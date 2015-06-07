@@ -11,9 +11,9 @@ Currently, sci_analysis can only be used for analyzing numeric data. Categorical
 
 ### How do I use sci_analysis?
 Before using sci_analysis, be sure the following three packages are installed:
-	* numpy
-	* scipy
-	* matplotlib
+	- numpy
+	- scipy
+	- matplotlib
 	
 Sci_analysis is also compatible with pandas and works best in the iPython Notebook.
 
