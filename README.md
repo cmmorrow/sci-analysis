@@ -104,7 +104,7 @@ dtype: int64
 The easiest and fastest way to use sci_analysis is to call it's `analyze` function. Here's the signature for the `analyze` function:
 
 ```python
-def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, categories='Categories'):
+def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05, categories='Categories'):
 ```
 
 `analyze` will detect the desired type of data analysis to perform based on whether the `ydata` argument is supplied, and whether the `xdata` argument is a two-dimensional array-like object. 
