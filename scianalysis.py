@@ -466,10 +466,13 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
 
 # Main function that will perform an analysis based on the provided data
 # ------------------------------------------------------------------------
-def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, categories='Categories'):
+def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05, categories='Categories'):
     # Compare Group Means and Variance
     if any(is_iterable(x) for x in xdata):
-        graph_boxplot(xdata, groups, xname, categories)
+        label = 'x'
+        if xname:
+            label = xname
+        graph_boxplot(xdata, groups, label, categories)
         group_stats(xdata, groups)
         stat, p = equal_variance(*xdata)
         if norm_test(xdata, display=False)[1] > alpha and p > alpha:
@@ -479,13 +482,21 @@ def analyze(xdata, ydata=[], groups=[], xname='x', yname='y', alpha=0.05, catego
         pass
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
-        graph_scatter(xdata, ydata, xname, yname)
+        label = 'x'
+        if xname:
+            label = xname
+        graph_scatter(xdata, ydata, label, yname)
         correlate(xdata, ydata)
         linear_regression(xdata, ydata)
         pass
     # Histogram and Basic Stats
     elif is_iterable(xdata):
-        graph_histo(xdata, name=xname)
+        label = 'Data'
+        if name:
+            label = name
+        elif xname:
+            label = xname
+        graph_histo(xdata, name=label)
         statistics(xdata)
         norm_test(xdata)
         pass

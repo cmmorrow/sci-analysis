@@ -9,7 +9,7 @@ Sci_analysis is a python module for performing rapid statistical data analysis. 
 
 Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.
 
-### How do I use sci_analysis?
+### Getting started with sci_analysis
 Before using sci_analysis, be sure the following three packages are installed:
 	- numpy
 	- scipy
@@ -73,7 +73,7 @@ H0: Data is normally distributed
 
 You should probably note that numpy was only imported for the purpose of the above example. Sci_analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. Sci_analysis can work with regular python sequences as in the following:
 
-```
+```python
 In[6]: a.clean([6, 9, 12, 15])
 Out[6]: array([ 6,  9, 12, 15])
 
@@ -81,7 +81,7 @@ In[7]: a.clean((4, 8, 12, 16, 20))
 Out[7]: array([ 4,  8, 12, 16, 20])
 ```
 
-Sci_analysis is also compatible with pandas Series and DataFrame objects. To use pandas with sci_analysis, be sure to import it to your project with:
+Sci_analysis is also compatible with the pandas Series object. To use pandas with sci_analysis, be sure to import it to your project with:
 
 ```python
 import pandas as pd
@@ -89,7 +89,7 @@ import pandas as pd
 
 The sci_analysis helper functions can accept a pandas Series object and return a Series as in the example below:
 
-```
+```python
 In[9]: a.clean(pd.Series([6, 9, 12, 15]))
 Out[9]: 
 0     6
@@ -98,3 +98,62 @@ Out[9]:
 3    15
 dtype: int64
 ```
+
+### How do I use sci_analysis?
+
+The easiest and fastest way to use sci_analysis is to call it's `analyze` function. Here's the signature for the `analyze` function:
+
+```python
+def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05, categories='Categories'):
+```
+
+`analyze` will detect the desired type of data analysis to perform based on whether the `ydata` argument is supplied, and whether the `xdata` argument is a two-dimensional array-like object. 
+
+The `xdata` and `ydata` arguments can accept most python iterable objects, with the exception of strings. For example, `xdata` will accept a python list or tuple, a numpy ndarray, or a pandas Series. Internally, lists and tuples are converted to ndarrays and Series objects are manipulated using the ndarray methods.
+
+If only the `xdata` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
+
+If `xdata` and `ydata` are supplied and are both one-dimensional vectors, the correlation between the two vectors will be graphed and calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
+
+```python
+In[24]: example1 = numpy.array([1.0, 2.0, float('nan'), 4.0, float('nan'), 6.0])
+In[25]: example2 = numpy.array([10.0, 20.0, float('nan'), 40.0, 50.0, 60.0])
+In[26]: a.dropnan_intersect(example1, example2)
+
+Out[26]: (array([ 1.,  2.,  4.,  6.]), array([ 10.,  20.,  40.,  60.]))
+```
+
+The `dropnan_intersect` function performs what the name implies --- any values that are not-a-number in either vector at the same index will be dropped from the output tuple. It's also important to note that both vector lengths must be equal.
+
+If `xdata` is a sequence of vectors, summary statistics will be reported for each vector. If the concatenation of each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.
+
+It is important to note that the vectors should be independent from one another --- that is to say, there should not be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results. For example, a proper use case would be if you had a vector with measurement data and another vector (or vectors) that represent a grouping applied to the measurement data. In this case, each group should be represented by it's own vector, which are then all wrapped in a sequence. the `analyze` function accepts a `groups` argument as a list of strings of grouping names. The order of the group names should match the order of the vectors passed to `xdata`. For example:
+
+```python
+In[10]: group_a = np.random.randn(6)
+In[11]: group_b = np.random.randn(7)
+In[12]: group_c = np.random.randn(5)
+In[13]: group_d = np.random.randn(8)
+In[14]: names = ["group_a", "group_b", "group_c", "group_d"]
+In[17]: data = [group_a, group_b, group_c, group_d]
+In[18]: a.analyze(data, groups=names)
+Count     Mean      Std.      Max       50%       Min       Group
+----------------------------------------------------------------------
+6         0.280     1.008     1.489     0.458     -1.555    group_a   
+7         0.131     1.596     1.980     0.678     -2.058    group_b   
+5         -0.300    0.932     1.061     -0.457    -1.428    group_c   
+8         0.246     0.944     1.964     0.369     -1.284    group_d   
+
+Bartlett Test
+--------
+T value = 2.3708
+p value = 0.4991
+H0: Variances are equal
+
+ANOVA
+--------
+f value = 0.2832
+p value = 0.8369
+H0: Group means are matched
+```
+
