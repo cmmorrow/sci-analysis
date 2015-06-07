@@ -11,6 +11,7 @@ Currently, sci_analysis can only be used for analyzing numeric data. Categorical
 
 ### Getting started with sci_analysis
 Before using sci_analysis, be sure the following three packages are installed:
+
 	- numpy
 	- scipy
 	- matplotlib
