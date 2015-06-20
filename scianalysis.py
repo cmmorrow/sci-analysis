@@ -429,7 +429,6 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
     else:
         v = []
         prob = []
-        # colors = ('blue', 'green', 'red', 'cyan', 'magenta', 'yellow')
         if not groups:
             groups = range(1, len(values) + 1)
         for i, value in enumerate(values):
