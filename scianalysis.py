@@ -17,6 +17,8 @@ def anova(*groups, **parms):
         if parm == "alpha":
             alpha = parm
 
+    if isdict(groups[0]):
+        groups = groups[0].values()
     for group in groups:
         if len(group) < 2:
             continue
@@ -51,6 +53,8 @@ def kruskal(*groups, **parms):
         if parm == 'alpha':
             alpha = parm
 
+    if isdict(groups[0]):
+        groups = groups[0].values()
     for group in groups:
         if len(group) < 2:
             continue
@@ -61,7 +65,7 @@ def kruskal(*groups, **parms):
     if len(copy) < 3:
         return 0, 0
     h_value, p_value = st.kruskal(*tuple(copy))
-    print "Wilcoxon/Kruskal-Wallis"
+    print "Kruskal-Wallis"
     print "-" * 8
     print "H value = " + "{:.4f}".format(h_value)
     print "p value = " + "{:.4f}".format(p_value)
@@ -106,6 +110,8 @@ def equal_variance(*groups, **parms):
         if parm == 'alpha':
             alpha = parm
 
+    if isdict(groups[0]):
+        groups = groups[0].values()
     for group in groups:
         if len(group) < 2:
             continue
@@ -309,6 +315,14 @@ def isarray(data):
     except AttributeError:
         return False
 
+# Test if data is a dictionary object
+# -----------------------------------
+def isdict(data):
+    try:
+        data.keys()
+        return True
+    except AttributeError:
+        return False
 
 # Cleans the data and returns a numPy array-like object
 # -------------------------------------------------------
@@ -360,6 +374,9 @@ def group_stats(data, groups):
     if not is_iterable(data):
         pass
     else:
+        if isdict(data):
+            groups = data.keys()
+            data = data.values()
         if not groups:
             groups = range(1, len(data) + 1)
         print "Count     Mean      Std.      Max       50%       Min       Group"
@@ -427,6 +444,9 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
     else:
         v = []
         prob = []
+        if isdict(values):
+            groups = values.keys()
+            values = values.values()
         if not groups:
 
             # Create numberic group names if not specified
@@ -471,6 +491,10 @@ def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05
 
     # Compare Group Means and Variance
     if any(is_iterable(x) for x in xdata):
+
+        if isdict(xdata):
+            groups = xdata.keys()
+            xdata = xdata.values()
 
         # Apply the x data label
         label = 'x'
