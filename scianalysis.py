@@ -262,8 +262,6 @@ def statistics(data, sample=True):
 # Removes NaN data from numPy arrays xdata and ydata, only preserving values where xdata and ydata are True
 # ---------------------------------------------------------------------------------------------------------
 def dropnan_intersect(xdata, ydata):
-#    x = strip(xdata)
-#    y = strip(ydata)
     c = np.logical_and(~np.isnan(xdata), ~np.isnan(ydata))
     return xdata[c], ydata[c]
 
@@ -271,7 +269,6 @@ def dropnan_intersect(xdata, ydata):
 # Removes NaN values from numPy array data
 # ----------------------------------------
 def dropnan(data):
-#    data = strip(data)
     return data[~np.isnan(data)]
 
 
@@ -279,10 +276,15 @@ def dropnan(data):
 # --------------------------------------------------------------
 def strip(data):
     if not isarray(data):
+        for i in range(len(data)):
+            try:
+                data[i] = float(data[i])
+            except ValueError:
+                data[i] = float("nan")
+            except KeyError:
+                data = strip(data.values())
         data = np.array(data)
-    if data.dtype.num == 18:
-        data = np.where([str(x).isdigit() for x in data], data, float("nan")).astype('float')
-#   clean = [x if str(x).isdigit() else float('nan') for x in data]
+    data.astype('float')
     return data
 
 
@@ -311,12 +313,8 @@ def isarray(data):
 # Cleans the data and returns a numPy array-like object
 # -------------------------------------------------------
 def clean(xdata, ydata = []):
-#    if not isarray(xdata):
-#        xdata = np.array(xdata)
     # TODO: Check xdata and ydata object type for equivalence
     if len(ydata) > 0:
- #       if not isarray(ydata):
- #           ydata = np.array(ydata)
         return dropnan_intersect(strip(xdata), strip(ydata))
     else:
         return dropnan(strip(xdata))
@@ -430,8 +428,12 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
         v = []
         prob = []
         if not groups:
+
+            # Create numberic group names if not specified
             groups = range(1, len(values) + 1)
         for i, value in enumerate(values):
+
+            # If a group is null, don't display it
             if len(value) == 0:
                 groups = slice_group(groups, i)
                 continue
@@ -466,35 +468,53 @@ def graph_boxplot(values, groups=[], xname='Values', categories='Categories', pr
 # Main function that will perform an analysis based on the provided data
 # ------------------------------------------------------------------------
 def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05, categories='Categories'):
+
     # Compare Group Means and Variance
     if any(is_iterable(x) for x in xdata):
+
+        # Apply the x data label
         label = 'x'
         if xname:
             label = xname
+
+        # Show the box plot and stats
         graph_boxplot(xdata, groups, label, categories)
         group_stats(xdata, groups)
         stat, p = equal_variance(*xdata)
+
+        # If normally distributed and variances are equal, perform one-way ANOVA
+        # Otherwise, perform a non-parametric Kruskal-Wallis test
         if norm_test(xdata, display=False)[1] > alpha and p > alpha:
             anova(*xdata)
         else:
             kruskal(*xdata)
         pass
+
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
+
+        # Apply the x data label
         label = 'x'
         if xname:
             label = xname
+
+        # Show the scatter plot, correlation and regression stats
         graph_scatter(xdata, ydata, label, yname)
         correlate(xdata, ydata)
         linear_regression(xdata, ydata)
         pass
+
     # Histogram and Basic Stats
     elif is_iterable(xdata):
+
+        # Apply the data label
         label = 'Data'
         if name:
             label = name
         elif xname:
             label = xname
+
+        # Show the histogram and stats
         graph_histo(xdata, name=label)
         statistics(xdata)
         norm_test(xdata)
