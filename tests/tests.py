@@ -42,7 +42,7 @@ class NormTest(Test):
     """
 
     def run(self):
-
+        if any()
 
 
         if not operations.is_vector(self.data):

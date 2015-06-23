@@ -1,5 +1,6 @@
-from . import vector
+#from . vector import Vector
 import numpy as np
+import vector
 
 
 def drop_nan(v):
@@ -25,4 +26,34 @@ def is_vector(d):
     if isinstance(d, vector.Vector):
         return True
     else:
+        return False
+
+
+def is_iterable(d):
+    try:
+        if len(d) > 0:
+            return True
+        else:
+            return False
+    except TypeError:
+        return False
+
+
+def is_array(d):
+    """ Tests if data is a numPy Array object
+    """
+    try:
+        d.shape
+        return True
+    except AttributeError:
+        return False
+
+
+def is_dict(d):
+    """ Test if data is a dictionary object
+    """
+    try:
+        d.keys()
+        return True
+    except AttributeError:
         return False
