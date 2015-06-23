@@ -8,33 +8,41 @@ class Test:
     """
 
     def __init__(self, data, alpha=0.05, display=True):
+
+        """Set members """
         self.data = data
         self.alpha = alpha
         self.display = display
         self.results = 0, 1
-        self.run()
+
+        """If data is not a vector, wrap it in a vector object """
+        if not operations.is_vector(data):
+            self.data = vector.Vector(data)
+
+        """Remove NaN values from the vector"""
+        self.data = operations.drop_nan(self.data)
+
+        """Run the test and display the results"""
+        self.results = self.run()
         if display:
             self.output()
             if self.results[1] > alpha:
                 self.h0()
             else:
                 self.ha()
+            print ""
 
     def run(self):
-        self.results = results = 0, 1
-        return results
+        return 0, 1
 
     def output(self):
-        values = self.run()
-        print str(values[0]) + ", " + str(values[1])
+        print str(self.results[0]) + ", " + str(self.results[1])
 
     def h0(self):
         print "H0: "
-        pass
 
     def ha(self):
         print "HA: "
-        pass
 
 
 class NormTest(Test):
@@ -42,14 +50,20 @@ class NormTest(Test):
     """
 
     def run(self):
-        if any()
+        w_value, p_value = st.shapiro(self.data)
+        return w_value, p_value
 
+    def output(self):
+        name = "Shapiro-Wilk test for normality"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print "W value = " + "{:.4f}".format(self.results[0])
+        print "p value = " + "{:.4f}".format(self.results[1])
 
-        if not operations.is_vector(self.data):
-            data = operations.cat(self.data)
-        else:
-            data = operations.cat(self.data.data)
-        data = vector.Vector(self.data)
+    def h0(self):
+        print "H0: Data is normally distributed"
 
-
-
+    def ha(self):
+        print "HA: Data is not normally distributed"

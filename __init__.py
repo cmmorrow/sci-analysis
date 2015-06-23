@@ -1,1 +1,1 @@
-__all__ = ["vector"]
+__all__ = ["vector", "tests"]

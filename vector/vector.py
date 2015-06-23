@@ -18,7 +18,6 @@ class Vector:
                 data = self.flatten(data.values())
             if is_iterable(data):
                 self.data = np.array(self.to_float(data))
-        self.__len__ = len(self.data)
         self.type = self.data.dtype
 
     def to_float(self, data):
@@ -32,7 +31,7 @@ class Vector:
                 float_list.append(float("nan"))
         return float_list
 
-    def append_to(self, vector):
+    def append_vector(self, vector):
         """ Appends data from vector to this Vector
         """
         np.append(self.data, vector.data)
@@ -48,3 +47,12 @@ class Vector:
             else:
                 flat.append(row)
         return flat
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, item):
+        return self.data[item]
+
+    def __contains__(self, item):
+        return item in self.data
