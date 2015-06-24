@@ -131,7 +131,7 @@ class Correlation(Comparison):
     __min_size = 3
 
     def run(self):
-        if NormTest(np.concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha)[0] > self.alpha:
+        if NormTest(np.concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha).results[0] > self.alpha:
             r_value, p_value = st.pearsonr(self.xdata, self.ydata)
             r = "pearson"
         else:
@@ -146,9 +146,9 @@ class Correlation(Comparison):
         print "-" * len(name)
         print ""
         if self.results[2] == "pearson":
-            print "    Pearson Coeff:"
+            print "Pearson Coeff:"
         else:
-            print "    Spearman Coeff:"
+            print "Spearman Coeff:"
         print "r = " + "{:.4f}".format(self.results[1])
         print "p = " + "{:.4f}".format(self.results[0])
         print ""
