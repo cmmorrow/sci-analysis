@@ -1,4 +1,5 @@
 import scipy.stats as st
+import numpy as np
 from ..vector import vector
 from ..vector import operations
 
@@ -116,6 +117,40 @@ class LinearRegression(Comparison):
         print "R^2       = " + "{:.4f}".format(self.results[3])
         print "std err   = " + "{:.4f}".format(self.results[4])
         print "p value   = " + "{:.4f}".format(self.results[0])
+        print ""
+
+    def h0(self):
+        print "H0: There is no significant relationship between predictor and response"
+
+    def ha(self):
+        print "HA: There is a significant relationship between predictor and response"
+
+
+class Correlation(Comparison):
+
+    __min_size = 3
+
+    def run(self):
+        if NormTest(np.concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha)[0] > self.alpha:
+            r_value, p_value = st.pearsonr(self.xdata, self.ydata)
+            r = "pearson"
+        else:
+            r_value, p_value = st.spearmanr(self.xdata, self.ydata)
+            r = "spearman"
+        return p_value, r_value, r
+
+    def output(self):
+        name = "Correlation"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        if self.results[2] == "pearson":
+            print "    Pearson Coeff:"
+        else:
+            print "    Spearman Coeff:"
+        print "r = " + "{:.4f}".format(self.results[1])
+        print "p = " + "{:.4f}".format(self.results[0])
         print ""
 
     def h0(self):

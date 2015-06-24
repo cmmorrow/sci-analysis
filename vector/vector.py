@@ -8,9 +8,9 @@ class Vector:
     """ The base data container class used by sci-analysis
     """
 
-    def __init__(self, data):
+    def __init__(self, data=None):
 
-        self.data = np.empty
+        self.data = np.empty(1)
         if is_array(data):
             self.data = data
         else:
