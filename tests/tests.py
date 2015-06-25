@@ -37,7 +37,7 @@ class Test:
             print ""
 
     def run(self):
-        return 0, 1
+        return 1, 0
 
     def output(self):
         print str(self.results[1]) + ", " + str(self.results[0])
@@ -47,6 +47,33 @@ class Test:
 
     def ha(self):
         print "HA: "
+
+
+class GroupTest(Test):
+
+    def __init__(self, *groups, **parms):
+        self.alpha = 0.05
+        self.data = []
+        self.display = True
+        self.results = 1, 0
+
+        parm_list = sorted(parms.keys())
+        for parm in parm_list:
+            if parm == "alpha":
+                self.alpha = parm
+            if parm == "display":
+                self.display = parm
+        if operations.is_dict(groups[0]):
+            groups = groups[0].values()
+        for group in groups:
+            if len(group) == 1:
+                continue
+            if not operations.is_vector(group):
+                group = vector.Vector(group)
+            if len(group) == 1:
+                continue
+            self.data.append(group)
+        self.logic()
 
 
 class Comparison(Test):
@@ -158,3 +185,57 @@ class Correlation(Comparison):
 
     def ha(self):
         print "HA: There is a significant relationship between predictor and response"
+
+
+class Anova(GroupTest):
+
+    __min_size = 2
+
+    def run(self):
+        if len(self.data) <= self.__min_size:
+            return self.results
+        f_value, p_value = st.f_oneway(*tuple(self.data))
+        return p_value, f_value
+
+    def output(self):
+        name = "Oneway ANOVA"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print "f value = " + "{:.4f}".format(self.results[1])
+        print "p value = " + "{:.4f}".format(self.results[0])
+        print ""
+
+    def h0(self):
+        print "H0: Group means are matched"
+
+    def ha(self):
+        print "HA: Group means are not matched"
+
+
+class Kruskal(GroupTest):
+
+        __min_size = 2
+
+        def run(self):
+            if len(self.data) <= self.__min_size:
+                return self.results
+            h_value, p_value = st.kruskal(*tuple(self.results))
+            return p_value, h_value
+
+        def output(self):
+            name = "Kruskal-Wallis"
+            print ""
+            print name
+            print "-" * len(name)
+            print ""
+            print "H value = " + "{:.4f}".format(self.results[1])
+            print "p value = " + "{:.4f}".format(self.results[0])
+            print ""
+
+        def h0(self):
+            print "H0: Group means are matched"
+
+        def ha(self):
+            print "HA: Group means are not matched"
