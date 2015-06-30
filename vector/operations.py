@@ -1,4 +1,3 @@
-#from . vector import Vector
 import numpy as np
 import vector
 

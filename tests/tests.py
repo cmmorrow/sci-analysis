@@ -216,26 +216,61 @@ class Anova(GroupTest):
 
 class Kruskal(GroupTest):
 
-        __min_size = 2
+    __min_size = 2
 
-        def run(self):
-            if len(self.data) <= self.__min_size:
-                return self.results
-            h_value, p_value = st.kruskal(*tuple(self.results))
-            return p_value, h_value
+    def run(self):
+        if len(self.data) <= self.__min_size:
+            return self.results
+        h_value, p_value = st.kruskal(*tuple(self.results))
+        return p_value, h_value
 
-        def output(self):
-            name = "Kruskal-Wallis"
-            print ""
-            print name
-            print "-" * len(name)
-            print ""
-            print "H value = " + "{:.4f}".format(self.results[1])
-            print "p value = " + "{:.4f}".format(self.results[0])
-            print ""
+    def output(self):
+        name = "Kruskal-Wallis"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print "H value = " + "{:.4f}".format(self.results[1])
+        print "p value = " + "{:.4f}".format(self.results[0])
+        print ""
 
-        def h0(self):
-            print "H0: Group means are matched"
+    def h0(self):
+        print "H0: Group means are matched"
 
-        def ha(self):
-            print "HA: Group means are not matched"
+    def ha(self):
+        print "HA: Group means are not matched"
+
+
+class EqualVariance(GroupTest):
+
+    __min_size = 2
+
+    def run(self):
+        if len(self.data) <= self.__min_size:
+            return self.results
+        if NormTest(self.data, display=False, alpha=self.alpha).results[0] > self.alpha:
+            statistic, p_value = st.bartlett(*tuple(self.data))
+            type = "Bartlett Test"
+        else:
+            statistic, p_value = st.levene(*tuple(self.data))
+            type = "Levene Test"
+        return p_value, statistic, type
+
+    def output(self):
+        name = "Equal Variance"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print self.results[2]
+        if self.results[2] == "Bartlett Test":
+            print "T value = " + "{:.4f}".format(self.results[1])
+        else:
+            print "W value = " + "{:.4f}".format(self.results[1])
+        print "p value = " + "{:.4f}".format(self.results[0])
+
+    def h0(self):
+        print "H0: Variances are equal"
+
+    def ha(self):
+        print "HA: Variances are not equal"
