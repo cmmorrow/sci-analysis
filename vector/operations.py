@@ -28,6 +28,13 @@ def is_vector(d):
         return False
 
 
+def is_data(d):
+    if isinstance(d, vector.Data):
+        return True
+    else:
+        return False
+
+
 def is_iterable(d):
     try:
         if len(d) > 0:

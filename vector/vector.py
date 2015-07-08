@@ -1,16 +1,22 @@
+# Import from numpy
 import numpy as np
-from operations import is_iterable
-from operations import is_array
-from operations import is_dict
 
+# Import from local
+from data import Data
+from operations import is_iterable, is_array, is_dict
 
-class Vector:
+# TODO: Create a Data class for Vector to inherit
+class Vector(Data):
     """ The base data container class used by sci-analysis
     """
 
-    def __init__(self, data=None):
+    data_type = "Vector"
 
-        self.data = np.empty(1)
+    def __init__(self, data=None, name=None):
+
+        #super(Data, self).__init__()
+        self.name = name
+        self.data = None
         if is_array(data):
             self.data = data
         else:
@@ -34,7 +40,7 @@ class Vector:
     def append_vector(self, vector):
         """ Appends data from vector to this Vector
         """
-        np.append(self.data, vector.data)
+        return np.append(self.data, vector.data)
 
     def flatten(self, data):
         """ Reduce the dimension of data by one

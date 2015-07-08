@@ -1,29 +1,38 @@
-import scipy.stats as st
-import numpy as np
-from ..vector import vector
-from ..vector import operations
+# Scipy imports
+from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene
+
+# Numpy imports
+from numpy import concatenate
+
+# Local imports
+from ..vector import vector, operations
 
 
-class Test:
+class Test(object):
     """ Generic statistical test class
     """
 
     def __init__(self, data, alpha=0.05, display=True):
 
-        """Set members """
+        # Set members
         self.data = data
         self.alpha = alpha
         self.display = display
         self.results = 1, 0
 
-        """If data is not a vector, wrap it in a vector object """
+        # If data is not a vector, wrap it in a Vector object
         if not operations.is_vector(data):
             self.data = vector.Vector(data)
 
-        """Remove NaN values from the vector"""
+        # Stop the test if the vector is empty
+        if self.data.is_empty():
+            print "vector is empty"
+            pass
+
+        # Remove NaN values from the vector
         self.data = operations.drop_nan(self.data)
 
-        """Run the test and display the results"""
+        # Run the test and display the results
         self.logic()
 
     def logic(self):
@@ -66,14 +75,16 @@ class GroupTest(Test):
         if operations.is_dict(groups[0]):
             groups = groups[0].values()
         for group in groups:
-            if len(group) == 1:
-                continue
+#            if len(group) == 1:
+#                continue
             if not operations.is_vector(group):
                 group = vector.Vector(group)
+            if group.is_empty():
+                continue
             if len(group) == 1:
                 continue
-            self.data.append(group)
-        self.logic()
+            self.data.append(group.data)
+        super(GroupTest, self).logic()
 
 
 class Comparison(Test):
@@ -92,13 +103,16 @@ class Comparison(Test):
             self.xdata = vector.Vector(xdata)
         if not operations.is_vector(ydata):
             self.ydata = vector.Vector(ydata)
+        if len(xdata) != len(ydata):
+            print "Vector lengths are not equal"
+            pass
 
         self.xdata, self.ydata = operations.drop_nan_intersect(self.xdata, self.ydata)
 
+    def logic(self):
         if len(self.xdata) <= self.__min_size or len(self.ydata) <= self.__min_size:
             return self.results
-
-        self.logic()
+        super(Comparison, self).logic()
 
 
 class NormTest(Test):
@@ -106,7 +120,7 @@ class NormTest(Test):
     """
 
     def run(self):
-        w_value, p_value = st.shapiro(self.data)
+        w_value, p_value = shapiro(self.data)
         return p_value, w_value
 
     def output(self):
@@ -130,7 +144,7 @@ class LinearRegression(Comparison):
     __min_size = 3
 
     def run(self):
-        slope, intercept, r2, p_value, std_err = st.linregress(self.xdata, self.ydata)
+        slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.ydata)
         return p_value, slope, intercept, r2, std_err
 
     def output(self):
@@ -158,11 +172,11 @@ class Correlation(Comparison):
     __min_size = 3
 
     def run(self):
-        if NormTest(np.concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha).results[0] > self.alpha:
-            r_value, p_value = st.pearsonr(self.xdata, self.ydata)
+        if NormTest(concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha).results[0] > self.alpha:
+            r_value, p_value = pearsonr(self.xdata, self.ydata)
             r = "pearson"
         else:
-            r_value, p_value = st.spearmanr(self.xdata, self.ydata)
+            r_value, p_value = spearmanr(self.xdata, self.ydata)
             r = "spearman"
         return p_value, r_value, r
 
@@ -194,7 +208,7 @@ class Anova(GroupTest):
     def run(self):
         if len(self.data) <= self.__min_size:
             return self.results
-        f_value, p_value = st.f_oneway(*tuple(self.data))
+        f_value, p_value = f_oneway(*tuple(self.data))
         return p_value, f_value
 
     def output(self):
@@ -221,7 +235,7 @@ class Kruskal(GroupTest):
     def run(self):
         if len(self.data) <= self.__min_size:
             return self.results
-        h_value, p_value = st.kruskal(*tuple(self.results))
+        h_value, p_value = kruskal(*tuple(self.data))
         return p_value, h_value
 
     def output(self):
@@ -248,13 +262,13 @@ class EqualVariance(GroupTest):
     def run(self):
         if len(self.data) <= self.__min_size:
             return self.results
-        if NormTest(self.data, display=False, alpha=self.alpha).results[0] > self.alpha:
-            statistic, p_value = st.bartlett(*tuple(self.data))
-            type = "Bartlett Test"
+        if NormTest(concatenate(self.data), display=False, alpha=self.alpha).results[0] > self.alpha:
+            statistic, p_value = bartlett(*tuple(self.data))
+            t = "Bartlett Test"
         else:
-            statistic, p_value = st.levene(*tuple(self.data))
-            type = "Levene Test"
-        return p_value, statistic, type
+            statistic, p_value = levene(*tuple(self.data))
+            t = "Levene Test"
+        return p_value, statistic, t
 
     def output(self):
         name = "Equal Variance"
