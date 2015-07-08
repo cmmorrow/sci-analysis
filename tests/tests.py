@@ -5,7 +5,7 @@ from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, krus
 from numpy import concatenate
 
 # Local imports
-from ..vector import vector, operations
+from ..data import vector, operations
 
 
 class Test(object):
@@ -28,12 +28,13 @@ class Test(object):
         if self.data.is_empty():
             print "vector is empty"
             pass
+        else:
 
-        # Remove NaN values from the vector
-        self.data = operations.drop_nan(self.data)
+            # Remove NaN values from the vector
+            self.data = operations.drop_nan(self.data)
 
-        # Run the test and display the results
-        self.logic()
+            # Run the test and display the results
+            self.logic()
 
     def logic(self):
         self.results = self.run()
@@ -106,8 +107,12 @@ class Comparison(Test):
         if len(xdata) != len(ydata):
             print "Vector lengths are not equal"
             pass
+        elif xdata.is_empty() or ydata.is_empty():
+            print "At least one vector is empty"
+            pass
+        else:
 
-        self.xdata, self.ydata = operations.drop_nan_intersect(self.xdata, self.ydata)
+            self.xdata, self.ydata = operations.drop_nan_intersect(self.xdata, self.ydata)
 
     def logic(self):
         if len(self.xdata) <= self.__min_size or len(self.ydata) <= self.__min_size:

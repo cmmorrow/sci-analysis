@@ -14,9 +14,9 @@ class Vector(Data):
 
     def __init__(self, data=None, name=None):
 
-        #super(Data, self).__init__()
-        self.name = name
-        self.data = None
+        super(Vector, self).__init__(None, name)
+        #self.name = name
+        #self.data = None
         if is_array(data):
             self.data = data
         else:
@@ -24,7 +24,7 @@ class Vector(Data):
                 data = self.flatten(data.values())
             if is_iterable(data):
                 self.data = np.array(self.to_float(data))
-        self.type = self.data.dtype
+                self.type = self.data.dtype
 
     def to_float(self, data):
         """ Converts values in data to float and returns a copy

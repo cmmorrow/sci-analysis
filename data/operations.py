@@ -38,7 +38,10 @@ def is_data(d):
 def is_iterable(d):
     try:
         if len(d) > 0:
-            return True
+            if isinstance(d, basestring):
+                return False
+            else:
+                return True
         else:
             return False
     except TypeError:
