@@ -1,21 +1,39 @@
 # Scipy imports
-from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene
+from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene, skew, kurtosis
 
 # Numpy imports
-from numpy import concatenate
+from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data import vector, operations
 
 
-class Test(object):
+class Analysis(object):
+
+    def __init__(self, data):
+        self.data = data
+        self.results = 0.0
+
+    def logic(self):
+        self.results = self.run()
+        self.output()
+
+    def run(self):
+        pass
+
+    def output(self):
+        pass
+
+
+class Test(Analysis):
     """ Generic statistical test class
     """
 
     def __init__(self, data, alpha=0.05, display=True):
 
+        super(Test, self).__init__(data)
+
         # Set members
-        self.data = data
         self.alpha = alpha
         self.display = display
         self.results = 1, 0
@@ -293,3 +311,142 @@ class EqualVariance(GroupTest):
 
     def ha(self):
         print "HA: Variances are not equal"
+
+
+class VectorStatistics(Analysis):
+
+    __min_size = 2
+
+    def __init__(self, data, sample=False):
+        super(VectorStatistics, self).__init__(data)
+
+        self.results = None
+        self.sample = sample
+
+        if not operations.is_vector(data):
+            self.data = vector.Vector(data)
+
+        if self.data.is_empty():
+            print "vector is empty"
+            pass
+        elif len(self.data) < self.__min_size:
+            pass
+        else:
+            # Remove NaN values from the vector
+            self.data = operations.drop_nan(self.data)
+            if len(self.data) < self.__min_size:
+                pass
+            else:
+                 self.logic()
+
+    def run(self):
+        dof = 0
+        if self.sample:
+            dof = 1
+        count = len(self.data)
+        avg = mean(self.data)
+        sd = std(self.data, ddof=dof)
+        med = median(self.data)
+        vmin = amin(self.data)
+        vmax = amax(self.data)
+        vrange = vmax - vmin
+        sk = skew(self.data)
+        kurt = kurtosis(self.data)
+        q1 = percentile(self.data, 25)
+        q3 = percentile(self.data, 75)
+        iqr = q3 - q1
+        return {"count": count,
+                "mean": avg,
+                "std": sd,
+                "median": med,
+                "min": vmin,
+                "max": vmax,
+                "range": vrange,
+                "skew": sk,
+                "kurtosis": kurt,
+                "q1": q1,
+                "q3": q3,
+                "iqr": iqr}
+
+    def output(self):
+        name = "Statistics"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print "Count = " + str(self.results["count"])
+        print "Mean = " + str(self.results['mean'])
+        print "Standard Deviation = " + str(self.results['std'])
+        print "Skewness = " + str(self.results['skew'])
+        print "Kurtosis = " + str(self.results['kurtosis'])
+        print "Max = " + str(self.results['max'])
+        print "75% = " + str(self.results['q3'])
+        print "50% = " + str(self.results['median'])
+        print "25% = " + str(self.results['q1'])
+        print "Min = " + str(self.results['min'])
+        print "IQR = " + str(self.results['iqr'])
+        print "Range = " + str(self.results['range'])
+        print ""
+
+
+class GroupStatistics(Analysis):
+
+    __min_size = 1
+
+    def __init__(self, data, groups=None):
+        super(GroupStatistics, self).__init__(data)
+        self.groups = groups
+        self.results = []
+        if not operations.is_iterable(data):
+            pass
+        else:
+            if operations.is_dict(data):
+                self.groups = data.keys()
+                self.data = data.values()
+            if groups is None:
+                self.groups = range(1, len(data) + 1)
+            self.logic()
+
+    def logic(self):
+        for i, d in enumerate(self.data):
+            if len(d) == 0:
+                self.groups = self.groups[:i] + self.groups[i + 1:]
+                continue
+            else:
+                if not operations.is_vector(d):
+                    d = vector.Vector(d)
+                if len(d) < self.__min_size:
+                    self.groups = self.groups[:i] + self.groups[i + 1:]
+                    continue
+                self.results.append(self.run(d, self.groups[i]))
+        if len(self.results) > 0:
+            self.output()
+
+    def run(self, vector, group):
+        count = len(vector)
+        avg = mean(vector)
+        sd = std(vector, ddof=1)
+        vmax = amax(vector)
+        vmin = amin(vector)
+        q2 = median(vector)
+        return {"group": group, "count": count, "mean": avg, "std": sd, "max": vmax, "median": q2, "min": vmin}
+
+    def output(self):
+        size = 10
+        header = ""
+        line = ""
+        stats = {"Group": self.results["group"],
+                 "Count": self.results["count"],
+                 "Mean":  "{:.3f}".format(self.results["mean"]),
+                 "Std.":  "{:.3f}".format(self.results["std"]),
+                 "Min":   "{:.3f}".format(self.results["max"]),
+                 "Q2":    "{:.3f}".format(self.results["median"]),
+                 "Max":   "{:.3f}".format(self.results["min"])
+                 }
+        for s in stats.keys():
+            header = header + s + " " * (size - len(s))
+        print header
+        print "-" * len(header)
+        for s in stats.values():
+            line = line + s + " " * (size - len(s))
+        print line

@@ -1,1 +1,1 @@
-__all__ = ["data", "tests"]
+__all__ = ["data", "analysis"]

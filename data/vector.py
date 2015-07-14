@@ -5,7 +5,7 @@ import numpy as np
 from data import Data
 from operations import is_iterable, is_array, is_dict
 
-# TODO: Create a Data class for Vector to inherit
+
 class Vector(Data):
     """ The base data container class used by sci-analysis
     """
@@ -15,8 +15,6 @@ class Vector(Data):
     def __init__(self, data=None, name=None):
 
         super(Vector, self).__init__(None, name)
-        #self.name = name
-        #self.data = None
         if is_array(data):
             self.data = data
         else:
