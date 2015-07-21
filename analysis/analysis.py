@@ -94,8 +94,6 @@ class GroupTest(Test):
         if operations.is_dict(groups[0]):
             groups = groups[0].values()
         for group in groups:
-#            if len(group) == 1:
-#                continue
             if not operations.is_vector(group):
                 group = vector.Vector(group)
             if group.is_empty():
@@ -337,7 +335,7 @@ class VectorStatistics(Analysis):
             if len(self.data) < self.__min_size:
                 pass
             else:
-                 self.logic()
+                self.logic()
 
     def run(self):
         dof = 0
@@ -403,7 +401,7 @@ class GroupStatistics(Analysis):
             if operations.is_dict(data):
                 self.groups = data.keys()
                 self.data = data.values()
-            if groups is None:
+            elif groups is None:
                 self.groups = range(1, len(data) + 1)
             self.logic()
 
@@ -432,21 +430,42 @@ class GroupStatistics(Analysis):
         return {"group": group, "count": count, "mean": avg, "std": sd, "max": vmax, "median": q2, "min": vmin}
 
     def output(self):
-        size = 10
+        size = 12
         header = ""
         line = ""
-        stats = {"Group": self.results["group"],
-                 "Count": self.results["count"],
-                 "Mean":  "{:.3f}".format(self.results["mean"]),
-                 "Std.":  "{:.3f}".format(self.results["std"]),
-                 "Min":   "{:.3f}".format(self.results["max"]),
-                 "Q2":    "{:.3f}".format(self.results["median"]),
-                 "Max":   "{:.3f}".format(self.results["min"])
-                 }
-        for s in stats.keys():
+        offset = 0
+        shift = False
+        spacing = "{:.5f}"
+        labels = ["Count", "Mean", "Std.", "Min", "Q2", "Max", "Group"]
+
+        for s in labels:
             header = header + s + " " * (size - len(s))
         print header
         print "-" * len(header)
-        for s in stats.values():
-            line = line + s + " " * (size - len(s))
-        print line
+        for v in self.results:
+            stats = [str(v["count"]),
+                     spacing.format(v["mean"]),
+                     spacing.format(v["std"]),
+                     spacing.format(v["min"]),
+                     spacing.format(v["median"]),
+                     spacing.format(v["max"]),
+                     str(v["group"])
+                     ]
+            for i, s in enumerate(stats):
+                if offset == 1 or shift:
+                    offset = -1
+                    shift = False
+                else:
+                    offset = 0
+                try:
+                    if stats[i + 1][0] == "-":
+                        if offset == -1:
+                            offset = 0
+                            shift = True
+                        else:
+                            offset = 1
+                    line = line + s + " " * (size - offset - len(s))
+                except IndexError:
+                    line = line + s + " " * (size - offset - len(s))
+            print line
+            line = ""
