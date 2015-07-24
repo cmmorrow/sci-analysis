@@ -35,6 +35,13 @@ def is_data(d):
         return False
 
 
+def is_tuple(d):
+    if isinstance(d, tuple):
+        return True
+    else:
+        return False
+
+
 def is_iterable(d):
     try:
         if len(d) > 0:
