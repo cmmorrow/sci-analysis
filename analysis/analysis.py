@@ -5,29 +5,46 @@ from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, krus
 from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
-from ..data import vector, operations
+from ..data.vector import Vector
+from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, drop_nan_intersect
+from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
 class Analysis(object):
+    """ Generic analysis super class
+    """
 
     def __init__(self, data):
+        """Initialize the data and results members.
+           Override this method to initialize additional members or perform
+           checks on data.
+        """
         self.data = data
         self.results = 0.0
 
     def logic(self):
+        """ Override this method to modify the execution sequence of the analysis.
+            This method needs to run the analysis, set the results member, and
+            display the output at bare minimum.
+        """
         self.results = self.run()
         self.output()
 
     def run(self):
+        """ Override this method to perform a specific analysis.
+            This method should return the results of the specific analysis
+        """
         pass
 
     def output(self):
+        """ Override this method to write the formatted output to std out.
+            This method shouldn't return a value and only produce a side-effect
+        """
         pass
 
 
 class Test(Analysis):
-    """ Generic statistical test class
-    """
+    """ Generic statistical test class"""
 
     def __init__(self, data, alpha=0.05, display=True):
 
@@ -39,8 +56,8 @@ class Test(Analysis):
         self.results = 1, 0
 
         # If data is not a vector, wrap it in a Vector object
-        if not operations.is_vector(data):
-            self.data = vector.Vector(data)
+        if not is_vector(data):
+            self.data = Vector(data)
 
         # Stop the test if the vector is empty
         if self.data.is_empty():
@@ -49,7 +66,7 @@ class Test(Analysis):
         else:
 
             # Remove NaN values from the vector
-            self.data = operations.drop_nan(self.data)
+            self.data = drop_nan(self.data)
 
             # Run the test and display the results
             self.logic()
@@ -58,6 +75,9 @@ class Test(Analysis):
         self.results = self.run()
         if self.display:
             self.output()
+
+            # If the result is greater than the significance, print the null
+            # hypothesis, otherwise, the alternate hypothesis
             if self.results[0] > self.alpha:
                 self.h0()
             else:
@@ -65,6 +85,8 @@ class Test(Analysis):
             print ""
 
     def run(self):
+        """ The default p-value is 1
+        """
         return 1, 0
 
     def output(self):
@@ -78,6 +100,8 @@ class Test(Analysis):
 
 
 class GroupTest(Test):
+    """ Perform a test on multiple vectors that are passed as a tuple of arbitrary length.
+    """
 
     def __init__(self, *groups, **parms):
         self.alpha = 0.05
@@ -91,11 +115,11 @@ class GroupTest(Test):
                 self.alpha = parm
             if parm == "display":
                 self.display = parm
-        if operations.is_dict(groups[0]):
+        if is_dict(groups[0]):
             groups = groups[0].values()
         for group in groups:
-            if not operations.is_vector(group):
-                group = vector.Vector(group)
+            if not is_vector(group):
+                group = Vector(group)
             if group.is_empty():
                 continue
             if len(group) == 1:
@@ -116,19 +140,19 @@ class Comparison(Test):
         self.display = display
         self.results = 1, 0
 
-        if not operations.is_vector(xdata):
-            self.xdata = vector.Vector(xdata)
-        if not operations.is_vector(ydata):
-            self.ydata = vector.Vector(ydata)
+        if not is_vector(xdata):
+            self.xdata = Vector(xdata)
+        if not is_vector(ydata):
+            self.ydata = Vector(ydata)
         if len(xdata) != len(ydata):
             print "Vector lengths are not equal"
             pass
-        elif xdata.is_empty() or ydata.is_empty():
+        elif self.xdata.is_empty() or self.ydata.is_empty():
             print "At least one vector is empty"
             pass
         else:
-
-            self.xdata, self.ydata = operations.drop_nan_intersect(self.xdata, self.ydata)
+            self.xdata, self.ydata = drop_nan_intersect(self.xdata, self.ydata)
+        self.logic()
 
     def logic(self):
         if len(self.xdata) <= self.__min_size or len(self.ydata) <= self.__min_size:
@@ -281,7 +305,7 @@ class EqualVariance(GroupTest):
     __min_size = 2
 
     def run(self):
-        if len(self.data) <= self.__min_size:
+        if len(self.data) < self.__min_size:
             return self.results
         if NormTest(concatenate(self.data), display=False, alpha=self.alpha).results[0] > self.alpha:
             statistic, p_value = bartlett(*tuple(self.data))
@@ -321,8 +345,8 @@ class VectorStatistics(Analysis):
         self.results = None
         self.sample = sample
 
-        if not operations.is_vector(data):
-            self.data = vector.Vector(data)
+        if not is_vector(data):
+            self.data = Vector(data)
 
         if self.data.is_empty():
             print "vector is empty"
@@ -331,7 +355,7 @@ class VectorStatistics(Analysis):
             pass
         else:
             # Remove NaN values from the vector
-            self.data = operations.drop_nan(self.data)
+            self.data = drop_nan(self.data)
             if len(self.data) < self.__min_size:
                 pass
             else:
@@ -395,10 +419,10 @@ class GroupStatistics(Analysis):
         super(GroupStatistics, self).__init__(data)
         self.groups = groups
         self.results = []
-        if not operations.is_iterable(data):
+        if not is_iterable(data):
             pass
         else:
-            if operations.is_dict(data):
+            if is_dict(data):
                 self.groups = data.keys()
                 self.data = data.values()
             elif groups is None:
@@ -411,8 +435,8 @@ class GroupStatistics(Analysis):
                 self.groups = self.groups[:i] + self.groups[i + 1:]
                 continue
             else:
-                if not operations.is_vector(d):
-                    d = vector.Vector(d)
+                if not is_vector(d):
+                    d = Vector(d)
                 if len(d) < self.__min_size:
                     self.groups = self.groups[:i] + self.groups[i + 1:]
                     continue
