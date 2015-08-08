@@ -52,6 +52,14 @@ def is_tuple(d):
 def is_iterable(d):
     """Checks if the argument is sequence-like but not a string"""
     try:
+        d.__iter__()
+        return True
+    except AttributeError:
+        return False
+
+
+"""
+    try:
         if len(d) > 0:
             if isinstance(d, basestring):
                 return False
@@ -61,13 +69,14 @@ def is_iterable(d):
             return False
     except TypeError:
         return False
+"""
 
 
 def is_array(d):
     """ Tests if data is a numPy Array object
     """
     try:
-        d.shape
+        d.dtype
         return True
     except AttributeError:
         return False
@@ -77,7 +86,31 @@ def is_dict(d):
     """ Test if data is a dictionary object
     """
     try:
-        d.keys()
+        d.items()
         return True
+    except AttributeError:
+        return False
+
+
+def is_group(d):
+    """ Test if data is a list of iterables
+    """
+    try:
+        if any(is_iterable(x) for x in d):
+            return True
+        else:
+            return False
+    except TypeError:
+        return False
+
+
+def is_dict_group(d):
+    """ Test if data is a dict of iterables
+    """
+    try:
+        if is_group(d.values()):
+            return True
+        else:
+            return False
     except AttributeError:
         return False

@@ -6,7 +6,7 @@ from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data.vector import Vector
-from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, drop_nan_intersect
+from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, drop_nan_intersect, is_group, is_dict_group
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
@@ -493,3 +493,64 @@ class GroupStatistics(Analysis):
                     line = line + s + " " * (size - offset - len(s))
             print line
             line = ""
+
+
+def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, alpha=0.05, categories='Categories'):
+
+    # Compare Group Means and Variance
+    if is_group(xdata) or is_dict_group(xdata):
+
+        # Show the box plot and stats
+        GraphBoxplot(xdata, groups, categories)
+        GroupStatistics(xdata, groups)
+        p = EqualVariance(*xdata).results[0]
+
+        # If normally distributed and variances are equal, perform one-way ANOVA
+        # Otherwise, perform a non-parametric Kruskal-Wallis test
+        if NormTest(xdata, display=False).results[0] > alpha and p > alpha:
+            Anova(*xdata)
+        else:
+            Kruskal(*xdata)
+        pass
+
+    # Correlation and Linear Regression
+    elif is_iterable(xdata) and is_iterable(ydata):
+
+        # Apply the x data label
+        label = 'x'
+        if xname:
+            label = xname
+
+        # Convert xdata and ydata to Vectors
+        if not is_vector(xdata):
+            xdata = Vector(xdata)
+        if not is_vector(ydata):
+            ydata = Vector(ydata)
+
+        # Show the scatter plot, correlation and regression stats
+        GraphScatter(xdata, ydata, label, yname)
+        Correlation(xdata, ydata)
+        LinearRegression(xdata, ydata)
+        pass
+
+    # Histogram and Basic Stats
+    elif is_iterable(xdata):
+
+        # Apply the data label
+        label = 'Data'
+        if name:
+            label = name
+        elif xname:
+            label = xname
+
+        # Convert xdata to a Vector
+        if not is_vector(xdata):
+            xdata = Vector(xdata)
+
+        # Show the histogram and stats
+        GraphHisto(xdata, name=label)
+        VectorStatistics(xdata)
+        NormTest(xdata, alpha=alpha)
+        pass
+    else:
+        return xdata, ydata

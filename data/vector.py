@@ -60,3 +60,6 @@ class Vector(Data):
 
     def __contains__(self, item):
         return item in self.data
+
+    def __iter__(self):
+        return self.data.__iter__()
