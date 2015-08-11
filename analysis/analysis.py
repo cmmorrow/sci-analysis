@@ -2,7 +2,7 @@
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene, skew, kurtosis
 
 # Numpy imports
-from numpy import concatenate, mean, std, median, amin, amax, percentile
+from numpy import concatenate, mean, std, median, amin, amax, percentile, append as cat, empty
 
 # Local imports
 from ..data.vector import Vector
@@ -166,6 +166,33 @@ class NormTest(Test):
 
     def run(self):
         w_value, p_value = shapiro(self.data)
+        return p_value, w_value
+
+    def output(self):
+        name = "Shapiro-Wilk test for normality"
+        print ""
+        print name
+        print "-" * len(name)
+        print ""
+        print "W value = " + "{:.4f}".format(self.results[1])
+        print "p value = " + "{:.4f}".format(self.results[0])
+
+    def h0(self):
+        print "H0: Data is normally distributed"
+
+    def ha(self):
+        print "HA: Data is not normally distributed"
+
+
+class GroupNormTest(GroupTest):
+    """ Tests a group of data to see if they are normally distributed or not
+    """
+
+    def run(self):
+        stacked_data = empty(0)
+        for vector in self.data:
+            stacked_data = cat(stacked_data, vector.data)
+        w_value, p_value = shapiro(stacked_data)
         return p_value, w_value
 
     def output(self):
@@ -495,10 +522,21 @@ class GroupStatistics(Analysis):
             line = ""
 
 
-def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, alpha=0.05, categories='Categories'):
+def analyze(
+        xdata,
+        ydata=None,
+        groups=None,
+        name=None,
+        xname=None,
+        yname=None,
+        alpha=0.05,
+        categories='Categories'):
 
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
+        if is_dict(xdata):
+            groups = xdata.keys()
+            xdata = xdata.values()
 
         # Show the box plot and stats
         GraphBoxplot(xdata, groups, categories)
@@ -507,7 +545,7 @@ def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, a
 
         # If normally distributed and variances are equal, perform one-way ANOVA
         # Otherwise, perform a non-parametric Kruskal-Wallis test
-        if NormTest(xdata, display=False).results[0] > alpha and p > alpha:
+        if GroupNormTest(*xdata, display=False).results[0] > alpha and p > alpha:
             Anova(*xdata)
         else:
             Kruskal(*xdata)

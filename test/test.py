@@ -1,5 +1,6 @@
 from sci_analysis.data.operations import *
 from sci_analysis.data.vector import Vector
+from sci_analysis.analysis.analysis import analyze
 
 import numpy as np
 import numpy.ma as ma
@@ -68,3 +69,15 @@ try:
     print drop_nan(Vector(test_list))
 except AssertionError:
     print "FAIL Drop nan test"
+
+
+# Test Group Analysis
+a = np.random.rand(50) * 2
+b = np.random.rand(50) * 3
+c = np.random.rand(50)
+d = np.random.rand(50) * 4
+e = np.random.rand(50) * 2
+
+#analyze([a, b, c, d, e], groups=["A", "B", "C", "D", "E"])
+#analyze({"A": a, "B": b, "C": c, "D": d, "E": e})
+analyze(xdata=d, name="Test")
