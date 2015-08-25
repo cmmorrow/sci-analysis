@@ -3,63 +3,48 @@ import numpy as np
 
 # Import from local
 from data import Data
-from operations import is_iterable, is_array, is_dict
+from operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten
 
 
 class Vector(Data):
-    """ The base data container class used by sci-analysis
-    """
+    """The base data container class used by sci-analysis"""
 
     data_type = "Vector"
 
-    def __init__(self, data=None, name=None):
+    def __init__(self, data=np.array([]), name=None):
 
-        super(Vector, self).__init__(None, name)
+        super(Vector, self).__init__(n=name)
         if is_array(data):
-            self.data = data
+            try:
+                self.data = np.asfarray(data)
+                self.type = self.data.dtype
+            except ValueError:
+                self.data = np.array([])
+        elif is_vector(data):
+            self.data = data.data
+            self.name = data.name
+            self.type = data.type
         else:
             if is_dict(data):
-                data = self.flatten(data.values())
+                data = flatten(data.values())
             if is_iterable(data):
-                self.data = np.array(self.to_float(data))
+                self.data = np.array(to_float(data))
                 self.type = self.data.dtype
-
-    def to_float(self, data):
-        """ Converts values in data to float and returns a copy
-        """
-        float_list = []
-        for i in range(len(data)):
-            try:
-                float_list.append(float(data[i]))
-            except ValueError:
-                float_list.append(float("nan"))
-        return float_list
+            else:
+                self.data = np.array([])
+        if len(self.data.shape) > 1:
+            self.data = self.data.flatten()
 
     def append_vector(self, vector):
-        """ Appends data from vector to this Vector
-        """
-        return np.append(self.data, vector.data)
+        """Appends data from vector to this Vector"""
+        if is_array(vector):
+            return np.append(self.data, vector)
+        elif is_vector(vector):
+            return np.append(self.data, vector.data)
 
-    def flatten(self, data):
-        """ Reduce the dimension of data by one
-        """
-        flat = []
-        for row in data:
-            if is_iterable(row):
-                for col in row:
-                    flat.append(col)
-            else:
-                flat.append(row)
-        return flat
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, item):
-        return self.data[item]
-
-    def __contains__(self, item):
-        return item in self.data
-
-    def __iter__(self):
-        return self.data.__iter__()
+    def is_empty(self):
+        """Over-rides the super class's method to also check for len = 0"""
+        if self.data is None or len(self.data) == 0:
+            return True
+        else:
+            return False

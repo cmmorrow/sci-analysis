@@ -4,7 +4,7 @@ from matplotlib.pyplot import show, subplot, plot, grid, xlabel, ylabel, figure,
 # Numpy imports
 from numpy import polyfit, polyval
 
-#Scipy imports
+# Scipy imports
 from scipy.stats import probplot
 
 # local imports

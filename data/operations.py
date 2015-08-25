@@ -3,6 +3,29 @@ import vector
 import data
 
 
+def to_float(d):
+        """Converts values in data to float and returns a copy"""
+        float_list = []
+        for i in range(len(d)):
+            try:
+                float_list.append(float(d[i]))
+            except (ValueError, TypeError):
+                float_list.append(float("nan"))
+        return float_list
+
+
+def flatten(d):
+        """Reduce the dimension of data by one"""
+        flat = []
+        for row in d:
+            if is_iterable(row):
+                for col in row:
+                    flat.append(col)
+            else:
+                flat.append(row)
+        return flat
+
+
 def drop_nan(v):
     """Removes NaN values from the given sequence"""
     return v.data[~np.isnan(v.data)]
@@ -14,15 +37,15 @@ def drop_nan_intersect(first, second):
     return first.data[c], second.data[c]
 
 
-def cat(list_of_data):
-    """Concatenates sequences together into a Vector object"""
-    output = []
-    for d in list_of_data:
-        if is_vector(d):
-            output.append(d.data)
-        else:
-            output.append(d)
-    return vector.Vector(output).data
+#def cat(list_of_data):
+#    """Concatenates sequences together into a Vector object"""
+#    output = []
+#    for d in list_of_data:
+#        if is_vector(d):
+#            output.append(d.data)
+#        else:
+#            output.append(d)
+#    return vector.Vector(output).data
 
 
 def is_vector(d):
@@ -54,27 +77,12 @@ def is_iterable(d):
     try:
         d.__iter__()
         return True
-    except AttributeError:
+    except (AttributeError, TypeError):
         return False
-
-
-"""
-    try:
-        if len(d) > 0:
-            if isinstance(d, basestring):
-                return False
-            else:
-                return True
-        else:
-            return False
-    except TypeError:
-        return False
-"""
 
 
 def is_array(d):
-    """ Tests if data is a numPy Array object
-    """
+    """Tests if data is a numPy Array object"""
     try:
         d.dtype
         return True
@@ -83,8 +91,7 @@ def is_array(d):
 
 
 def is_dict(d):
-    """ Test if data is a dictionary object
-    """
+    """Test if data is a dictionary object"""
     try:
         d.items()
         return True
@@ -93,8 +100,7 @@ def is_dict(d):
 
 
 def is_group(d):
-    """ Test if data is a list of iterables
-    """
+    """Test if data is a list of iterables"""
     try:
         if any(is_iterable(x) for x in d):
             return True
@@ -105,8 +111,7 @@ def is_group(d):
 
 
 def is_dict_group(d):
-    """ Test if data is a dict of iterables
-    """
+    """Test if data is a dict of iterables"""
     try:
         if is_group(d.values()):
             return True

@@ -34,13 +34,17 @@ class Analysis(object):
         """ Override this method to perform a specific analysis.
             This method should return the results of the specific analysis
         """
-        pass
+        return 0.0
 
     def output(self):
         """ Override this method to write the formatted output to std out.
             This method shouldn't return a value and only produce a side-effect
         """
+        print self.results
         pass
+
+    def __repr__(self):
+        print self.results
 
 
 class Test(Analysis):
@@ -423,18 +427,18 @@ class VectorStatistics(Analysis):
         print name
         print "-" * len(name)
         print ""
-        print "Count = " + str(self.results["count"])
-        print "Mean = " + str(self.results['mean'])
-        print "Standard Deviation = " + str(self.results['std'])
-        print "Skewness = " + str(self.results['skew'])
-        print "Kurtosis = " + str(self.results['kurtosis'])
-        print "Max = " + str(self.results['max'])
-        print "75% = " + str(self.results['q3'])
-        print "50% = " + str(self.results['median'])
-        print "25% = " + str(self.results['q1'])
-        print "Min = " + str(self.results['min'])
-        print "IQR = " + str(self.results['iqr'])
-        print "Range = " + str(self.results['range'])
+        print "Count    = " + str(self.results["count"])
+        print "Mean     = " + "{:.3f}".format(self.results['mean'])
+        print "Std Dev  = " + "{:.3f}".format(self.results['std'])
+        print "Skewness = " + "{:.3f}".format(self.results['skew'])
+        print "Kurtosis = " + "{:.3f}".format(self.results['kurtosis'])
+        print "Max      = " + "{:.3f}".format(self.results['max'])
+        print "75%      = " + "{:.3f}".format(self.results['q3'])
+        print "50%      = " + "{:.3f}".format(self.results['median'])
+        print "25%      = " + "{:.3f}".format(self.results['q1'])
+        print "Min      = " + "{:.3f}".format(self.results['min'])
+        print "IQR      = " + "{:.3f}".format(self.results['iqr'])
+        print "Range    = " + "{:.3f}".format(self.results['range'])
         print ""
 
 
