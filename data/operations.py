@@ -26,15 +26,29 @@ def flatten(d):
         return flat
 
 
+def clean(x, y=list()):
+    """This is a deprecated function from 1.2 which now just converts the args
+    to a Vector and passes it through drop_nan"""
+    if len(y) > 0:
+        return drop_nan_intersect(vector.Vector(x), vector.Vector(y))
+    else:
+        return drop_nan(vector.Vector(x))
+
+
+def strip(d):
+    """This is a deprecated function from 1.2 which now just converts d to a Vector"""
+    return vector.Vector(d).data
+
+
 def drop_nan(v):
     """Removes NaN values from the given sequence"""
-    return v.data[~np.isnan(v.data)]
+    return vector.Vector(v.data[~np.isnan(v.data)])
 
 
 def drop_nan_intersect(first, second):
     """Creates a tuple of sequences where only non-NaN values are given"""
     c = np.logical_and(~np.isnan(first.data), ~np.isnan(second.data))
-    return first.data[c], second.data[c]
+    return vector.Vector(first.data[c]), vector.Vector(second.data[c])
 
 
 #def cat(list_of_data):
@@ -117,5 +131,5 @@ def is_dict_group(d):
             return True
         else:
             return False
-    except AttributeError:
+    except (AttributeError, TypeError):
         return False

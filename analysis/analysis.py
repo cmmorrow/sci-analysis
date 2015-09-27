@@ -2,7 +2,7 @@
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene, skew, kurtosis
 
 # Numpy imports
-from numpy import concatenate, mean, std, median, amin, amax, percentile, append as cat, empty
+from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data.vector import Vector
@@ -14,12 +14,13 @@ class Analysis(object):
     """ Generic analysis super class
     """
 
-    def __init__(self, data):
+    def __init__(self, data, display=True):
         """Initialize the data and results members.
            Override this method to initialize additional members or perform
            checks on data.
         """
         self.data = data
+        self.display = display
         self.results = 0.0
 
     def logic(self):
@@ -28,7 +29,8 @@ class Analysis(object):
             display the output at bare minimum.
         """
         self.results = self.run()
-        self.output()
+        if self.display:
+            self.output()
 
     def run(self):
         """ Override this method to perform a specific analysis.
@@ -43,8 +45,11 @@ class Analysis(object):
         print self.results
         pass
 
+    def __str__(self):
+        return str(self.results)
+
     def __repr__(self):
-        print self.results
+        return str(self.results)
 
 
 class Test(Analysis):
@@ -52,11 +57,10 @@ class Test(Analysis):
 
     def __init__(self, data, alpha=0.05, display=True):
 
-        super(Test, self).__init__(data)
+        super(Test, self).__init__(data, display=display)
 
         # Set members
         self.alpha = alpha
-        self.display = display
         self.results = 1, 0
 
         # If data is not a vector, wrap it in a Vector object
@@ -113,17 +117,13 @@ class GroupTest(Test):
         self.display = True
         self.results = 1, 0
 
-        parm_list = sorted(parms.keys())
-        for parm in parm_list:
-            if parm == "alpha":
-                self.alpha = parm
-            if parm == "display":
-                self.display = parm
+        self.__dict__.update(parms)
+
         if is_dict(groups[0]):
             groups = groups[0].values()
         for group in groups:
             if not is_vector(group):
-                group = Vector(group)
+                group = drop_nan(Vector(group))
             if group.is_empty():
                 continue
             if len(group) == 1:
@@ -180,6 +180,7 @@ class NormTest(Test):
         print ""
         print "W value = " + "{:.4f}".format(self.results[1])
         print "p value = " + "{:.4f}".format(self.results[0])
+        print ""
 
     def h0(self):
         print "H0: Data is normally distributed"
@@ -193,10 +194,7 @@ class GroupNormTest(GroupTest):
     """
 
     def run(self):
-        stacked_data = empty(0)
-        for vector in self.data:
-            stacked_data = cat(stacked_data, vector.data)
-        w_value, p_value = shapiro(stacked_data)
+        w_value, p_value = shapiro(concatenate(self.data))
         return p_value, w_value
 
     def output(self):
@@ -207,6 +205,7 @@ class GroupNormTest(GroupTest):
         print ""
         print "W value = " + "{:.4f}".format(self.results[1])
         print "p value = " + "{:.4f}".format(self.results[0])
+        print ""
 
     def h0(self):
         print "H0: Data is normally distributed"
@@ -221,7 +220,8 @@ class LinearRegression(Comparison):
 
     def run(self):
         slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.ydata)
-        return p_value, slope, intercept, r2, std_err
+        count = len(self.xdata)
+        return p_value, slope, intercept, r2, std_err, count
 
     def output(self):
         name = "Linear Regression"
@@ -229,6 +229,7 @@ class LinearRegression(Comparison):
         print name
         print "-" * len(name)
         print ""
+        print "count     = " + str(self.results[5])
         print "slope     = " + "{:.4f}".format(self.results[1])
         print "intercept = " + "{:.4f}".format(self.results[2])
         print "R^2       = " + "{:.4f}".format(self.results[3])
@@ -358,6 +359,7 @@ class EqualVariance(GroupTest):
         else:
             print "W value = " + "{:.4f}".format(self.results[1])
         print "p value = " + "{:.4f}".format(self.results[0])
+        print ""
 
     def h0(self):
         print "H0: Variances are equal"
@@ -370,14 +372,13 @@ class VectorStatistics(Analysis):
 
     __min_size = 2
 
-    def __init__(self, data, sample=False):
-        super(VectorStatistics, self).__init__(data)
+    def __init__(self, data, sample=False, display=True):
+        super(VectorStatistics, self).__init__(data, display=display)
 
         self.results = None
         self.sample = sample
 
-        if not is_vector(data):
-            self.data = Vector(data)
+        self.data = drop_nan(Vector(data))
 
         if self.data.is_empty():
             print "vector is empty"
@@ -385,8 +386,6 @@ class VectorStatistics(Analysis):
         elif len(self.data) < self.__min_size:
             pass
         else:
-            # Remove NaN values from the vector
-            self.data = drop_nan(self.data)
             if len(self.data) < self.__min_size:
                 pass
             else:
@@ -446,8 +445,8 @@ class GroupStatistics(Analysis):
 
     __min_size = 1
 
-    def __init__(self, data, groups=None):
-        super(GroupStatistics, self).__init__(data)
+    def __init__(self, data, groups=None, display=True):
+        super(GroupStatistics, self).__init__(data, display=display)
         self.groups = groups
         self.results = []
         if not is_iterable(data):
@@ -476,6 +475,7 @@ class GroupStatistics(Analysis):
             self.output()
 
     def run(self, vector, group):
+        vector = drop_nan(vector)
         count = len(vector)
         avg = mean(vector)
         sd = std(vector, ddof=1)
@@ -549,7 +549,7 @@ def analyze(
 
         # If normally distributed and variances are equal, perform one-way ANOVA
         # Otherwise, perform a non-parametric Kruskal-Wallis test
-        if GroupNormTest(*xdata, display=False).results[0] > alpha and p > alpha:
+        if GroupNormTest(*xdata, display=False, alpha=alpha).results[0] > alpha and p > alpha:
             Anova(*xdata)
         else:
             Kruskal(*xdata)
@@ -571,8 +571,8 @@ def analyze(
 
         # Show the scatter plot, correlation and regression stats
         GraphScatter(xdata, ydata, label, yname)
-        Correlation(xdata, ydata)
         LinearRegression(xdata, ydata)
+        Correlation(xdata, ydata)
         pass
 
     # Histogram and Basic Stats

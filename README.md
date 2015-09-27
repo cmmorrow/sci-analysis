@@ -2,12 +2,12 @@
 A light weight python data exploration and analysis tool by Chris Morrow
 
 ## Current Version:
-1.2 --- Released May 26, 2015
+1.3 --- Released September 21, 2015
 
 ### What is sci-analysis?
-sci-analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
+sci-analysis is a python package for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
 
-Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way sci-analysisANOVA.
+Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.
 
 ### Getting started with sci-analysis
 Before using sci-analysis, be sure the following three packages are installed:
@@ -23,20 +23,22 @@ https://github.com/cmmorrow/sci-analysis
 Next, add the sci-analysis directory to your project with:
 
 ```python
-sys.path.extend(['<path to directory>/sci-analysis'])
-import scianalysis as a
+sys.path.extend(['<path to directory>/sci_analysis'])
+import sci_analysis as a
 import numpy as np
 ```
 
-This will tell python were to find sci-analysis and import it to your project as the object `a`. 
+**Note:** The package name is `sci_analysis` with an underscore.
+
+This will tell python where to find sci-analysis and import it to your project is the object `a`. 
 
 If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:
 
 ```python
 %matplotlib inline
 import matplotlib
-sys.path.extend(['<path to directory>/sci-analysis'])
-import scianalysis as a
+sys.path.extend(['<path to directory>/sci_analysis'])
+import sci_analysis as a
 import numpy as np
 ```
 
@@ -71,59 +73,58 @@ p value = 0.9581
 H0: Data is normally distributed
 ```
 
-You should probably note that numpy was only imported for the purpose of the above example. sci-analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. sci-analysis can work with regular python sequences as in the following:
-
-```python
-In[6]: a.clean([6, 9, 12, 15])
-Out[6]: array([ 6,  9, 12, 15])
-
-In[7]: a.clean((4, 8, 12, 16, 20))
-Out[7]: array([ 4,  8, 12, 16, 20])
-```
-
-sci-analysis is also compatible with the pandas Series object. To use pandas with sci-analysis, be sure to import it to your project with:
-
-```python
-import pandas as pd
-```
-
-The sci-analysis helper functions can accept a pandas Series object and return a Series as in the example below:
-
-```python
-In[9]: a.clean(pd.Series([6, 9, 12, 15]))
-Out[9]: 
-0     6
-1     9
-2    12
-3    15
-dtype: int64
-```
+You should probably note that numpy was only imported for the purpose of the above example. sci-analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. 
 
 ### How do I use sci-analysis?
 
 The easiest and fastest way to use sci-analysis is to call it's `analyze` function. Here's the signature for the `analyze` function:
 
 ```python
-def analyze(xdata, ydata=[], groups=[], name='', xname='', yname='y', alpha=0.05, categories='Categories'):
+def analyze(
+        xdata,
+        ydata=None,
+        groups=None,
+        name=None,
+        xname=None,
+        yname=None,
+        alpha=0.05,
+        categories='Categories'):
 ```
 
 `analyze` will detect the desired type of data analysis to perform based on whether the `ydata` argument is supplied, and whether the `xdata` argument is a two-dimensional array-like object. 
 
-The `xdata` and `ydata` arguments can accept most python iterable objects, with the exception of strings. For example, `xdata` will accept a python list or tuple, a numpy ndarray, or a pandas Series. Internally, lists and tuples are converted to ndarrays and Series objects are manipulated using the ndarray methods.
+The `xdata` and `ydata` arguments can accept most python iterable objects, with the exception of strings. For example, `xdata` will accept a python list or tuple, a numpy array, or a pandas Series. Internally, iterable objects are converted to a Vector object, which is a numpy array of type `float64`.
 
 If only the `xdata` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
 
 If `xdata` and `ydata` are supplied and are both one-dimensional vectors, the correlation between the two vectors will be graphed and calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
 
 ```python
-In[24]: example1 = numpy.array([1.0, 2.0, float('nan'), 4.0, float('nan'), 6.0])
-In[25]: example2 = numpy.array([10.0, 20.0, float('nan'), 40.0, 50.0, 60.0])
-In[26]: a.dropnan_intersect(example1, example2)
+In[6]: example1 = [0.2, 0.25, "nan", 0.38, 0.45, 0.6]
+In[7]: example2 = [0.23, 0.27, "nan", 0.35, "nan", 0.58]
+In[8]: a.analyze(example1, example2)
 
-Out[26]: (array([ 1.,  2.,  4.,  6.]), array([ 10.,  20.,  40.,  60.]))
+Correlation
+-----------
+
+Pearson Coeff:
+r = 0.9932
+p = 0.0068
+
+HA: There is a significant relationship between predictor and response
+
+
+Linear Regression
+-----------------
+
+slope     = 0.8704
+intercept = 0.0463
+R^2       = 0.9932
+std err   = 0.0720
+p value   = 0.0068
+
+HA: There is a significant relationship between predictor and response
 ```
-
-The `dropnan_intersect` function performs what the name implies --- any values that are not-a-number in either vector at the same index will be dropped from the output tuple. It's also important to note that both vector lengths must be equal.
 
 If `xdata` is a sequence of vectors, summary statistics will be reported for each vector. If the concatenation of each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.
 
@@ -156,4 +157,8 @@ f value = 0.2832
 p value = 0.8369
 H0: Group means are matched
 ```
+
+### What's new in sci-analysis version 1.3?
+
+In version 1.3, sci-analysis has been re-written from scratch and is now object oriented. sci-analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be more easily updated and modified in the future. The change should be mostly transparent, however, the names of individual tests have changed, and some of them now need to be called with the module name.
 

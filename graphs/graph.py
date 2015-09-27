@@ -1,5 +1,6 @@
 # matplotlib imports
-from matplotlib.pyplot import show, subplot, plot, grid, xlabel, ylabel, figure, boxplot, hist, legend
+from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
+    xlabel, ylabel, figure, boxplot, hist, legend
 
 # Numpy imports
 from numpy import polyfit, polyval
@@ -8,7 +9,7 @@ from numpy import polyfit, polyval
 from scipy.stats import probplot
 
 # local imports
-from ..data.operations import is_vector, is_iterable, is_dict
+from ..data.operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
 from ..data.vector import Vector
 
 
@@ -50,11 +51,11 @@ class Graph(object):
 class GraphHisto(Graph):
     """Creates a histogram as a side effect."""
 
-    nrows = 2
+    nrows = 3
     ncols = 1
 
     def __init__(self, data, bins=20, name="Data", color="green", box_plot=True):
-        super(GraphHisto, self).__init__(data, name, "Probability")
+        super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability")
         self.bins = bins
         self.color = color
         self.box_plot = box_plot
@@ -67,9 +68,12 @@ class GraphHisto(Graph):
         if self.bins > len(self.vector):
             self.bins = len(self.vector)
         if self.box_plot:
-            subplot(self.nrows, self.ncols, 1)
+            subplot2grid((self.nrows, self.ncols), (0, 0), rowspan=1)
             grid(boxplot(self.vector.data, vert=False, showmeans=True), which='major', axis='x')
-            subplot(self.nrows, self.ncols, 2)
+            xlabel("")
+            ylabel("")
+            yticks([])
+            subplot2grid((self.nrows, self.ncols), (1, 0), rowspan=2)
         grid(hist(self.vector.data, self.bins, normed=True, color=self.color))
         ylabel(self.yname)
         xlabel(self.xname)
@@ -85,7 +89,7 @@ class GraphScatter(Graph):
     ysize = 3
 
     def __init__(self, xdata, ydata, xname='x Data', yname='y Data', fit=True, pointstyle='k.', linestyle='r-'):
-        super(GraphScatter, self).__init__((xdata, ydata), xname, yname)
+        super(GraphScatter, self).__init__(drop_nan_intersect(xdata, ydata), xname, yname)
         self.fit = fit
         self.style = (pointstyle, linestyle)
         self.draw()
@@ -112,7 +116,7 @@ class GraphBoxplot(Graph):
     xsize = 7.5
     ysize = 5
 
-    def __init__(self, vectors, groups=[], xname='Categories', yname='Values', nqp=True):
+    def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
         if not any(is_iterable(v) for v in vectors):
             if is_dict(vectors):
                 groups = vectors.keys()
@@ -128,6 +132,7 @@ class GraphBoxplot(Graph):
         if not groups:
             groups = range(1, len(self.vector) + 1)
         for i, v in enumerate(self.vector):
+            self.vector[i] = v = drop_nan(v)
             if len(v) == 0:
                 groups = groups[:i] + groups[i + 1:]
                 continue
