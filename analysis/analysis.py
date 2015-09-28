@@ -1,5 +1,5 @@
 # Scipy imports
-from scipy.stats import linregress, shapiro, pearsonr, spearmanr, f_oneway, kruskal, bartlett, levene, skew, kurtosis
+from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis
 
 # Numpy imports
 from numpy import concatenate, mean, std, median, amin, amax, percentile
@@ -214,6 +214,64 @@ class GroupNormTest(GroupTest):
         print "HA: Data is not normally distributed"
 
 
+class TTest(Test):
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+
+        self.alpha = alpha
+        self.display = display
+
+        if is_iterable(ydata):
+            # If data is not a vector, wrap it in a Vector object
+            if not is_vector(ydata):
+                self.ydata = Vector(ydata)
+
+            # Stop the test if the vector is empty
+            if self.ydata.is_empty():
+                print "vector is empty"
+                pass
+            else:
+                # Remove NaN values from the vector
+                self.ydata = drop_nan(self.ydata)
+        else:
+            try:
+                self.ydata = float(ydata)
+            except (ValueError, TypeError):
+                print "ydata is not a vector or a number"
+                pass
+
+        super(TTest, self).__init__(xdata, alpha=alpha, display=display)
+
+    def run(self):
+
+        if is_iterable(self.ydata):
+            if EqualVariance(self.data, self.ydata, display=False).results[0] > self.alpha:
+                t, p = ttest_ind(self.data, self.ydata, equal_var=True)
+                test = "T Test"
+            else:
+                t, p = ttest_ind(self.data, self.ydata, equal_var=False)
+                test = "Welch's T Test"
+        else:
+            t, p = ttest_1samp(self.data, float(self.ydata))
+            test = "1 Sample T Test"
+        return float(p), float(t), test
+
+    def output(self):
+        print ""
+        print self.results[2]
+        print "-" * len(self.results[2])
+        print ""
+        print "t = " + "{:.4f}".format(self.results[1])
+        print "p = " + "{:.4f}".format(self.results[0])
+        print ""
+
+    def h0(self):
+        print "H0: Means are matched"
+
+    def ha(self):
+        print "HA: Means are significantly different"
+
+
 class LinearRegression(Comparison):
 
     __min_size = 3
@@ -348,12 +406,10 @@ class EqualVariance(GroupTest):
         return p_value, statistic, t
 
     def output(self):
-        name = "Equal Variance"
-        print ""
-        print name
-        print "-" * len(name)
         print ""
         print self.results[2]
+        print "-" * len(self.results[2])
+        print ""
         if self.results[2] == "Bartlett Test":
             print "T value = " + "{:.4f}".format(self.results[1])
         else:
@@ -535,6 +591,17 @@ def analyze(
         yname=None,
         alpha=0.05,
         categories='Categories'):
+    """ Magic method for performing quick data analysis
+    :param xdata:
+    :param ydata:
+    :param groups:
+    :param name:
+    :param xname:
+    :param yname:
+    :param alpha:
+    :param categories:
+    :return:
+    """
 
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
@@ -542,26 +609,54 @@ def analyze(
             groups = xdata.keys()
             xdata = xdata.values()
 
+        # Apply the y data label
+        if yname:
+            yname = yname
+        elif name:
+            yname = name
+        else:
+            yname = 'Values'
+
+        # Apply the x data label
+        if xname:
+            label = xname
+        else:
+            label = categories
+
         # Show the box plot and stats
-        GraphBoxplot(xdata, groups, categories)
+        GraphBoxplot(xdata, groups, label, yname=yname)
         GroupStatistics(xdata, groups)
         p = EqualVariance(*xdata).results[0]
 
         # If normally distributed and variances are equal, perform one-way ANOVA
         # Otherwise, perform a non-parametric Kruskal-Wallis test
         if GroupNormTest(*xdata, display=False, alpha=alpha).results[0] > alpha and p > alpha:
-            Anova(*xdata)
+            if len(xdata) == 2:
+                TTest(xdata[0], xdata[1])
+            else:
+                Anova(*xdata)
         else:
-            Kruskal(*xdata)
+            if len(xdata) == 2:
+                TTest(xdata[0], xdata[1])
+            else:
+                Kruskal(*xdata)
         pass
 
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
 
         # Apply the x data label
-        label = 'x'
+        label = 'Predictor'
         if xname:
             label = xname
+
+        # Apply the y data label
+        if yname:
+            yname = yname
+        elif name:
+            yname = name
+        else:
+            yname = 'Response'
 
         # Convert xdata and ydata to Vectors
         if not is_vector(xdata):
