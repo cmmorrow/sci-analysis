@@ -5,32 +5,9 @@ A light weight python data exploration and analysis tool by Chris Morrow
 1.3 --- Released October 10, 2015
 
 ### What is sci-analysis?
-<<<<<<< HEAD
 sci-analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
 
 Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way sci-analysisANOVA.
-
-<<<<<<< HEAD
-### Getting started with sci_analysis
-Before using sci_analysis, be sure the following three packages are installed:
-
-=======
-### Getting started with sci-analysis
-Before using sci-analysis, be sure the following three packages are installed:
->>>>>>> 1.2.5
-=======
-### Getting started with sci-analysis
-Before using sci-analysis, be sure the following three packages are installed:
->>>>>>> 1.2.5
-	* numpy
-	* scipy
-	* matplotlib
-	
-sci-analysis is also compatible with pandas and works best in the iPython Notebook.
-=======
-sci-analysis is a python package for performing rapid statistical data analysis. It provides a graphical representation of the supplied data and performs the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
-
-Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA between multiple vectors.
 
 ### Getting started with sci-analysis
 sci-analysis require python 2.7. It has not been tested with python 3.0 or above. 
@@ -47,16 +24,15 @@ Before using sci-analysis, be sure the following three packages are installed:
 - matplotlib
 	
 If you need to install these packages, it's best to install them from a package manager. I recommend pip, but if you use OS X, you can also use homebrew. On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:
->>>>>>> 1.3.0
 
 https://pypi.python.org/pypi/pip
 
 sci-analysis is also compatible with pandas and works best in the iPython Notebook.
 
 To install sci-analysis, first download it to your PC or clone the repo at: 
+
 https://github.com/cmmorrow/sci-analysis
 
-<<<<<<< HEAD
 Next, add the sci-analysis directory to your project with:
 
 ```python
@@ -66,7 +42,7 @@ import numpy as np
 ```
 
 This will tell python were to find sci-analysis and import it to your project as the object `a`. 
-=======
+
 Next, from the python interpreter, add the sci-analysis directory to your project with:
 
 ```python
