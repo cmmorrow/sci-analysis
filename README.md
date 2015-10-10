@@ -19,9 +19,9 @@ If you are on Windows, you might need to install python. You can check to see if
 https://www.python.org/downloads/windows/
 
 Before using sci-analysis, be sure the following three packages are installed:
-	* numpy
-	* scipy
-	* matplotlib
+- numpy
+- scipy
+- matplotlib
 	
 If you need to install these packages, it's best to install them from a package manager. I recommend pip, but if you use OS X, you can also use homebrew. On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:
 
