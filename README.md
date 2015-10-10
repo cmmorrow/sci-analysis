@@ -9,9 +9,14 @@ sci-analysis is a python module for performing rapid statistical data analysis. 
 
 Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way sci-analysisANOVA.
 
+<<<<<<< HEAD
 ### Getting started with sci_analysis
 Before using sci_analysis, be sure the following three packages are installed:
 
+=======
+### Getting started with sci-analysis
+Before using sci-analysis, be sure the following three packages are installed:
+>>>>>>> 1.2.5
 =======
 ### Getting started with sci-analysis
 Before using sci-analysis, be sure the following three packages are installed:
