@@ -7,7 +7,11 @@ A light weight python data exploration and analysis tool by Chris Morrow
 ### What is sci-analysis?
 sci-analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
 
-Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way sci-analysisANOVA.
+Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.
+
+### What's new in sci-analysis version 1.3?
+
+In version 1.3, sci-analysis has been re-written from scratch and is now object oriented. sci-analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent, however, the names of individual tests have changed, and some of them now need to be called with the module name.
 
 ### Getting started with sci-analysis
 sci-analysis require python 2.7. It has not been tested with python 3.0 or above. 
@@ -53,21 +57,15 @@ import numpy as np
 
 **Note:** The package name is `sci_analysis` with an underscore.
 
-This will tell python where to find sci-analysis and import it to your project as the object `a`. 
->>>>>>> 1.3.0
+This will tell python where to find sci-analysis and import it to your project as the object `a`.
 
 If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:
 
 ```python
 %matplotlib inline
 import matplotlib
-<<<<<<< HEAD
-sys.path.extend(['<path to directory>/sci-analysis'])
-import scianalysis as a
-=======
 sys.path.extend(['<path to directory>/sci_analysis'])
 import sci_analysis as a
->>>>>>> 1.3.0
 import numpy as np
 ```
 
@@ -102,21 +100,13 @@ p value = 0.9581
 H0: Data is normally distributed
 ```
 
-<<<<<<< HEAD
-You should probably note that numpy was only imported for the purpose of the above example. sci-analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. sci-analysis can work with regular python sequences as in the following:
-=======
 If `xdata` contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.
->>>>>>> 1.3.0
 
 You should probably note that numpy was only imported for the purpose of the above example. sci-analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. 
 
 ### How do I use sci-analysis?
 
-<<<<<<< HEAD
-sci-analysis is also compatible with the pandas Series object. To use pandas with sci-analysis, be sure to import it to your project with:
-=======
 The easiest and fastest way to use sci-analysis is to call it's `analyze` function. Here's the signature for the `analyze` function:
->>>>>>> 1.3.0
 
 ```python
 def analyze(
@@ -130,23 +120,15 @@ def analyze(
         categories='Categories'):
 ```
 
-<<<<<<< HEAD
 The sci-analysis helper functions can accept a pandas Series object and return a Series as in the example below:
-=======
+
 `analyze` will detect the desired type of data analysis to perform based on whether the `ydata` argument is supplied, and whether the `xdata` argument is a two-dimensional array-like object. 
->>>>>>> 1.3.0
 
 The `xdata` and `ydata` arguments can accept most python iterable objects, with the exception of strings. For example, `xdata` will accept a python list or tuple, a numpy array, or a pandas Series. Internally, iterable objects are converted to a Vector object, which is a numpy array of type `float64`.
 
-<<<<<<< HEAD
-### How do I use sci-analysis?
-
-The easiest and fastest way to use sci-analysis is to call it's `analyze` function. Here's the signature for the `analyze` function:
-=======
 If only the `xdata` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
 
 If `xdata` and `ydata` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
->>>>>>> 1.3.0
 
 ```python
 In[6]: example1 = [0.2, 0.25, "nan", 0.38, 0.45, 0.6]
@@ -214,8 +196,4 @@ p value = 0.1941
 
 H0: Group means are matched
 ```
-
-### What's new in sci-analysis version 1.3?
-
-In version 1.3, sci-analysis has been re-written from scratch and is now object oriented. sci-analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent, however, the names of individual tests have changed, and some of them now need to be called with the module name.
 
