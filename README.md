@@ -37,16 +37,6 @@ To install sci-analysis, first download it to your PC or clone the repo at:
 
 https://github.com/cmmorrow/sci-analysis
 
-Next, add the sci-analysis directory to your project with:
-
-```python
-sys.path.extend(['<path to directory>/sci-analysis'])
-import scianalysis as a
-import numpy as np
-```
-
-This will tell python were to find sci-analysis and import it to your project as the object `a`. 
-
 Next, from the python interpreter, add the sci-analysis directory to your project with:
 
 ```python
