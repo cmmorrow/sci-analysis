@@ -158,7 +158,7 @@ class GraphBoxplot(Graph):
         desired_color = []
         if num < 0:
             num *= -1
-        floor = int(num) / len(colors)
+        floor = int(num) // len(colors)
         remainder = int(num) % len(colors)
         selected = colors[remainder]
         if floor > 0:
