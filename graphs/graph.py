@@ -122,7 +122,7 @@ class GraphBoxplot(Graph):
                 groups = vectors.keys()
                 vectors = vectors.values()
             else:
-                print "Provided data is not a sequence"
+                print("Provided data is not a sequence")
                 pass
         self.prob = []
         self.groups = []

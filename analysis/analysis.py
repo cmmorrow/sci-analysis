@@ -42,7 +42,7 @@ class Analysis(object):
         """ Override this method to write the formatted output to std out.
             This method shouldn't return a value and only produce a side-effect
         """
-        print self.results
+        print(self.results)
         pass
 
     def __str__(self):
@@ -69,7 +69,7 @@ class Test(Analysis):
 
         # Stop the test if the vector is empty
         if self.data.is_empty():
-            print "vector is empty"
+            print("vector is empty")
             pass
         else:
 
@@ -90,7 +90,7 @@ class Test(Analysis):
                 self.h0()
             else:
                 self.ha()
-            print ""
+            print("")
 
     def run(self):
         """ The default p-value is 1
@@ -98,13 +98,13 @@ class Test(Analysis):
         return 1, 0
 
     def output(self):
-        print str(self.results[1]) + ", " + str(self.results[0])
+        print(str(self.results[1]) + ", " + str(self.results[0]))
 
     def h0(self):
-        print "H0: "
+        print("H0: ")
 
     def ha(self):
-        print "HA: "
+        print("HA: ")
 
 
 class GroupTest(Test):
@@ -149,10 +149,10 @@ class Comparison(Test):
         if not is_vector(ydata):
             self.ydata = Vector(ydata)
         if len(xdata) != len(ydata):
-            print "Vector lengths are not equal"
+            print("Vector lengths are not equal")
             pass
         elif self.xdata.is_empty() or self.ydata.is_empty():
-            print "At least one vector is empty"
+            print("At least one vector is empty")
             pass
         else:
             self.xdata, self.ydata = drop_nan_intersect(self.xdata, self.ydata)
@@ -174,19 +174,19 @@ class NormTest(Test):
 
     def output(self):
         name = "Shapiro-Wilk test for normality"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "W value = " + "{:.4f}".format(self.results[1])
-        print "p value = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("W value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Data is normally distributed"
+        print("H0: Data is normally distributed")
 
     def ha(self):
-        print "HA: Data is not normally distributed"
+        print("HA: Data is not normally distributed")
 
 
 class GroupNormTest(GroupTest):
@@ -199,19 +199,19 @@ class GroupNormTest(GroupTest):
 
     def output(self):
         name = "Shapiro-Wilk test for normality"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "W value = " + "{:.4f}".format(self.results[1])
-        print "p value = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("W value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Data is normally distributed"
+        print("H0: Data is normally distributed")
 
     def ha(self):
-        print "HA: Data is not normally distributed"
+        print("HA: Data is not normally distributed")
 
 
 class TTest(Test):
@@ -228,7 +228,7 @@ class TTest(Test):
 
             # Stop the test if the vector is empty
             if self.ydata.is_empty():
-                print "vector is empty"
+                print("vector is empty")
                 pass
             else:
                 # Remove NaN values from the vector
@@ -237,7 +237,7 @@ class TTest(Test):
             try:
                 self.ydata = float(ydata)
             except (ValueError, TypeError):
-                print "ydata is not a vector or a number"
+                print("ydata is not a vector or a number")
                 pass
 
         super(TTest, self).__init__(xdata, alpha=alpha, display=display)
@@ -257,19 +257,19 @@ class TTest(Test):
         return float(p), float(t), test
 
     def output(self):
-        print ""
-        print self.results[2]
-        print "-" * len(self.results[2])
-        print ""
-        print "t = " + "{:.4f}".format(self.results[1])
-        print "p = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(self.results[2])
+        print("-" * len(self.results[2]))
+        print("")
+        print("t = " + "{:.4f}".format(self.results[1]))
+        print("p = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Means are matched"
+        print("H0: Means are matched")
 
     def ha(self):
-        print "HA: Means are significantly different"
+        print("HA: Means are significantly different")
 
 
 class LinearRegression(Comparison):
@@ -283,23 +283,23 @@ class LinearRegression(Comparison):
 
     def output(self):
         name = "Linear Regression"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "count     = " + str(self.results[5])
-        print "slope     = " + "{:.4f}".format(self.results[1])
-        print "intercept = " + "{:.4f}".format(self.results[2])
-        print "R^2       = " + "{:.4f}".format(self.results[3])
-        print "std err   = " + "{:.4f}".format(self.results[4])
-        print "p value   = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("count     = " + str(self.results[5]))
+        print("slope     = " + "{:.4f}".format(self.results[1]))
+        print("intercept = " + "{:.4f}".format(self.results[2]))
+        print("R^2       = " + "{:.4f}".format(self.results[3]))
+        print("std err   = " + "{:.4f}".format(self.results[4]))
+        print("p value   = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: There is no significant relationship between predictor and response"
+        print("H0: There is no significant relationship between predictor and response")
 
     def ha(self):
-        print "HA: There is a significant relationship between predictor and response"
+        print("HA: There is a significant relationship between predictor and response")
 
 
 class Correlation(Comparison):
@@ -317,23 +317,23 @@ class Correlation(Comparison):
 
     def output(self):
         name = "Correlation"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
         if self.results[2] == "pearson":
-            print "Pearson Coeff:"
+            print("Pearson Coeff:")
         else:
-            print "Spearman Coeff:"
-        print "r = " + "{:.4f}".format(self.results[1])
-        print "p = " + "{:.4f}".format(self.results[0])
-        print ""
+            print("Spearman Coeff:")
+        print("r = " + "{:.4f}".format(self.results[1]))
+        print("p = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: There is no significant relationship between predictor and response"
+        print("H0: There is no significant relationship between predictor and response")
 
     def ha(self):
-        print "HA: There is a significant relationship between predictor and response"
+        print("HA: There is a significant relationship between predictor and response")
 
 
 class Anova(GroupTest):
@@ -348,19 +348,19 @@ class Anova(GroupTest):
 
     def output(self):
         name = "Oneway ANOVA"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "f value = " + "{:.4f}".format(self.results[1])
-        print "p value = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("f value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Group means are matched"
+        print("H0: Group means are matched")
 
     def ha(self):
-        print "HA: Group means are not matched"
+        print("HA: Group means are not matched")
 
 
 class Kruskal(GroupTest):
@@ -375,19 +375,19 @@ class Kruskal(GroupTest):
 
     def output(self):
         name = "Kruskal-Wallis"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "H value = " + "{:.4f}".format(self.results[1])
-        print "p value = " + "{:.4f}".format(self.results[0])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("H value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Group means are matched"
+        print("H0: Group means are matched")
 
     def ha(self):
-        print "HA: Group means are not matched"
+        print("HA: Group means are not matched")
 
 
 class EqualVariance(GroupTest):
@@ -406,22 +406,22 @@ class EqualVariance(GroupTest):
         return p_value, statistic, t
 
     def output(self):
-        print ""
-        print self.results[2]
-        print "-" * len(self.results[2])
-        print ""
+        print("")
+        print(self.results[2])
+        print("-" * len(self.results[2]))
+        print("")
         if self.results[2] == "Bartlett Test":
-            print "T value = " + "{:.4f}".format(self.results[1])
+            print("T value = " + "{:.4f}".format(self.results[1]))
         else:
-            print "W value = " + "{:.4f}".format(self.results[1])
-        print "p value = " + "{:.4f}".format(self.results[0])
-        print ""
+            print("W value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
 
     def h0(self):
-        print "H0: Variances are equal"
+        print("H0: Variances are equal")
 
     def ha(self):
-        print "HA: Variances are not equal"
+        print("HA: Variances are not equal")
 
 
 class VectorStatistics(Analysis):
@@ -437,7 +437,7 @@ class VectorStatistics(Analysis):
         self.data = drop_nan(Vector(data))
 
         if self.data.is_empty():
-            print "vector is empty"
+            print("vector is empty")
             pass
         elif len(self.data) < self.__min_size:
             pass
@@ -478,23 +478,23 @@ class VectorStatistics(Analysis):
 
     def output(self):
         name = "Statistics"
-        print ""
-        print name
-        print "-" * len(name)
-        print ""
-        print "Count    = " + str(self.results["count"])
-        print "Mean     = " + "{:.3f}".format(self.results['mean'])
-        print "Std Dev  = " + "{:.3f}".format(self.results['std'])
-        print "Skewness = " + "{:.3f}".format(self.results['skew'])
-        print "Kurtosis = " + "{:.3f}".format(self.results['kurtosis'])
-        print "Max      = " + "{:.3f}".format(self.results['max'])
-        print "75%      = " + "{:.3f}".format(self.results['q3'])
-        print "50%      = " + "{:.3f}".format(self.results['median'])
-        print "25%      = " + "{:.3f}".format(self.results['q1'])
-        print "Min      = " + "{:.3f}".format(self.results['min'])
-        print "IQR      = " + "{:.3f}".format(self.results['iqr'])
-        print "Range    = " + "{:.3f}".format(self.results['range'])
-        print ""
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("Count    = " + str(self.results["count"]))
+        print("Mean     = " + "{:.3f}".format(self.results['mean']))
+        print("Std Dev  = " + "{:.3f}".format(self.results['std']))
+        print("Skewness = " + "{:.3f}".format(self.results['skew']))
+        print("Kurtosis = " + "{:.3f}".format(self.results['kurtosis']))
+        print("Max      = " + "{:.3f}".format(self.results['max']))
+        print("75%      = " + "{:.3f}".format(self.results['q3']))
+        print("50%      = " + "{:.3f}".format(self.results['median']))
+        print("25%      = " + "{:.3f}".format(self.results['q1']))
+        print("Min      = " + "{:.3f}".format(self.results['min']))
+        print("IQR      = " + "{:.3f}".format(self.results['iqr']))
+        print("Range    = " + "{:.3f}".format(self.results['range']))
+        print("")
 
 
 class GroupStatistics(Analysis):
@@ -551,8 +551,8 @@ class GroupStatistics(Analysis):
 
         for s in labels:
             header = header + s + " " * (size - len(s))
-        print header
-        print "-" * len(header)
+        print(header)
+        print("-" * len(header))
         for v in self.results:
             stats = [str(v["count"]),
                      spacing.format(v["mean"]),
@@ -578,7 +578,7 @@ class GroupStatistics(Analysis):
                     line = line + s + " " * (size - offset - len(s))
                 except IndexError:
                     line = line + s + " " * (size - offset - len(s))
-            print line
+            print(line)
             line = ""
 
 
