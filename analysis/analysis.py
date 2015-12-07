@@ -1,12 +1,18 @@
+# Python3 compatability
+from __future__ import absolute_import
+from __future__ import print_function
+
 # Scipy imports
-from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis
+from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis
 
 # Numpy imports
 from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data.vector import Vector
-from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, drop_nan_intersect, is_group, is_dict_group
+from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, \
+    drop_nan_intersect, is_group, is_dict_group
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
@@ -120,7 +126,7 @@ class GroupTest(Test):
         self.__dict__.update(parms)
 
         if is_dict(groups[0]):
-            groups = groups[0].values()
+            groups = list(groups[0].values())
         for group in groups:
             if not is_vector(group):
                 group = drop_nan(Vector(group))
@@ -509,10 +515,10 @@ class GroupStatistics(Analysis):
             pass
         else:
             if is_dict(data):
-                self.groups = data.keys()
-                self.data = data.values()
+                self.groups = list(data.keys())
+                self.data = list(data.values())
             elif groups is None:
-                self.groups = range(1, len(data) + 1)
+                self.groups = list(range(1, len(data) + 1))
             self.logic()
 
     def logic(self):
@@ -606,8 +612,8 @@ def analyze(
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
         if is_dict(xdata):
-            groups = xdata.keys()
-            xdata = xdata.values()
+            groups = list(xdata.keys())
+            xdata = list(xdata.values())
 
         # Apply the y data label
         if yname:

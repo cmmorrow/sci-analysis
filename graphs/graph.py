@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
     xlabel, ylabel, figure, boxplot, hist, legend
@@ -11,6 +13,7 @@ from scipy.stats import probplot
 # local imports
 from ..data.operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
 from ..data.vector import Vector
+#from six.moves import range
 
 
 class Graph(object):
@@ -119,8 +122,8 @@ class GraphBoxplot(Graph):
     def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
         if not any(is_iterable(v) for v in vectors):
             if is_dict(vectors):
-                groups = vectors.keys()
-                vectors = vectors.values()
+                groups = list(vectors.keys())
+                vectors = list(vectors.values())
             else:
                 print("Provided data is not a sequence")
                 pass
@@ -130,7 +133,7 @@ class GraphBoxplot(Graph):
             groups = []
         super(GraphBoxplot, self).__init__(vectors, xname, yname)
         if not groups:
-            groups = range(1, len(self.vector) + 1)
+            groups = list(range(1, len(self.vector) + 1))
         for i, v in enumerate(self.vector):
             self.vector[i] = v = drop_nan(v)
             if len(v) == 0:

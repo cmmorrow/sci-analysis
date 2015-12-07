@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 # Import from numpy
 import numpy as np
 
 # Import from local
-from data import Data
-from operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten
+from .data import Data
+from .operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten
 
 
 class Vector(Data):
@@ -26,7 +27,7 @@ class Vector(Data):
             self.type = data.type
         else:
             if is_dict(data):
-                data = flatten(data.values())
+                data = flatten(list(data.values()))
             if is_iterable(data):
                 self.data = np.array(to_float(data))
                 self.type = self.data.dtype

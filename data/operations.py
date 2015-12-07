@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import numpy as np
-import vector
-import data
+from . import vector
+from . import data
 
 
 def to_float(d):
@@ -107,7 +108,7 @@ def is_array(d):
 def is_dict(d):
     """Test if data is a dictionary object"""
     try:
-        d.items()
+        list(d.items())
         return True
     except AttributeError:
         return False
@@ -127,7 +128,7 @@ def is_group(d):
 def is_dict_group(d):
     """Test if data is a dict of iterables"""
     try:
-        if is_group(d.values()):
+        if is_group(list(d.values())):
             return True
         else:
             return False
