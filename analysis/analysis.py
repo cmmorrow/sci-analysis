@@ -17,11 +17,12 @@ from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
 class Analysis(object):
-    """ Generic analysis super class
+    """Generic analysis super class.
     """
 
     def __init__(self, data, display=True):
         """Initialize the data and results members.
+
            Override this method to initialize additional members or perform
            checks on data.
         """
@@ -30,23 +31,26 @@ class Analysis(object):
         self.results = 0.0
 
     def logic(self):
-        """ Override this method to modify the execution sequence of the analysis.
-            This method needs to run the analysis, set the results member, and
+        """This method needs to run the analysis, set the results member, and
             display the output at bare minimum.
+
+            Override this method to modify the execution sequence of the analysis.
         """
         self.results = self.run()
         if self.display:
             self.output()
 
     def run(self):
-        """ Override this method to perform a specific analysis.
-            This method should return the results of the specific analysis
+        """This method should return the results of the specific analysis.
+
+            Override this method to perform a specific analysis or calculation.
         """
         return 0.0
 
     def output(self):
-        """ Override this method to write the formatted output to std out.
-            This method shouldn't return a value and only produce a side-effect
+        """This method shouldn't return a value and only produce a side-effect.
+
+            Override this method to write the formatted output to std out.
         """
         print(self.results)
         pass
@@ -59,7 +63,7 @@ class Analysis(object):
 
 
 class Test(Analysis):
-    """ Generic statistical test class"""
+    """ Generic statistical test class."""
 
     def __init__(self, data, alpha=0.05, display=True):
 
@@ -139,6 +143,7 @@ class GroupTest(Test):
 
 
 class Comparison(Test):
+    """Perform a test on two independent vectors of equal length."""
 
     __min_size = 2
 
@@ -171,7 +176,7 @@ class Comparison(Test):
 
 
 class NormTest(Test):
-    """ Tests for whether data is normally distributed or not
+    """ Tests for whether data is normally distributed or not.
     """
 
     def run(self):
@@ -196,7 +201,7 @@ class NormTest(Test):
 
 
 class GroupNormTest(GroupTest):
-    """ Tests a group of data to see if they are normally distributed or not
+    """ Tests a group of data to see if they are normally distributed or not.
     """
 
     def run(self):
@@ -221,6 +226,7 @@ class GroupNormTest(GroupTest):
 
 
 class TTest(Test):
+    """Performs a T-Test on the two provided vectors."""
 
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
 
@@ -279,6 +285,7 @@ class TTest(Test):
 
 
 class LinearRegression(Comparison):
+    """Performs a linear regression between two vectors."""
 
     __min_size = 3
 
@@ -309,6 +316,7 @@ class LinearRegression(Comparison):
 
 
 class Correlation(Comparison):
+    """Performs a pearson or spearman correlation between two vectors."""
 
     __min_size = 3
 
@@ -343,6 +351,7 @@ class Correlation(Comparison):
 
 
 class Anova(GroupTest):
+    """Performs a one-way ANOVA on a group of vectors."""
 
     __min_size = 2
 
@@ -370,6 +379,7 @@ class Anova(GroupTest):
 
 
 class Kruskal(GroupTest):
+    """Performs a non-parametric Kruskal-Wallis test on a group of vectors."""
 
     __min_size = 2
 
@@ -397,6 +407,7 @@ class Kruskal(GroupTest):
 
 
 class EqualVariance(GroupTest):
+    """Checks a group of vectors for equal variance."""
 
     __min_size = 2
 
@@ -431,6 +442,7 @@ class EqualVariance(GroupTest):
 
 
 class VectorStatistics(Analysis):
+    """Reports basic summary stats for a provided vector."""
 
     __min_size = 2
 
@@ -504,6 +516,7 @@ class VectorStatistics(Analysis):
 
 
 class GroupStatistics(Analysis):
+    """Reports basic summary stats for a group of vectors."""
 
     __min_size = 1
 
@@ -597,16 +610,17 @@ def analyze(
         yname=None,
         alpha=0.05,
         categories='Categories'):
-    """ Magic method for performing quick data analysis
-    :param xdata:
-    :param ydata:
-    :param groups:
-    :param name:
-    :param xname:
-    :param yname:
-    :param alpha:
-    :param categories:
-    :return:
+    """ Magic method for performing quick data analysis.
+
+    :param xdata: A Vector, numPy Array or sequence like object
+    :param ydata: An optional secondary Vector, numPy Array or sequence object
+    :param groups: A list of group names. The box plots will be graphed in order of groups
+    :param name: The response variable label
+    :param xname: The predictor variable (x-axis) label
+    :param yname: The response variable (y-axis) label
+    :param alpha: The significance level of the test
+    :param categories: The x-axis label when performing a group analysis
+    :return: A tuple of xdata and ydata
     """
 
     # Compare Group Means and Variance

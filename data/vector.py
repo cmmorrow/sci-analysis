@@ -1,3 +1,7 @@
+"""sci_analysis module: vector
+Classes:
+    Vector - The base data container class used by sci_analysis
+"""
 from __future__ import absolute_import
 # Import from numpy
 import numpy as np
@@ -8,11 +12,18 @@ from .operations import is_iterable, is_array, is_dict, to_float, is_vector, fla
 
 
 class Vector(Data):
-    """The base data container class used by sci-analysis"""
+    """The base data container class used by sci_analysis."""
 
     data_type = "Vector"
 
     def __init__(self, data=np.array([]), name=None):
+        """Takes a sequence like object and converts it to a numPy Array of
+        dtype float64, with any non-numeric values converted to NaN.
+
+        :param data: A numPy Array of data type float64
+        :param name: An optional name for the Vector object
+        :return: A Vector object
+        """
 
         super(Vector, self).__init__(n=name)
         if is_array(data):
@@ -37,14 +48,21 @@ class Vector(Data):
             self.data = self.data.flatten()
 
     def append_vector(self, vector):
-        """Appends data from vector to this Vector"""
+        """Appends data from vector to this Vector.
+
+        :param vector: A numPy Array or Vector object
+        :return: A copy of the new Vector
+        """
         if is_array(vector):
             return np.append(self.data, vector)
         elif is_vector(vector):
             return np.append(self.data, vector.data)
 
     def is_empty(self):
-        """Over-rides the super class's method to also check for len = 0"""
+        """Overrides the super class's method to also check for length of zero.
+
+        :return: True or False
+        """
         if self.data is None or len(self.data) == 0:
             return True
         else:

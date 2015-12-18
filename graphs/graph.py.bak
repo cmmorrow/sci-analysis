@@ -1,13 +1,3 @@
-"""sci_analysis module: graph
-Classes:
-    Graph - The super class all other sci_analysis graphing classes descend from.
-    GraphHisto - Draws a histogram.
-    GraphScatter - Draws an x-by-y scatter plot.
-    GraphBoxplot - Draws box plots of the provided data as well as an optional probability plot.
-
-"""
-from __future__ import absolute_import
-from __future__ import print_function
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
     xlabel, ylabel, figure, boxplot, hist, legend
@@ -21,21 +11,10 @@ from scipy.stats import probplot
 # local imports
 from ..data.operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
 from ..data.vector import Vector
-# from six.moves import range
 
 
 class Graph(object):
-    """The super class all other sci_analysis graphing classes descend from.
-    Classes that descend from Graph should implement the draw method at bare minimum.
-
-    Graph members are nrows, ncols, xsize, ysize, vector, xname and yname. The nrows
-    member is the number of graphs that will span vertically. The ncols member is
-    the number of graphs that will span horizontally. The xsize member is the horizontal
-    size of the graph area. The ysize member is the vertical size of the graph area.
-    The vector member the data to be plotted. The xname member is the x-axis label.
-    The yname member is the y-axis label.
-
-    """
+    """Creates a matplotlib graph as a side effect."""
 
     nrows = 1
     ncols = 1
@@ -43,15 +22,6 @@ class Graph(object):
     ysize = 5
 
     def __init__(self, data=None, xname="x", yname="y"):
-        """Converts the data argument to a Vector object and sets it to the Graph
-        object's vector member. Sets the xname and yname arguments as the axis
-        labels. The default values are "x" and "y".
-
-        :param data: The data to plot
-        :param xname: The x-axis label
-        :param yname: The y-axis label
-        :return: pass
-        """
 
         # If data is a sequence, create a Vector for each argument
         if any(is_iterable(d) for d in data):
@@ -74,32 +44,17 @@ class Graph(object):
         self.yname = yname
 
     def draw(self):
-        """Prepares and displays the graph based on the set class members."""
+        """Prepares and displays the graph as a side effect."""
         pass
 
 
 class GraphHisto(Graph):
-    """Draws a histogram.
-
-    New class members are bins, color and box_plot. The bins member is the number
-    of histogram bins to draw. The color member is the color of the histogram area.
-    The box_plot member is a boolean flag for whether to draw the corresponding
-    box plot.
-    """
+    """Creates a histogram as a side effect."""
 
     nrows = 3
     ncols = 1
 
     def __init__(self, data, bins=20, name="Data", color="green", box_plot=True):
-        """GraphHisto constructor.
-
-        :param data: The data to be graphed. This arg sets the vector member.
-        :param bins: The number of histogram bins to draw. This arg sets the bins member.
-        :param name: The optional x-axis label.
-        :param color: The optional color of the histogram as a formmated string.
-        :param box_plot: Display the optional boxplot.
-        :return: pass
-        """
         super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability")
         self.bins = bins
         self.color = color
@@ -127,14 +82,6 @@ class GraphHisto(Graph):
 
 
 class GraphScatter(Graph):
-    """Draws an x-by-y scatter plot.
-
-    Unique class members are fit and style. The fit member is a boolean flag for
-    whether to draw the linear best fit line. The style member is a tuple of
-    formatted strings that set the matplotlib point style and line style. It is
-    also worth noting that the vector member for the GraphScatter class is a
-    tuple of xdata and ydata.
-    """
 
     nrows = 1
     ncols = 1
@@ -142,17 +89,6 @@ class GraphScatter(Graph):
     ysize = 3
 
     def __init__(self, xdata, ydata, xname='x Data', yname='y Data', fit=True, pointstyle='k.', linestyle='r-'):
-        """GraphScatter constructor.
-
-        :param xdata: The x-axis data.
-        :param ydata: The y-axis data.
-        :param xname: The optional x-axis label.
-        :param yname: The optional y-axis label.
-        :param fit: Display the optional line fit.
-        :param pointstyle: The optional matplotlib point style formatted string.
-        :param linestyle: The optional matplotlib line style formatted string.
-        :return: pass
-        """
         super(GraphScatter, self).__init__(drop_nan_intersect(xdata, ydata), xname, yname)
         self.fit = fit
         self.style = (pointstyle, linestyle)
@@ -174,16 +110,6 @@ class GraphScatter(Graph):
 
 
 class GraphBoxplot(Graph):
-    """Draws box plots of the provided data as well as an optional probability plot.
-
-    Unique class members are groups, nqp and prob. The groups member is a list of
-    labels for each boxplot. If groups is an empty list, sequentially ascending
-    numbers are used for each boxplot. The nqp member is a flag that turns the
-    probability plot on or off. The prob member is a list of tuples that contains
-    the data used to graph the probability plot. It is also worth noting that the
-    vector member for the GraphBoxplot is a list of lists that contain the data
-    for each boxplot.
-    """
 
     nrows = 1
     ncols = 2
@@ -191,16 +117,6 @@ class GraphBoxplot(Graph):
     ysize = 5
 
     def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
-        """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are
-        graphed in random order instead of the provided order.
-
-        :param vectors: A list of lists or dict of lists of the data to graph.
-        :param groups: An optional list of boxplot labels. The order should match the order in vectors.
-        :param xname: The optional x-axis label for the boxplots.
-        :param yname: The optional y-axis label.
-        :param nqp: Display the optional probability plot.
-        :return: pass
-        """
         if not any(is_iterable(v) for v in vectors):
             if is_dict(vectors):
                 groups = list(vectors.keys())
@@ -227,11 +143,7 @@ class GraphBoxplot(Graph):
         self.draw()
 
     def get_color(self, num):
-        """Return a color based on the given num argument.
-
-        :param num: An integer not equal to zero that returns a corresponding color
-        :return: A color tuple calculated from the num argument
-        """
+        """Return a color based on the given index"""
         colors = [(0,   0,   1, 1),
                   (0,   0.5, 0, 1),
                   (1,   0,   0, 1),
