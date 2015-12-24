@@ -19,8 +19,8 @@ from numpy import polyfit, polyval
 from scipy.stats import probplot
 
 # local imports
-from ..data.operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
 from ..data.vector import Vector
+from ..operations.data_operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
 # from six.moves import range
 
 

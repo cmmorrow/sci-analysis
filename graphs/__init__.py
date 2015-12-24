@@ -2,4 +2,5 @@
 Modules:
     graphs - graphing classes
 """
+
 from graph import *

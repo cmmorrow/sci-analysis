@@ -1,5 +1,3 @@
-
-
 class Data(object):
     """The super class used by all objects representing data for analysis
     in sci_analysis. All analysis classes should expect the data provided through

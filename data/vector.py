@@ -8,7 +8,6 @@ import numpy as np
 
 # Import from local
 from .data import Data
-from .operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten
 
 
 class Vector(Data):
@@ -67,3 +66,6 @@ class Vector(Data):
             return True
         else:
             return False
+
+# Perform the operations import at the end to avoid cyclical imports.
+from ..operations.data_operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten

@@ -1,3 +1,22 @@
+"""Module: analysis.py
+Classes:
+    Analysis - Generic analysis root class.
+    Test - Generic statistical test class.
+    GroupTest - Perform a test on multiple vectors that are passed as a tuple of arbitrary length.
+    Comparison - Perform a test on two independent vectors of equal length.
+    NormTest - Tests for whether data is normally distributed or not.
+    GroupNormTest - Tests a group of data to see if they are normally distributed or not.
+    TTest - Performs a T-Test on the two provided vectors.
+    LinearRegression - Performs a linear regression between two vectors.
+    Correlation - Performs a pearson or spearman correlation between two vectors.
+    Anova - Performs a one-way ANOVA on a group of vectors.
+    Kruskal - Performs a non-parametric Kruskal-Wallis test on a group of vectors.
+    EqualVariance - Checks a group of vectors for equal variance.
+    VectorStatistics - Reports basic summary stats for a provided vector.
+    GroupStatistics - Reports basic summary stats for a group of vectors.
+Functions:
+    analyze - Magic method for performing quick data analysis.
+"""
 # Python3 compatability
 from __future__ import absolute_import
 from __future__ import print_function
@@ -11,20 +30,30 @@ from numpy import concatenate, mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data.vector import Vector
-from ..data.operations import is_vector, is_dict, is_iterable, drop_nan, \
-    drop_nan_intersect, is_group, is_dict_group
+from ..operations.data_operations import is_dict, is_iterable, is_vector, is_group,\
+    is_dict_group, drop_nan, drop_nan_intersect
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
 class Analysis(object):
-    """Generic analysis super class.
+    """Generic analysis root class.
+
+    Members:
+        data - the data used for analysis.
+        display - flag for whether to display the analysis output.
+        results - a tuple representing the results of the analysis.
+
+    Methods:
+        logic - This method needs to run the analysis, set the results member, and display the output at bare minimum.
+        run - This method should return the results of the specific analysis.
+        output - This method shouldn't return a value and only produce a side-effect.
     """
 
     def __init__(self, data, display=True):
         """Initialize the data and results members.
 
-           Override this method to initialize additional members or perform
-           checks on data.
+        Override this method to initialize additional members or perform
+        checks on data.
         """
         self.data = data
         self.display = display
@@ -32,9 +61,9 @@ class Analysis(object):
 
     def logic(self):
         """This method needs to run the analysis, set the results member, and
-            display the output at bare minimum.
+        display the output at bare minimum.
 
-            Override this method to modify the execution sequence of the analysis.
+        Override this method to modify the execution sequence of the analysis.
         """
         self.results = self.run()
         if self.display:
@@ -43,14 +72,14 @@ class Analysis(object):
     def run(self):
         """This method should return the results of the specific analysis.
 
-            Override this method to perform a specific analysis or calculation.
+        Override this method to perform a specific analysis or calculation.
         """
         return 0.0
 
     def output(self):
         """This method shouldn't return a value and only produce a side-effect.
 
-            Override this method to write the formatted output to std out.
+        Override this method to write the formatted output to std out.
         """
         print(self.results)
         pass
@@ -63,7 +92,20 @@ class Analysis(object):
 
 
 class Test(Analysis):
-    """ Generic statistical test class."""
+    """Generic statistical test class.
+    Members:
+        data - the data used for analysis.
+        display - flag for whether to display the analysis output.
+        results - a tuple representing the results of the analysis.
+        alpha - the statistical significance of the test.
+    Methods:
+        logic - If the result is greater than the significance, print the null hypothesis, otherwise,
+            the alternate hypothesis.
+        run - This method should return the results of the specific analysis.
+        output - This method shouldn't return a value and only produce a side-effect.
+        h0 - Prints the null hypothesis.
+        ha - Prints the alternate hypothesis.
+    """
 
     def __init__(self, data, alpha=0.05, display=True):
 
@@ -176,8 +218,7 @@ class Comparison(Test):
 
 
 class NormTest(Test):
-    """ Tests for whether data is normally distributed or not.
-    """
+    """Tests for whether data is normally distributed or not."""
 
     def run(self):
         w_value, p_value = shapiro(self.data)
@@ -201,8 +242,7 @@ class NormTest(Test):
 
 
 class GroupNormTest(GroupTest):
-    """ Tests a group of data to see if they are normally distributed or not.
-    """
+    """Tests a group of data to see if they are normally distributed or not."""
 
     def run(self):
         w_value, p_value = shapiro(concatenate(self.data))
@@ -610,7 +650,7 @@ def analyze(
         yname=None,
         alpha=0.05,
         categories='Categories'):
-    """ Magic method for performing quick data analysis.
+    """Magic method for performing quick data analysis.
 
     :param xdata: A Vector, numPy Array or sequence like object
     :param ydata: An optional secondary Vector, numPy Array or sequence object
