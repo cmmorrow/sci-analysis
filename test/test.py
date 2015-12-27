@@ -1,8 +1,8 @@
 import numpy.ma as ma
 import pandas as pd
 
-from sci_analysis.analysis.analysis import *
-from sci_analysis.operations.data_operations import *
+from ..analysis.analysis import *
+from ..operations.data_operations import *
 
 inputs = {
     'num': 3,
