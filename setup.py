@@ -7,7 +7,8 @@ setup(
         'sci_analysis',
         'sci_analysis.data',
         'sci_analysis.graphs',
-        'sci_analysis.analysis'
+        'sci_analysis.analysis',
+        'sci_analysis.operations'
     ],
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
