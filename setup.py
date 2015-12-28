@@ -2,14 +2,9 @@ from setuptools import setup
 
 setup(
     name='sci_analysis',
-    version='1.3.2',
+    version='1.3.3',
     packages=[
-	'sci_analysis'
-        'sci_analysis.data',
-        'sci_analysis.graphs',
-        'sci_analysis.analysis',
-        'sci_analysis.operations'
-    ],
+	'sci_analysis'],
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
     author='chris morrow',

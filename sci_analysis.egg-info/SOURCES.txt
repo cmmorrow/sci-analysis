@@ -1,0 +1,8 @@
+README
+setup.py
+sci_analysis/__init__.py
+sci_analysis.egg-info/PKG-INFO
+sci_analysis.egg-info/SOURCES.txt
+sci_analysis.egg-info/dependency_links.txt
+sci_analysis.egg-info/requires.txt
+sci_analysis.egg-info/top_level.txt
