@@ -4,10 +4,11 @@ setup(
     name='sci_analysis',
     version='1.3.1',
     packages=[
-        'data',
-        'graphs',
-        'analysis',
-        'operations'
+	'sci_analysis'
+        'sci_analysis.data',
+        'sci_analysisgraphs',
+        'sci_analysis.analysis',
+        'sci_analysis.operations'
     ],
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
