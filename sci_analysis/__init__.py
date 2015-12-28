@@ -14,9 +14,9 @@ clean and strip.
 """
 
 from . import analysis
-from analysis import Comparison, NormTest, GroupNormTest, TTest, LinearRegression,\
+from .analysis import Comparison, NormTest, GroupNormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
     analyze, Vector
-from operations import clean, strip
+from .operations import clean, strip
 
 __all__ = ["data", "analysis", "graphs"]
