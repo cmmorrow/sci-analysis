@@ -119,10 +119,10 @@ class GraphBoxplot(Graph):
     def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
         if not any(is_iterable(v) for v in vectors):
             if is_dict(vectors):
-                groups = vectors.keys()
-                vectors = vectors.values()
+                groups = list(vectors.keys())
+                vectors = list(vectors.values())
             else:
-                print "Provided data is not a sequence"
+                print("Provided data is not a sequence")
                 pass
         self.prob = []
         self.groups = []
@@ -130,7 +130,7 @@ class GraphBoxplot(Graph):
             groups = []
         super(GraphBoxplot, self).__init__(vectors, xname, yname)
         if not groups:
-            groups = range(1, len(self.vector) + 1)
+            groups = list(range(1, len(self.vector) + 1))
         for i, v in enumerate(self.vector):
             self.vector[i] = v = drop_nan(v)
             if len(v) == 0:
@@ -158,7 +158,7 @@ class GraphBoxplot(Graph):
         desired_color = []
         if num < 0:
             num *= -1
-        floor = int(num) / len(colors)
+        floor = int(num) // len(colors)
         remainder = int(num) % len(colors)
         selected = colors[remainder]
         if floor > 0:
