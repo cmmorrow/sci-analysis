@@ -64,9 +64,11 @@ Now, sci-analysis should be ready to use. Try the following code:::
 	a.analyze(data)
 
 A histogram and box plot of the data should appear, as well as printed output similar to that below:
-.. image:: /img/histo.png
 
-	::
+.. image:: ../img/histo.png
+
+::
+
 	Statistics
 	----------
 

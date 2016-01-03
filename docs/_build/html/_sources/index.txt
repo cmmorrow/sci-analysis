@@ -63,27 +63,35 @@ Now, sci-analysis should be ready to use. Try the following code:::
 	data = np.random.randn(100)
 	a.analyze(data)
 
-A histogram and box plot of the data should appear, as well as printed output similar to that below:::
+A histogram and box plot of the data should appear, as well as printed output similar to that below:
+
+.. image:: ../img/histo.png
+
+::
 
 	Statistics
-	--------
-	Count = 100
-	Mean = -0.0346394170379
-	Standard Deviation = 1.00138009977
-	Skewness = 0.246797356486
-	Kurtosis = 0.0301715149203
-	Max = 2.98521191579
-	75% = 0.618195797909
-	50% = -0.1045351866
-	25% = -0.760766375821
-	Min = -2.43834596493
-	IQR = 1.37896217373
-	Range = 5.42355788072
+	----------
+
+	Count    = 1000
+	Mean     = -0.015
+	Std Dev  = 1.043
+	Skewness = 0.014
+	Kurtosis = 0.002
+	Max      = 3.511
+	75%      = 0.721
+	50%      = -0.021
+	25%      = -0.700
+	Min      = -3.277
+	IQR      = 1.421
+	Range    = 6.788
+
 
 	Shapiro-Wilk test for normality
-	--------
-	W value = 0.9944
-	p value = 0.9581
+	-------------------------------
+
+	W value = 0.9995
+	p value = 0.9965
+
 	H0: Data is normally distributed
 
 If ``data`` contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.
