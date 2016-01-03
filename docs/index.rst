@@ -114,30 +114,31 @@ If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an
 
 	example1 = [0.2, 0.25, 0.27, "nan", 0.32, 0.38, 0.39, "nan", 0.42, 0.43, 0.47, 0.51, 0.52, 0.56, 0.6]
 	example2 = [0.23, 0.27, 0.29, "nan", 0.33, 0.35, 0.39, 0.42, "nan", 0.46, 0.48, 0.49, "nan", 0.5, 0.58]
-	sa.analyze(example1, example2)
+	a.analyze(example1, example2)
 
 .. image:: ../img/corr.png
 
 ::
-
+	
 	Linear Regression
 	-----------------
 
-	count     = 4
-	slope     = 0.8704
-	intercept = 0.0463
-	R^2       = 0.9932
-	std err   = 0.0720
-	p value   = 0.0068
+	count  	  = 11
+	slope     = 0.8467
+	intercept = 0.0601
+	R^2       = 0.9836
+	std err   = 0.0518
+	p value   = 0.0000
 
 	HA: There is a significant relationship between predictor and response
+
 
 	Correlation
 	-----------
 
 	Pearson Coeff:
-	r = 0.9932
-	p = 0.0068
+	r = 0.9836
+	p = 0.0000
 
 	HA: There is a significant relationship between predictor and response
 
@@ -147,25 +148,32 @@ It is important to note that the vectors should be independent from one another 
 
 For example, a proper use case would be if you had a table with measurement data for multiple groups, such as trial numbers or patients. In this case, each group should be represented by it's own vector, which are then all wrapped in a dictionary or sequence. 
 
-If ``xdata`` is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, ``xdata`` can be a python sequence of the vectors and the ``groups`` argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to ``xdata``. For example:::
+If ``xdata`` is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, ``xdata`` can be a python sequence of the vectors and the ``groups`` argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to ``xdata``. For example
 
-	In[5]: group_a = np.random.randn(6)
-	In[6]: group_b = np.random.randn(7)
-	In[7]: group_c = np.random.randn(5)
-	In[8]: group_d = np.random.randn(8)
+::
+	
+	In[5]: group_a = np.random.randn(50)
+	In[6]: group_b = np.random.randn(25)
+	In[7]: group_c = np.random.randn(30)
+	In[8]: group_d = group_d = np.random.randn(40)
 	In[9]: a.analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
+	
+.. image:: ../img/comp1.png
+
+::
+	
 	Count       Mean        Std.        Min         Q2          Max         Group       
 	------------------------------------------------------------------------------------
-	8          -0.53665     0.84271    -1.30249    -0.79383     1.31658     Group D     
-	7          -0.24336     1.09071    -1.69316     0.18019     1.21020     Group B     
-	5           0.73371     0.95148    -0.55325     0.43994     1.70520     Group C     
-	6           0.40363     1.52694    -2.16493     0.32231     2.32542     Group A     
+	50         -0.09281     0.97702    -2.06823    -0.21706     2.20736     A           
+	25         -0.01699     0.70658    -1.81908     0.11035     1.52168     B           
+	30          0.36266     0.97275    -1.42187     0.33914     2.77769     C           
+	40          0.18866     0.94583    -1.50868     0.20423     2.14427     D           
 
 	Bartlett Test
 	-------------
 
-	T value = 2.1667
-	p value = 0.5385
+	T value = 3.3845
+	p value = 0.3361
 
 	H0: Variances are equal
 
@@ -173,7 +181,47 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
 	Oneway ANOVA
 	------------
 
-	f value = 1.7103
-	p value = 0.1941
+	f value = 1.7762
+	p value = 0.1545
 
 	H0: Group means are matched
+
+In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test and Oneway ANOVA), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B
+
+::
+	
+	In[10]: group_a = np.random.normal(0, 1, 50)
+	In[11]: group_b = np.random.normal(0, 3, 25)
+	In[12]: group_c = np.random.normal(0.1, 1, 30)
+	In[13]: group_d = np.random.normal(0, 1, 40)
+	In[14]: a.analyze([group_a, group_b, group_c, group_d], groups=["A", "B", "C", "D"])
+
+.. image:: ../img/comp2.png
+
+::
+	
+	Count       Mean        Std.        Min         Q2          Max         Group       
+	------------------------------------------------------------------------------------
+	50         -0.19082     1.01291    -2.48687    -0.22015     2.15578     A           
+	25         -0.03630     2.89428    -6.02110     0.07263     4.47457     B           
+	30         -0.09452     1.14620    -2.00273    -0.14987     2.68979     C           
+	40         -0.31092     0.86448    -2.51564    -0.13437     1.09661     D           
+
+	Levene Test
+	-----------
+
+	W value = 22.9783
+	p value = 0.0000
+
+	HA: Variances are not equal
+
+
+	Kruskal-Wallis
+	--------------
+
+	H value = 0.5562
+	p value = 0.9064
+
+	H0: Group means are matched	
+
+In the example above, group B has a standard deviation of 2.89 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance.
