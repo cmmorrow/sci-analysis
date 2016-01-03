@@ -60,7 +60,7 @@ If you are using the iPython Notebook, you will also want to use the following c
 
 Now, sci-analysis should be ready to use. Try the following code:::
 
-	data = np.random.randn(100)
+	data = np.random.randn(1000)
 	a.analyze(data)
 
 A histogram and box plot of the data should appear, as well as printed output similar to that below:
@@ -108,12 +108,17 @@ The ``xdata`` and ``ydata`` arguments can accept most python iterable objects, w
 
 If only the ``xdata`` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
 
-If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:::
+If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield
 
-	In[6]: example1 = [0.2, 0.25, "nan", 0.38, 0.45, 0.6]
-	In[7]: example2 = [0.23, 0.27, "nan", 0.35, "nan", 0.58]
-	In[8]: a.analyze(example1, example2)
+::
 
+	example1 = [0.2, 0.25, 0.27, "nan", 0.32, 0.38, 0.39, "nan", 0.42, 0.43, 0.47, 0.51, 0.52, 0.56, 0.6]
+	example2 = [0.23, 0.27, 0.29, "nan", 0.33, 0.35, 0.39, 0.42, "nan", 0.46, 0.48, 0.49, "nan", 0.5, 0.58]
+	sa.analyze(example1, example2)
+
+.. image:: ../img/corr.png
+
+::
 
 	Linear Regression
 	-----------------
