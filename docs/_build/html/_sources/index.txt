@@ -186,7 +186,7 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
 
 	H0: Group means are matched
 
-In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test and Oneway ANOVA), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B
+In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B
 
 ::
 	
@@ -225,3 +225,45 @@ In the example above, sci_analysis is telling us the four groups are normally di
 	H0: Group means are matched	
 
 In the example above, group B has a standard deviation of 2.89 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance.
+
+In another example, let's compare groups that have different distibutions and different means:
+
+::
+	
+	In[15]: group_a = np.random.normal(0, 1, 50)
+	In[16]: group_b = np.random.weibull(0.82, 50)
+	In[17]: group_c = np.random.normal(2.5, 1, 30)
+	In[18]: group_d = np.random.normal(-0.5, 1, 40)
+	In[19]: a.analyze({"A": group_a, "B": group_b, "C": group_c, "D": group_d})
+
+.. image:: ../img/comp3.png
+
+::
+	
+	Count       Mean        Std.        Min         Q2          Max         Group       
+	------------------------------------------------------------------------------------
+	50         -0.07091     1.06720    -2.59419    -0.05428     2.31340     A           
+	30          2.41758     0.86823     0.90913     2.54628     4.21419     C           
+	50          1.26172     1.54953     0.00308     0.67848     7.18120     B           
+	40         -0.41410     0.95377    -3.40598    -0.27992     1.64474     D           
+
+	Levene Test
+	-----------
+
+	W value = 1.0429
+	p value = 0.3751
+
+	H0: Variances are equal
+
+
+	Kruskal-Wallis
+	--------------
+
+	H value = 86.0827
+	p value = 0.0000
+
+	HA: Group means are not matched
+
+.. note:: If a dict is passed to the analyze function, the groups are reported in arbitrary order. This will be fixed in a future release.
+
+The above example models group B as a weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the longer tail on the group B boxplot, and the curved shape of group B on the quantile plot. Group C has the highest mean at 2.42, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.
