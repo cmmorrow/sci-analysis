@@ -118,7 +118,7 @@ The ``xdata`` and ``ydata`` arguments can accept most python iterable objects, w
 
 If only the ``xdata`` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
 
-If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield
+If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
 
 ::
 
@@ -158,7 +158,7 @@ It is important to note that the vectors should be independent from one another 
 
 For example, a proper use case would be if you had a table with measurement data for multiple groups, such as trial numbers or patients. In this case, each group should be represented by it's own vector, which are then all wrapped in a dictionary or sequence. 
 
-If ``xdata`` is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, ``xdata`` can be a python sequence of the vectors and the ``groups`` argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to ``xdata``. For example
+If ``xdata`` is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, ``xdata`` can be a python sequence of the vectors and the ``groups`` argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to ``xdata``. For example:
 
 ::
 	
@@ -196,7 +196,7 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
 
 	H0: Group means are matched
 
-In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B
+In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B:
 
 ::
 	
