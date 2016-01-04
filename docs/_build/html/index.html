@@ -43,12 +43,12 @@
             
   <div class="section" id="what-is-sci-analysis">
 <h1>What is sci_analysis?<a class="headerlink" href="#what-is-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.</p>
-<p>Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.</p>
+<p>sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. It is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.</p>
+<p>Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.</p>
 </div>
 <div class="section" id="what-s-new-in-sci-analysis-version-1-3">
 <h1>What&#8217;s new in sci_analysis version 1.3?<a class="headerlink" href="#what-s-new-in-sci-analysis-version-1-3" title="Permalink to this headline">¶</a></h1>
-<p>In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci-analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.</p>
+<p>In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci_analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.</p>
 </div>
 <div class="section" id="getting-started-with-sci-analysis">
 <h1>Getting started with sci_analysis<a class="headerlink" href="#getting-started-with-sci-analysis" title="Permalink to this headline">¶</a></h1>
@@ -59,13 +59,16 @@
 </div>
 <div class="section" id="installing-sci-analysis">
 <h1>Installing sci_analysis<a class="headerlink" href="#installing-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis can be installed with pip by tying the following:</p>
+<p>sci_analysis can be installed with pip by typing the following:</p>
 <div class="highlight-python"><div class="highlight"><pre>pip install sci_analysis
 </pre></div>
 </div>
 <p>On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:</p>
 <p><a class="reference external" href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a></p>
-<p>sci_analysis is also compatible with pandas and works best in the iPython Notebook.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">sci_analysis is also compatible with pandas and works best in the iPython Notebook.</p>
+</div>
 </div>
 <div class="section" id="using-sci-analysis">
 <h1>Using sci_analysis<a class="headerlink" href="#using-sci-analysis" title="Permalink to this headline">¶</a></h1>
@@ -82,7 +85,7 @@ import sci_analysis as a
 import numpy as np
 </pre></div>
 </div>
-<p>Now, sci-analysis should be ready to use. Try the following code:</p>
+<p>Now, sci_analysis should be ready to use. Try the following code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
@@ -118,7 +121,15 @@ H0: Data is normally distributed
 <p>If <code class="docutils literal"><span class="pre">data</span></code> contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.</p>
 <p>You should probably note that numpy was only imported for the purpose of the above example. sci_analysis uses numpy internally, so it isn&#8217;t necessary to import it unless you want to explicitly use it.</p>
 <p>Let&#8217;s examine the <code class="docutils literal"><span class="pre">analyze</span></code> function in more detail. Here&#8217;s the signature for the <code class="docutils literal"><span class="pre">analyze</span></code> function:</p>
-<div class="highlight-python"><div class="highlight"><pre>def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, alpha=0.05, categories=&#39;Categories&#39;):
+<div class="highlight-python"><div class="highlight"><pre>def analyze(
+        xdata,
+        ydata=None,
+        groups=None,
+        name=None,
+        xname=None,
+        yname=None,
+        alpha=0.05,
+        categories=&#39;Categories&#39;):
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">analyze</span></code> will detect the desired type of data analysis to perform based on whether the <code class="docutils literal"><span class="pre">ydata</span></code> argument is supplied, and whether the <code class="docutils literal"><span class="pre">xdata</span></code> argument is a two-dimensional array-like object.</p>
@@ -156,13 +167,13 @@ HA: There is a significant relationship between predictor and response
 </div>
 <p>If <code class="docutils literal"><span class="pre">xdata</span></code> is a sequence or dictionary of vectors, summary statistics will be reported for each vector. If the concatenation of each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.</p>
 <p>It is important to note that the vectors should be independent from one another &#8212; that is to say, there should not be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results.</p>
-<p>For example, a proper use case would be if you had a table with measurement data for multiple groups, such as trial numbers or patients. In this case, each group should be represented by it&#8217;s own vector, which are then all wrapped in a dictionary or sequence.</p>
+<p>For example, a proper use case would be if you had a table with measurement data for multiple groups, such as test scores per class, accidents per site or measurements per trial, where the classes, sites and trials are the groups. In this case, each group should be represented by it&#8217;s own vector, which are then all wrapped in a dictionary or sequence.</p>
 <p>If <code class="docutils literal"><span class="pre">xdata</span></code> is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, <code class="docutils literal"><span class="pre">xdata</span></code> can be a python sequence of the vectors and the <code class="docutils literal"><span class="pre">groups</span></code> argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to <code class="docutils literal"><span class="pre">xdata</span></code>. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre>In[5]: group_a = np.random.randn(50)
-In[6]: group_b = np.random.randn(25)
-In[7]: group_c = np.random.randn(30)
-In[8]: group_d = group_d = np.random.randn(40)
-In[9]: a.analyze({&quot;Group A&quot;: group_a, &quot;Group B&quot;: group_b, &quot;Group C&quot;: group_c, &quot;Group D&quot;: group_d})
+<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">group_d</span> <span class="o">=</span> <span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
 <img alt="_images/comp1.png" src="_images/comp1.png" />
@@ -192,11 +203,11 @@ H0: Group means are matched
 </pre></div>
 </div>
 <p>In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let&#8217;s try another example, but this time change the variance of group B:</p>
-<div class="highlight-python"><div class="highlight"><pre>In[10]: group_a = np.random.normal(0, 1, 50)
-In[11]: group_b = np.random.normal(0, 3, 25)
-In[12]: group_c = np.random.normal(0.1, 1, 30)
-In[13]: group_d = np.random.normal(0, 1, 40)
-In[14]: a.analyze([group_a, group_b, group_c, group_d], groups=[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;])
+<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">([</span><span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span><span class="p">,</span> <span class="n">group_c</span><span class="p">,</span> <span class="n">group_d</span><span class="p">],</span> <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 <img alt="_images/comp2.png" src="_images/comp2.png" />
@@ -227,11 +238,11 @@ H0: Group means are matched
 </div>
 <p>In the example above, group B has a standard deviation of 2.89 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance.</p>
 <p>In another example, let&#8217;s compare groups that have different distibutions and different means:</p>
-<div class="highlight-python"><div class="highlight"><pre>In[15]: group_a = np.random.normal(0, 1, 50)
-In[16]: group_b = np.random.weibull(0.82, 50)
-In[17]: group_c = np.random.normal(2.5, 1, 30)
-In[18]: group_d = np.random.normal(-0.5, 1, 40)
-In[19]: a.analyze({&quot;A&quot;: group_a, &quot;B&quot;: group_b, &quot;C&quot;: group_c, &quot;D&quot;: group_d})
+<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">weibull</span><span class="p">(</span><span class="mf">0.82</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s">&quot;A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
 <img alt="_images/comp3.png" src="_images/comp3.png" />
@@ -264,7 +275,7 @@ HA: Group means are not matched
 <p class="first admonition-title">Note</p>
 <p class="last">If a dict is passed to the analyze function, the groups are reported in arbitrary order. This will be fixed in a future release.</p>
 </div>
-<p>The above example models group B as a weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the longer tail on the group B boxplot, and the curved shape of group B on the quantile plot. Group C has the highest mean at 2.42, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.</p>
+<p>The above example models group B as a Weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the longer tail on the group B boxplot, and the curved shape of group B on the quantile plot. Group C has the highest mean at 2.42, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.</p>
 </div>
 
 

@@ -7,14 +7,14 @@
 What is sci_analysis?
 =====================
 
-sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
+sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. It is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
 
-Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.
+Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.
 
 What's new in sci_analysis version 1.3?
 =======================================
 
-In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci-analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.
+In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci_analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.
 
 Getting started with sci_analysis
 =================================
@@ -30,7 +30,7 @@ If you are on Windows, you might need to install python. You can check to see if
 Installing sci_analysis
 =======================
 
-sci_analysis can be installed with pip by tying the following:
+sci_analysis can be installed with pip by typing the following:
 
 ::
 	
@@ -40,7 +40,7 @@ On Linux, you can install pip from your OS package manager. Otherwise, you can d
 
 `<https://pypi.python.org/pypi/pip>`_
 
-sci_analysis is also compatible with pandas and works best in the iPython Notebook.
+.. note:: sci_analysis is also compatible with pandas and works best in the iPython Notebook.
 
 Using sci_analysis
 ==================
@@ -64,7 +64,7 @@ If you are using the iPython Notebook, you will also want to use the following c
 	import sci_analysis as a
 	import numpy as np
 
-Now, sci-analysis should be ready to use. Try the following code:
+Now, sci_analysis should be ready to use. Try the following code:
 
 ::
 	
@@ -110,7 +110,15 @@ Let's examine the ``analyze`` function in more detail. Here's the signature for 
 
 ::
 	
-	def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, alpha=0.05, categories='Categories'):
+	def analyze(
+		xdata, 
+		ydata=None, 
+		groups=None, 
+		name=None, 
+		xname=None, 
+		yname=None, 
+		alpha=0.05, 
+		categories='Categories'):
 
 ``analyze`` will detect the desired type of data analysis to perform based on whether the ``ydata`` argument is supplied, and whether the ``xdata`` argument is a two-dimensional array-like object. 
 
@@ -156,17 +164,17 @@ If ``xdata`` is a sequence or dictionary of vectors, summary statistics will be 
 
 It is important to note that the vectors should be independent from one another --- that is to say, there should not be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results. 
 
-For example, a proper use case would be if you had a table with measurement data for multiple groups, such as trial numbers or patients. In this case, each group should be represented by it's own vector, which are then all wrapped in a dictionary or sequence. 
+For example, a proper use case would be if you had a table with measurement data for multiple groups, such as test scores per class, accidents per site or measurements per trial, where the classes, sites and trials are the groups. In this case, each group should be represented by it's own vector, which are then all wrapped in a dictionary or sequence. 
 
 If ``xdata`` is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, ``xdata`` can be a python sequence of the vectors and the ``groups`` argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to ``xdata``. For example:
 
 ::
 	
-	In[5]: group_a = np.random.randn(50)
-	In[6]: group_b = np.random.randn(25)
-	In[7]: group_c = np.random.randn(30)
-	In[8]: group_d = group_d = np.random.randn(40)
-	In[9]: a.analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
+	group_a = np.random.randn(50)
+	group_b = np.random.randn(25)
+	group_c = np.random.randn(30)
+	group_d = group_d = np.random.randn(40)
+	a.analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
 	
 .. image:: ../img/comp1.png
 
@@ -200,11 +208,11 @@ In the example above, sci_analysis is telling us the four groups are normally di
 
 ::
 	
-	In[10]: group_a = np.random.normal(0, 1, 50)
-	In[11]: group_b = np.random.normal(0, 3, 25)
-	In[12]: group_c = np.random.normal(0.1, 1, 30)
-	In[13]: group_d = np.random.normal(0, 1, 40)
-	In[14]: a.analyze([group_a, group_b, group_c, group_d], groups=["A", "B", "C", "D"])
+	group_a = np.random.normal(0, 1, 50)
+	group_b = np.random.normal(0, 3, 25)
+	group_c = np.random.normal(0.1, 1, 30)
+	group_d = np.random.normal(0, 1, 40)
+	a.analyze([group_a, group_b, group_c, group_d], groups=["A", "B", "C", "D"])
 
 .. image:: ../img/comp2.png
 
@@ -240,11 +248,11 @@ In another example, let's compare groups that have different distibutions and di
 
 ::
 	
-	In[15]: group_a = np.random.normal(0, 1, 50)
-	In[16]: group_b = np.random.weibull(0.82, 50)
-	In[17]: group_c = np.random.normal(2.5, 1, 30)
-	In[18]: group_d = np.random.normal(-0.5, 1, 40)
-	In[19]: a.analyze({"A": group_a, "B": group_b, "C": group_c, "D": group_d})
+	group_a = np.random.normal(0, 1, 50)
+	group_b = np.random.weibull(0.82, 50)
+	group_c = np.random.normal(2.5, 1, 30)
+	group_d = np.random.normal(-0.5, 1, 40)
+	a.analyze({"A": group_a, "B": group_b, "C": group_c, "D": group_d})
 
 .. image:: ../img/comp3.png
 
@@ -276,4 +284,4 @@ In another example, let's compare groups that have different distibutions and di
 
 .. note:: If a dict is passed to the analyze function, the groups are reported in arbitrary order. This will be fixed in a future release.
 
-The above example models group B as a weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the longer tail on the group B boxplot, and the curved shape of group B on the quantile plot. Group C has the highest mean at 2.42, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.
+The above example models group B as a Weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the longer tail on the group B boxplot, and the curved shape of group B on the quantile plot. Group C has the highest mean at 2.42, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.
