@@ -30,8 +30,10 @@ If you are on Windows, you might need to install python. You can check to see if
 Installing sci_analysis
 =======================
 
-sci_analysis can be installed with pip by tying the following:::
+sci_analysis can be installed with pip by tying the following:
 
+::
+	
 	pip install sci_analysis
 	
 On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:
@@ -43,8 +45,10 @@ sci_analysis is also compatible with pandas and works best in the iPython Notebo
 Using sci_analysis
 ==================
 
-From the python interpreter, type:::
+From the python interpreter, type:
 
+::
+	
 	import sci_analysis as a
 	import numpy as np
 
@@ -52,14 +56,18 @@ From the python interpreter, type:::
 
 This will tell python to import sci_analysis to your project as the object ``a``.
 
-If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:::
+If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:
 
+::
+	
 	%matplotlib inline
 	import sci_analysis as a
 	import numpy as np
 
-Now, sci-analysis should be ready to use. Try the following code:::
+Now, sci-analysis should be ready to use. Try the following code:
 
+::
+	
 	data = np.random.randn(1000)
 	a.analyze(data)
 
@@ -98,8 +106,10 @@ If ``data`` contains missing values or strings, they will be ignored when genera
 
 You should probably note that numpy was only imported for the purpose of the above example. sci_analysis uses numpy internally, so it isn't necessary to import it unless you want to explicitly use it. 
 
-Let's examine the ``analyze`` function in more detail. Here's the signature for the ``analyze`` function:::
+Let's examine the ``analyze`` function in more detail. Here's the signature for the ``analyze`` function:
 
+::
+	
 	def analyze(xdata, ydata=None, groups=None, name=None, xname=None, yname=None, alpha=0.05, categories='Categories'):
 
 ``analyze`` will detect the desired type of data analysis to perform based on whether the ``ydata`` argument is supplied, and whether the ``xdata`` argument is a two-dimensional array-like object. 
