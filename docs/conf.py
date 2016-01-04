@@ -43,8 +43,8 @@ templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+#source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sci_analysis'
-copyright = u'2015, Chris Morrow'
+copyright = u'2015-2016, Chris Morrow'
 author = u'Chris Morrow'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -119,7 +119,7 @@ todo_include_todos = True
 if on_rtd:
 	html_theme = 'sphinx_rtd_theme'
 else:
-	html_theme = 'alabaster'
+	html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -127,7 +127,13 @@ else:
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = []
+if not on_rtd:
+	try:
+		import sphinx_rtd_theme
+		html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+	except ImportError:
+		pass
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
