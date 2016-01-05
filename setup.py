@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='sci_analysis',
-    version='1.3.3',
+    version='1.3.4',
     packages=[
 	'sci_analysis'],
     url='https://github.com/cmmorrow/sci-analysis',
