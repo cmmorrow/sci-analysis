@@ -71,3 +71,5 @@ dist/sci_analysis-1.3.2.tar.gz
 dist/sci_analysis-1.3.3.tar.gz
 
 *.whl
+
+dist/sci_analysis-1.3.4.tar.gz
