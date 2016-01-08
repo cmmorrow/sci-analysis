@@ -13,7 +13,7 @@ from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
     xlabel, ylabel, figure, boxplot, hist, legend
 
 # Numpy imports
-from numpy import polyfit, polyval
+from numpy import polyfit, polyval, sort, arange, array
 
 # Scipy imports
 from scipy.stats import probplot
@@ -87,10 +87,11 @@ class GraphHisto(Graph):
     box plot.
     """
 
-    nrows = 3
+    nrows = 2
     ncols = 1
+    ysize = 4
 
-    def __init__(self, data, bins=20, name="Data", color="green", box_plot=True):
+    def __init__(self, data, bins=20, name="Data", color="green", box_plot=True, cdf=True):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
@@ -104,21 +105,38 @@ class GraphHisto(Graph):
         self.bins = bins
         self.color = color
         self.box_plot = box_plot
+        self.cdf = cdf
         self.draw()
 
     def draw(self):
-        figure(figsize=(self.xsize, self.ysize))
-        if len(self.vector) < self.bins:
-            self.bins = len(self.vector)
-        if self.bins > len(self.vector):
-            self.bins = len(self.vector)
+        histo_span = 2
+        box_plot_span = 1
+        cdf_span = 2
         if self.box_plot:
-            subplot2grid((self.nrows, self.ncols), (0, 0), rowspan=1)
+            self.ysize += 1
+            self.nrows += box_plot_span
+        if self.cdf:
+            self.ysize += 4
+            self.nrows += cdf_span
+        figure(figsize=(self.xsize, self.ysize))
+        if len(self.vector) < self.bins or self.bins > len(self.vector):
+            self.bins = len(self.vector)
+        if self.cdf:
+            x_sorted_vector = sort(self.vector)
+            y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
+            x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
+            y_cdf = array([y_sorted_vector[:(len(y_sorted_vector)-1)], y_sorted_vector[1:]]).T.flatten()
+            subplot2grid((self.nrows, self.ncols), (0, 0), rowspan=cdf_span)
+            grid(plot(x_cdf, y_cdf, 'k-'), which='major', axis='x')
+            ylabel("Cumulative Probability")
+        if self.box_plot:
+            subplot2grid((self.nrows, self.ncols), (self.nrows - (box_plot_span + histo_span), 0), rowspan=box_plot_span)
             grid(boxplot(self.vector.data, vert=False, showmeans=True), which='major', axis='x')
             xlabel("")
             ylabel("")
             yticks([])
-            subplot2grid((self.nrows, self.ncols), (1, 0), rowspan=2)
+        if self.box_plot or self.cdf:
+            subplot2grid((self.nrows, self.ncols), (self.nrows - histo_span, 0), rowspan=histo_span)
         grid(hist(self.vector.data, self.bins, normed=True, color=self.color))
         ylabel(self.yname)
         xlabel(self.xname)
