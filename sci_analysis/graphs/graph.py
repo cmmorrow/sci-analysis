@@ -87,11 +87,11 @@ class GraphHisto(Graph):
     box plot.
     """
 
-    nrows = 2
+    nrows = 3
     ncols = 1
     ysize = 4
 
-    def __init__(self, data, bins=20, name="Data", color="green", box_plot=True, cdf=True):
+    def __init__(self, data, bins=20, name="Data", color="green", box_plot=True, cdf=False):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
@@ -109,9 +109,9 @@ class GraphHisto(Graph):
         self.draw()
 
     def draw(self):
-        histo_span = 2
+        histo_span = 3
         box_plot_span = 1
-        cdf_span = 2
+        cdf_span = 3
         if self.box_plot:
             self.ysize += 1
             self.nrows += box_plot_span
@@ -119,7 +119,7 @@ class GraphHisto(Graph):
             self.ysize += 4
             self.nrows += cdf_span
         figure(figsize=(self.xsize, self.ysize))
-        if len(self.vector) < self.bins or self.bins > len(self.vector):
+        if len(self.vector) < self.bins:
             self.bins = len(self.vector)
         if self.cdf:
             x_sorted_vector = sort(self.vector)
@@ -127,7 +127,8 @@ class GraphHisto(Graph):
             x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
             y_cdf = array([y_sorted_vector[:(len(y_sorted_vector)-1)], y_sorted_vector[1:]]).T.flatten()
             subplot2grid((self.nrows, self.ncols), (0, 0), rowspan=cdf_span)
-            grid(plot(x_cdf, y_cdf, 'k-'), which='major', axis='x')
+            grid(plot(x_cdf, y_cdf, 'k-'))  # , which='major', axis='x')
+            yticks(arange(11) * 0.1)
             ylabel("Cumulative Probability")
         if self.box_plot:
             subplot2grid((self.nrows, self.ncols), (self.nrows - (box_plot_span + histo_span), 0), rowspan=box_plot_span)
