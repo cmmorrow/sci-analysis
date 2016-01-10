@@ -87,11 +87,11 @@ class GraphHisto(Graph):
     box plot.
     """
 
-    nrows = 3
+    nrows = 2
     ncols = 1
     ysize = 4
 
-    def __init__(self, data, bins=20, name="Data", color="green", box_plot=True, cdf=False):
+    def __init__(self, data, bins=20, name="Data", distribution="norm", color="green", box_plot=True, cdf=False):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
@@ -109,9 +109,9 @@ class GraphHisto(Graph):
         self.draw()
 
     def draw(self):
-        histo_span = 3
+        histo_span = 2
         box_plot_span = 1
-        cdf_span = 3
+        cdf_span = 2
         if self.box_plot:
             self.ysize += 1
             self.nrows += box_plot_span
