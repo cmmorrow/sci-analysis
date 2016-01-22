@@ -23,7 +23,7 @@ from __future__ import print_function
 
 # Scipy imports
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
-    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest
 
 # Numpy imports
 from numpy import concatenate, mean, std, median, amin, amax, percentile
@@ -239,6 +239,34 @@ class NormTest(Test):
 
     def ha(self):
         print("HA: Data is not normally distributed")
+
+
+class KSTest(Test):
+    """Tests whether data comes from a specified distribution or not."""
+
+    def __init__(self, data, distribution, alpha=0.05, display=True):
+        self.distribution = distribution
+        super(KSTest, self).__init__(data, alpha=alpha, display=display)
+
+    def run(self):
+        d_value, p_value = kstest(self.data, self.distribution)
+        return p_value, d_value
+
+    def output(self):
+        name = "Kolmogorov-Smirnov Test"
+        print("")
+        print(name)
+        print("-" * len(name))
+        print("")
+        print("D value = " + "{:.4f}".format(self.results[1]))
+        print("p value = " + "{:.4f}".format(self.results[0]))
+        print("")
+
+    def h0(self):
+        print("H0: Data is matched to the " + self.distribution + " distribution")
+
+    def ha(self):
+        print("HA: Data is not from the " + self.distribution + " distribution")
 
 
 class GroupNormTest(GroupTest):

@@ -10,10 +10,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
-    xlabel, ylabel, figure, boxplot, hist, legend
+    xlabel, ylabel, figure, boxplot, hist, legend, setp
+from matplotlib.gridspec import GridSpec
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array
+from numpy import polyfit, polyval, sort, arange, array, linspace
 
 # Scipy imports
 from scipy.stats import probplot
@@ -87,11 +88,11 @@ class GraphHisto(Graph):
     box plot.
     """
 
-    nrows = 2
-    ncols = 1
+    #nrows = 2
+    #ncols = 1
     ysize = 4
 
-    def __init__(self, data, bins=20, name="Data", distribution="norm", color="green", box_plot=True, cdf=False):
+    def __init__(self, data, bins=20, name="Data", distribution="norm", color="green", box_plot=True, cdf=False, fit=True):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
@@ -103,42 +104,66 @@ class GraphHisto(Graph):
         """
         super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability")
         self.bins = bins
+        self.distribution = distribution
         self.color = color
         self.box_plot = box_plot
         self.cdf = cdf
+        self.fit = fit
         self.draw()
 
     def draw(self):
-        histo_span = 2
+        histo_span = 3
         box_plot_span = 1
-        cdf_span = 2
+        cdf_span = 3
+        h_ratios = [histo_span]
+        p = []
         if self.box_plot:
             self.ysize += 1
-            self.nrows += box_plot_span
+            self.nrows += 1
+            h_ratios.insert(0, box_plot_span)
         if self.cdf:
             self.ysize += 4
-            self.nrows += cdf_span
-        figure(figsize=(self.xsize, self.ysize))
+            self.nrows += 1
+            h_ratios.insert(0, cdf_span)
+        f = figure(figsize=(self.xsize, self.ysize))
+        gs = GridSpec(self.nrows, self.ncols, height_ratios=h_ratios, hspace=0)
         if len(self.vector) < self.bins:
             self.bins = len(self.vector)
+        if self.fit:
+            distro_class = getattr(__import__('scipy.stats', globals(), locals(), [self.distribution], -1), self.distribution)
+            fit = distro_class.fit(self.vector)
+            distro = linspace(distro_class.ppf(0.001, *fit), distro_class.ppf(0.999, *fit), 100)
+            distro_pdf = distro_class.pdf(distro, *fit)
+            if self.cdf:
+                distro_cdf = distro_class.cdf(distro, *fit)
         if self.cdf:
             x_sorted_vector = sort(self.vector)
             y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
             x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
             y_cdf = array([y_sorted_vector[:(len(y_sorted_vector)-1)], y_sorted_vector[1:]]).T.flatten()
-            subplot2grid((self.nrows, self.ncols), (0, 0), rowspan=cdf_span)
-            grid(plot(x_cdf, y_cdf, 'k-'))  # , which='major', axis='x')
+            ax_cdf = f.add_subplot(gs[0])
+            grid(ax_cdf.plot(x_cdf, y_cdf, 'k-'))
+            p.append(ax_cdf.get_xticklabels())
+            if self.fit:
+                ax_cdf.plot(distro, distro_cdf, 'r--', linewidth=2)
             yticks(arange(11) * 0.1)
             ylabel("Cumulative Probability")
         if self.box_plot:
-            subplot2grid((self.nrows, self.ncols), (self.nrows - (box_plot_span + histo_span), 0), rowspan=box_plot_span)
-            grid(boxplot(self.vector.data, vert=False, showmeans=True), which='major', axis='x')
-            xlabel("")
-            ylabel("")
+            if self.cdf:
+                ax_box = f.add_subplot(gs[len(h_ratios)-2], sharex=ax_cdf)
+            else:
+                ax_box = f.add_subplot(gs[len(h_ratios)-2])
+            grid(ax_box.boxplot(self.vector.data, vert=False, showmeans=True))
             yticks([])
-        if self.box_plot or self.cdf:
-            subplot2grid((self.nrows, self.ncols), (self.nrows - histo_span, 0), rowspan=histo_span)
-        grid(hist(self.vector.data, self.bins, normed=True, color=self.color))
+            p.append(ax_box.get_xticklabels())
+            ax_hist = f.add_subplot(gs[len(h_ratios)-1], sharex=ax_box)
+        else:
+            ax_hist = f.add_subplot(gs[len(h_ratios)-1])
+        grid(ax_hist.hist(self.vector.data, self.bins, normed=True, color=self.color))
+        if self.fit:
+            ax_hist.plot(distro, distro_pdf, 'r--', linewidth=2)
+        if len(p) > 0:
+            setp(p, visible=False)
         ylabel(self.yname)
         xlabel(self.xname)
         show()
