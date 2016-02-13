@@ -22,6 +22,8 @@ from scipy.stats import probplot
 # local imports
 from ..data.vector import Vector
 from ..operations.data_operations import is_vector, is_iterable, is_dict, drop_nan, drop_nan_intersect
+# TODO: Add preferences back in a future version
+# from ..preferences.preferences import GraphPreferences
 # from six.moves import range
 
 
@@ -92,24 +94,69 @@ class GraphHisto(Graph):
     #ncols = 1
     ysize = 4
 
-    def __init__(self, data, bins=20, name="Data", distribution="norm", color="green", box_plot=True, cdf=False, fit=True):
+    def __init__(self, data,
+                 bins=20,
+                 name="Data",
+                 distribution='norm',
+                 color='green',
+                 box_plot=True,
+                 cdf=False,
+                 violin_plot=False,
+                 histogram=True,
+                 fit=False):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
         :param bins: The number of histogram bins to draw. This arg sets the bins member.
         :param name: The optional x-axis label.
+        :param distribution: The theoretical distribution to fit.
         :param color: The optional color of the histogram as a formmated string.
-        :param box_plot: Display the optional boxplot.
+        :param box_plot: Toggle the display of the optional boxplot.
+        :param cdf: Toggle the display of the optional cumulative density function plot.
+        :param violin_plot: Add a distribution density overlay to the boxplot.
+        :param fit: Toggle the display of the best fit line for the specified distribution.
         :return: pass
         """
         super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability")
         self.bins = bins
         self.distribution = distribution
         self.color = color
+        # if GraphPreferences.Plot.boxplot != GraphPreferences.Plot.defaults[0]:
+        #    _box_plot = GraphPreferences.Plot.boxplot
+        # else:
+        #    _box_plot = box_plot
         self.box_plot = box_plot
+        self.violin_plot = violin_plot
+        self.histogram = histogram
+        # if GraphPreferences.Plot.cdf != GraphPreferences.Plot.defaults[2]:
+        #    _cdf = GraphPreferences.Plot.cdf
+        # else:
+        #    _cdf = cdf
         self.cdf = cdf
         self.fit = fit
         self.draw()
+
+    def fit_distro(self):
+        if not self.distribution:
+            self.distribution = 'norm'
+        distro_class = getattr(__import__('scipy.stats', globals(), locals(), [self.distribution], -1), self.distribution)
+        parms = distro_class.fit(self.vector)
+        distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
+        distro_pdf = distro_class.pdf(distro, *parms)
+        if self.fit:
+            distro_cdf = distro_class.cdf(distro, *parms)
+        else:
+            distro_cdf = None
+        return distro, distro_pdf, distro_cdf
+
+    def calc_cdf(self):
+        x_sorted_vector = sort(self.vector)
+        if x_sorted_vector == 0:
+            return 0, 0
+        y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
+        x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
+        y_cdf = array([y_sorted_vector[:(len(y_sorted_vector)-1)], y_sorted_vector[1:]]).T.flatten()
+        return x_cdf, y_cdf
 
     def draw(self):
         histo_span = 3
@@ -130,17 +177,9 @@ class GraphHisto(Graph):
         if len(self.vector) < self.bins:
             self.bins = len(self.vector)
         if self.fit:
-            distro_class = getattr(__import__('scipy.stats', globals(), locals(), [self.distribution], -1), self.distribution)
-            fit = distro_class.fit(self.vector)
-            distro = linspace(distro_class.ppf(0.001, *fit), distro_class.ppf(0.999, *fit), 100)
-            distro_pdf = distro_class.pdf(distro, *fit)
-            if self.cdf:
-                distro_cdf = distro_class.cdf(distro, *fit)
+            distro, distro_pdf, distro_cdf = self.fit_distro()
         if self.cdf:
-            x_sorted_vector = sort(self.vector)
-            y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
-            x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
-            y_cdf = array([y_sorted_vector[:(len(y_sorted_vector)-1)], y_sorted_vector[1:]]).T.flatten()
+            x_cdf, y_cdf = self.calc_cdf()
             ax_cdf = f.add_subplot(gs[0])
             grid(ax_cdf.plot(x_cdf, y_cdf, 'k-'))
             p.append(ax_cdf.get_xticklabels())
@@ -148,11 +187,15 @@ class GraphHisto(Graph):
                 ax_cdf.plot(distro, distro_cdf, 'r--', linewidth=2)
             yticks(arange(11) * 0.1)
             ylabel("Cumulative Probability")
-        if self.box_plot:
+        if self.box_plot or self.violin_plot:
             if self.cdf:
                 ax_box = f.add_subplot(gs[len(h_ratios)-2], sharex=ax_cdf)
             else:
                 ax_box = f.add_subplot(gs[len(h_ratios)-2])
+            # if GraphPreferences.distribution['violin']:
+            if self.violin_plot:
+                grid(ax_box.violinplot(self.vector.data, vert=False, showextrema=False, showmedians=False, showmeans=False))
+            # if GraphPreferences.distribution['boxplot']:
             grid(ax_box.boxplot(self.vector.data, vert=False, showmeans=True))
             yticks([])
             p.append(ax_box.get_xticklabels())
