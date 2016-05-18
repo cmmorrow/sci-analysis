@@ -23,7 +23,7 @@ from __future__ import print_function
 
 # Scipy imports
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
-    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem
 
 # Numpy imports
 from numpy import concatenate, mean, std, median, amin, amax, percentile
@@ -241,6 +241,7 @@ class NormTest(Test):
         print("HA: Data is not normally distributed")
 
 
+#TODO: Need to test the KSTest function rigorously
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
 
@@ -293,6 +294,7 @@ class GroupNormTest(GroupTest):
         print("HA: Data is not normally distributed")
 
 
+#TODO: Need to implement the TTest in the analysis function
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
@@ -514,7 +516,7 @@ class VectorStatistics(Analysis):
 
     __min_size = 2
 
-    def __init__(self, data, sample=False, display=True):
+    def __init__(self, data, sample=True, display=True):
         super(VectorStatistics, self).__init__(data, display=display)
 
         self.results = None
@@ -540,6 +542,7 @@ class VectorStatistics(Analysis):
         count = len(self.data)
         avg = mean(self.data)
         sd = std(self.data, ddof=dof)
+        error = sem(self.data, 0, dof)
         med = median(self.data)
         vmin = amin(self.data)
         vmax = amax(self.data)
@@ -552,6 +555,7 @@ class VectorStatistics(Analysis):
         return {"count": count,
                 "mean": avg,
                 "std": sd,
+                "error": error,
                 "median": med,
                 "min": vmin,
                 "max": vmax,
@@ -568,18 +572,19 @@ class VectorStatistics(Analysis):
         print(name)
         print("-" * len(name))
         print("")
-        print("Count    = " + str(self.results["count"]))
-        print("Mean     = " + "{:.3f}".format(self.results['mean']))
-        print("Std Dev  = " + "{:.3f}".format(self.results['std']))
-        print("Skewness = " + "{:.3f}".format(self.results['skew']))
-        print("Kurtosis = " + "{:.3f}".format(self.results['kurtosis']))
-        print("Max      = " + "{:.3f}".format(self.results['max']))
-        print("75%      = " + "{:.3f}".format(self.results['q3']))
-        print("50%      = " + "{:.3f}".format(self.results['median']))
-        print("25%      = " + "{:.3f}".format(self.results['q1']))
-        print("Min      = " + "{:.3f}".format(self.results['min']))
-        print("IQR      = " + "{:.3f}".format(self.results['iqr']))
-        print("Range    = " + "{:.3f}".format(self.results['range']))
+        print("Count     = " + str(self.results["count"]))
+        print("Mean      = " + "{:.3f}".format(self.results['mean']))
+        print("Std Dev   = " + "{:.3f}".format(self.results['std']))
+        print("Std Error = " + "{:.3f}".format(self.results['error']))
+        print("Skewness  = " + "{:.3f}".format(self.results['skew']))
+        print("Kurtosis  = " + "{:.3f}".format(self.results['kurtosis']))
+        print("Max       = " + "{:.3f}".format(self.results['max']))
+        print("75%       = " + "{:.3f}".format(self.results['q3']))
+        print("50%       = " + "{:.3f}".format(self.results['median']))
+        print("25%       = " + "{:.3f}".format(self.results['q1']))
+        print("Min       = " + "{:.3f}".format(self.results['min']))
+        print("IQR       = " + "{:.3f}".format(self.results['iqr']))
+        print("Range     = " + "{:.3f}".format(self.results['range']))
         print("")
 
 

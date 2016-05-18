@@ -17,6 +17,6 @@ from . import analysis
 from .analysis import Comparison, NormTest, GroupNormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
     analyze, Vector
-from .operations import clean, strip
+from test import test
 
 __all__ = ["data", "analysis", "graphs"]

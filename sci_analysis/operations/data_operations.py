@@ -52,35 +52,11 @@ def flatten(d):
     flat = []
     for row in d:
         if is_iterable(row):
-            for col in row:
+            for col in flatten(row):
                 flat.append(col)
         else:
             flat.append(row)
     return flat
-
-
-def clean(x, y=list()):
-    """This is a deprecated function from sci_analysis 1.2 which now just converts
-    the args to a Vector and passes it through drop_nan.
-
-    :param x: A sequence like object
-    :param y: A sequence like object
-    :return: x and y as a Vector object
-    """
-    if len(y) > 0:
-        return drop_nan_intersect(Vector(x), Vector(y))
-    else:
-        return drop_nan(Vector(x))
-
-
-def strip(d):
-    """This is a deprecated function from sci_analysis 1.2 which now just converts
-    d to a Vector.
-
-    :param d: A sequence like object
-    :return: d as a numPy Array
-    """
-    return Vector(d).data
 
 
 def drop_nan(v):

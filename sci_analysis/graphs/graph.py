@@ -10,14 +10,14 @@ from __future__ import absolute_import
 from __future__ import print_function
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
-    xlabel, ylabel, figure, boxplot, hist, legend, setp
+    xlabel, ylabel, figure, boxplot, hist, legend, setp, savefig, contour
 from matplotlib.gridspec import GridSpec
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape
 
 # Scipy imports
-from scipy.stats import probplot
+from scipy.stats import probplot, gaussian_kde
 
 # local imports
 from ..data.vector import Vector
@@ -45,7 +45,7 @@ class Graph(object):
     xsize = 5
     ysize = 5
 
-    def __init__(self, data=None, xname="x", yname="y"):
+    def __init__(self, data=None, xname="x", yname="y", save_to=None):
         """Converts the data argument to a Vector object and sets it to the Graph
         object's vector member. Sets the xname and yname arguments as the axis
         labels. The default values are "x" and "y".
@@ -53,6 +53,7 @@ class Graph(object):
         :param data: The data to plot
         :param xname: The x-axis label
         :param yname: The y-axis label
+        :param save_to: Save the graph to the specified path
         :return: pass
         """
 
@@ -76,9 +77,18 @@ class Graph(object):
         self.xname = xname
         self.yname = yname
 
+        # Set the save path
+        self.file = save_to
+
     def draw(self):
         """Prepares and displays the graph based on the set class members."""
         pass
+
+    #TODO: Finish implementing save_graph and remove the sub class method
+    def save_graph(self):
+        if self.file:
+            savefig(self.file)
+
 
 
 class GraphHisto(Graph):
@@ -103,7 +113,8 @@ class GraphHisto(Graph):
                  cdf=False,
                  violin_plot=False,
                  histogram=True,
-                 fit=False):
+                 fit=False,
+                 save_to=None):
         """GraphHisto constructor.
 
         :param data: The data to be graphed. This arg sets the vector member.
@@ -115,9 +126,10 @@ class GraphHisto(Graph):
         :param cdf: Toggle the display of the optional cumulative density function plot.
         :param violin_plot: Add a distribution density overlay to the boxplot.
         :param fit: Toggle the display of the best fit line for the specified distribution.
+        :param save_to: Save the graph to the specified path
         :return: pass
         """
-        super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability")
+        super(GraphHisto, self).__init__(drop_nan(Vector(data)), name, "Probability", save_to)
         self.bins = bins
         self.distribution = distribution
         self.color = color
@@ -151,7 +163,7 @@ class GraphHisto(Graph):
 
     def calc_cdf(self):
         x_sorted_vector = sort(self.vector)
-        if x_sorted_vector == 0:
+        if len(x_sorted_vector) == 0:
             return 0, 0
         y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
         x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
@@ -210,6 +222,8 @@ class GraphHisto(Graph):
         ylabel(self.yname)
         xlabel(self.xname)
         show()
+        if self.file:
+            savefig(self.file)
         pass
 
 
@@ -225,10 +239,26 @@ class GraphScatter(Graph):
 
     nrows = 1
     ncols = 1
-    xsize = 3
-    ysize = 3
+    xsize = 5
+    ysize = 5
 
-    def __init__(self, xdata, ydata, xname='x Data', yname='y Data', fit=True, pointstyle='k.', linestyle='r-'):
+    def __init__(self, xdata,
+                 ydata,
+                 xname='x Data',
+                 yname='y Data',
+                 fit=True,
+                 pointstyle='k.',
+                 linestyle='r-',
+                 points=True,
+                 contours=False,
+                 num_of_contours=31,
+                 contour_width=1.1,
+                 histogram_borders=False,
+                 bins=20,
+                 color='green',
+                 boxplot_borders=False,
+                 violin_plots=True,
+                 save_to=None):
         """GraphScatter constructor.
 
         :param xdata: The x-axis data.
@@ -240,22 +270,81 @@ class GraphScatter(Graph):
         :param linestyle: The optional matplotlib line style formatted string.
         :return: pass
         """
-        super(GraphScatter, self).__init__(drop_nan_intersect(xdata, ydata), xname, yname)
+        super(GraphScatter, self).__init__(drop_nan_intersect(Vector(xdata), Vector(ydata)), xname, yname, save_to)
         self.fit = fit
         self.style = (pointstyle, linestyle)
+        self.points = points
+        self.contours = contours
+        self.contour_props = (num_of_contours, contour_width)
+        self.histogram_props = (bins, color)
+        self.histogram_borders = histogram_borders
+        self.boxplot_borders = boxplot_borders
+        self.violin_plots = violin_plots
         self.draw()
+
+    def calc_contours(self):
+        xmin = self.vector[0].data.min()
+        xmax = self.vector[0].data.max()
+        ymin = self.vector[1].data.min()
+        ymax = self.vector[1].data.max()
+
+        values = vstack([self.vector[0].data, self.vector[1].data])
+        kernel = gaussian_kde(values)
+        _x, _y = mgrid[xmin:xmax:100j, ymin:ymax:100j]
+        positions = vstack([_x.ravel(), _y.ravel()])
+        _z = reshape(kernel(positions).T, _x.shape)
+        return _x, _y, _z, arange(_z.min(), _z.max(), (_z.max() - _z.min()) / self.contour_props[0])
+
+    def calc_fit(self):
+        x = self.vector[0].data
+        y = self.vector[1].data
+        p = polyfit(x, y, 1, full=True)
+        return polyval(p[0], x)
 
     def draw(self):
         x = self.vector[0].data
         y = self.vector[1].data
         pointstyle = self.style[0]
         linestyle = self.style[1]
-        p = polyfit(x, y, 1, full=True)
-        grid(plot(x, y, pointstyle))
-        if self.fit:
-            plot(x, polyval(p[0], x), linestyle)
+        h_ratio = [1, 1]
+        w_ratio = [1, 1]
+        borders = self.histogram_borders or self.boxplot_borders
+
+        if borders:
+            self.nrows, self.ncols = 2, 2
+            self.xsize, self.ysize = 7, 6
+            h_ratio, w_ratio = [2, 5], [5, 2]
+            main_plot = 2
+        else:
+            main_plot = 0
+        f = figure(figsize=(self.xsize, self.ysize))
+        if borders:
+            gs = GridSpec(self.nrows, self.ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0.1, wspace=0.1)
+        else:
+            gs = GridSpec(self.nrows, self.ncols)
+        ax2 = f.add_subplot(gs[main_plot])
+        if self.points:
+            grid(ax2.plot(x, y, pointstyle, zorder=1))
         xlabel(self.xname)
         ylabel(self.yname)
+        if self.contours:
+            x_prime, y_prime, z, levels = self.calc_contours()
+            ax2.contour(x_prime, y_prime, z, levels, linewidths=self.contour_props[1], nchunk=16, extend='both', zorder=2)
+        if self.fit:
+            ax2.plot(x, self.calc_fit(), linestyle, zorder=3)
+        if borders:
+            ax1 = f.add_subplot(gs[0], sharex=ax2)
+            ax3 = f.add_subplot(gs[3], sharey=ax2)
+            if self.histogram_borders:
+                grid(ax1.hist(x, bins=self.histogram_props[0], color=self.histogram_props[1], normed=True))
+                grid(ax3.hist(y, bins=self.histogram_props[0], color=self.histogram_props[1], normed=True, orientation='horizontal'))
+            elif self.boxplot_borders:
+                grid(ax1.boxplot(x, vert=False, showmeans=True))
+                grid(ax3.boxplot(y, vert=True, showmeans=True))
+                if self.violin_plots:
+                    ax1.violinplot(x, vert=False, showmedians=False, showmeans=False, showextrema=False)
+                    ax3.violinplot(y, vert=True, showmedians=False, showmeans=False, showextrema=False)
+            setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()], visible=False)
         show()
         pass
 
@@ -276,6 +365,8 @@ class GraphBoxplot(Graph):
     ncols = 2
     xsize = 7.5
     ysize = 5
+
+    #TODO: Make sure the grid on the histogram borders is working properly
 
     def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
         """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are

@@ -18,5 +18,6 @@ setup(
     ],
     keywords='statistics data EDA graphing',
     description='A light weight python data exploration and analysis tool',
-    install_requires=['numpy', 'scipy', 'matplotlib']
+    install_requires=['numpy', 'scipy', 'matplotlib'],
+    test_suite='test'
 )
