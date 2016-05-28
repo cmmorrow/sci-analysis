@@ -13,10 +13,13 @@ following methods are imported so that they are exposed at a high level: analyze
 clean and strip.
 """
 
+enable_test = True
+
 from . import analysis
 from .analysis import Comparison, NormTest, GroupNormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
     analyze, Vector
-from test import test
+if enable_test:
+    from test import test
 
 __all__ = ["data", "analysis", "graphs"]

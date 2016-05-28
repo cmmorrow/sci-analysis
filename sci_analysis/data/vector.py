@@ -24,7 +24,7 @@ class Vector(Data):
         :return: A Vector object
         """
 
-        super(Vector, self).__init__(n=name)
+        super(Vector, self).__init__(d=np.array([]), n=name)
         if is_array(data):
             try:
                 self.data = np.asfarray(data)

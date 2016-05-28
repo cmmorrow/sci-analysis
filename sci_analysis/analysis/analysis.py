@@ -241,16 +241,19 @@ class NormTest(Test):
         print("HA: Data is not normally distributed")
 
 
-#TODO: Need to test the KSTest function rigorously
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
 
-    def __init__(self, data, distribution, alpha=0.05, display=True):
+    def __init__(self, data, distribution, parms=[], alpha=0.05, display=True):
         self.distribution = distribution
+        self.parms = parms
         super(KSTest, self).__init__(data, alpha=alpha, display=display)
 
     def run(self):
-        d_value, p_value = kstest(self.data, self.distribution)
+        args = [self.data, self.distribution]
+        if self.parms:
+            args.append(self.parms)
+        d_value, p_value = kstest(*args)
         return p_value, d_value
 
     def output(self):
