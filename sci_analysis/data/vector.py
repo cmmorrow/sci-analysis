@@ -24,13 +24,14 @@ class Vector(Data):
         :return: A Vector object
         """
 
-        super(Vector, self).__init__(n=name)
+        super(Vector, self).__init__(d=np.array([]), n=name)
         if is_array(data):
             try:
                 self.data = np.asfarray(data)
                 self.type = self.data.dtype
             except ValueError:
-                self.data = np.array([])
+                self.data = np.array(to_float(data))
+                self.type = self.data.dtype
         elif is_vector(data):
             self.data = data.data
             self.name = data.name
