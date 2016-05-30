@@ -23,7 +23,7 @@ from __future__ import print_function
 
 # Scipy imports
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
-    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem, normaltest
 
 # Numpy imports
 from numpy import concatenate, mean, std, median, amin, amax, percentile
@@ -244,7 +244,7 @@ class NormTest(Test):
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
 
-    def __init__(self, data, distribution, parms=[], alpha=0.05, display=True):
+    def __init__(self, data, distribution, parms=(), alpha=0.05, display=True):
         self.distribution = distribution
         self.parms = parms
         super(KSTest, self).__init__(data, alpha=alpha, display=display)
@@ -277,8 +277,14 @@ class GroupNormTest(GroupTest):
     """Tests a group of data to see if they are normally distributed or not."""
 
     def run(self):
-        w_value, p_value = shapiro(concatenate(self.data))
-        return p_value, w_value
+        w_value = list()
+        p_value = list()
+        for d in self.data:
+            _w, _p = shapiro(d)
+            w_value.append(_w)
+            p_value.append(_p)
+        min_p = min(p_value)
+        return min_p, w_value[p_value.index(min_p)]
 
     def output(self):
         name = "Shapiro-Wilk test for normality"
@@ -297,7 +303,6 @@ class GroupNormTest(GroupTest):
         print("HA: Data is not normally distributed")
 
 
-#TODO: Need to implement the TTest in the analysis function
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
@@ -487,7 +492,7 @@ class EqualVariance(GroupTest):
     def run(self):
         if len(self.data) < self.__min_size:
             return self.results
-        if NormTest(concatenate(self.data), display=False, alpha=self.alpha).results[0] > self.alpha:
+        if GroupNormTest(*self.data, display=False, alpha=self.alpha).results[0] > self.alpha:
             statistic, p_value = bartlett(*tuple(self.data))
             t = "Bartlett Test"
         else:
