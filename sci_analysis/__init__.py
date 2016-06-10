@@ -16,7 +16,7 @@ clean and strip.
 enable_test = True
 
 from . import analysis
-from .analysis import Comparison, NormTest, GroupNormTest, TTest, LinearRegression,\
+from .analysis import Comparison, NormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
     analyze, Vector
 if enable_test:

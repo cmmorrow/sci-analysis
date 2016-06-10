@@ -14,7 +14,7 @@ from sci_analysis.operations.data_operations import is_array, is_dict, is_iterab
 from sci_analysis.data.data import Data
 from sci_analysis.data.vector import Vector
 from sci_analysis.analysis import TTest, KSTest, NormTest, LinearRegression, Correlation, EqualVariance, Kruskal, \
-    Anova, GroupNormTest, VectorStatistics
+    Anova, VectorStatistics
 
 
 class SciAnalysisTest(unittest.TestCase):

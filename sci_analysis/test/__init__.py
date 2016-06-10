@@ -1,2 +1,2 @@
-__author__ = 'chrismorrow'
 from test import *
+__author__ = 'chrismorrow'
