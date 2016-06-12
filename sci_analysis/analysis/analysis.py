@@ -31,7 +31,7 @@ from numpy import concatenate, mean, std, median, amin, amax, percentile
 # Local imports
 from ..data.vector import Vector
 from ..operations.data_operations import is_dict, is_iterable, is_vector, is_group,\
-    is_dict_group, drop_nan, drop_nan_intersect
+    is_dict_group, is_array, drop_nan, drop_nan_intersect
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
@@ -90,7 +90,7 @@ class Analysis(object):
             pass
         self.run()
         if self._display:
-            str(self)
+            print(self)
 
     def run(self):
         """This method should perform the specific analysis and set the results dict.
@@ -99,19 +99,44 @@ class Analysis(object):
         """
         pass
 
-    def output(self):
-        """This method shouldn't return a value and only produce a side-effect.
+    def output(self, name, order=list(), precision=4):
+        """Print the results of the test in a user-friendly format"""
+        label_max_length = 0
 
-        Override this method to write the formatted output to std out.
-        """
-        print(str(self.__class__))
-        pass
+        def format_output(n, v):
+            """Format the results with a consistent look"""
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + '{:< .{}f}'.format(v, precision)
+
+        for label in self._results.keys():
+            if len(label) > label_max_length:
+                label_max_length = len(label)
+
+        report = [
+            ' ',
+            name,
+            '-' * len(name),
+            ' ',
+        ]
+
+        if order:
+            for key in order:
+                for label, value in self._results.items():
+                    if label == key:
+                        report.append(format_output(label, value))
+                        continue
+        else:
+            for label, value in self._results.items():
+                report.append(format_output(label, value))
+
+        report.append(" ")
+
+        return "\n".join(report)
 
     def __str__(self):
-        return self.output()
+        return self.output(self._name)
 
-    def __repr__(self):
-        return self.output()
+    # def __repr__(self):
+    #    return self.output(self._name)
 
 
 class Test(Analysis):
@@ -157,18 +182,12 @@ class Test(Analysis):
     @property
     def statistic(self):
         """The test statistic returned by the function called in the run method"""
-        try:
-            return self._results['statistic']
-        except KeyError:
-            return float("nan")
+        return self._results['statistic']
 
     @property
     def p_value(self):
         """The p-value returned by the function called in the run method"""
-        try:
-            return self._results['p_value']
-        except KeyError:
-            return float("nan")
+        return self._results['p value']
 
     def data_prep(self, data):
         clean_list = list()
@@ -185,25 +204,47 @@ class Test(Analysis):
                 clean_list.append(v)
         return clean_list
 
-    def output(self):
+    def output(self, name, order=list(), precision=4):
         """Print the results of the test in a user-friendly format"""
-        return "\n".join((
+        label_max_length = 0
+
+        def format_output(n, v):
+            """Format the results with a consistent look"""
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + '{:< .{}f}'.format(v, precision)
+
+        for label in self._results.keys():
+            if len(label) > label_max_length:
+                label_max_length = len(label)
+
+        report = [
             ' ',
-            self._name,
-            '-' * len(self._name),
+            name,
+            '-' * len(name),
             ' ',
-            self._statistic_name + " = " + "{:.4f}".format(self.statistic),
-            "p value = " + "{:.4f}".format(self.p_value),
-            " ",
-            # If the result is greater than the significance, print the null
-            # hypothesis, otherwise, the alternate hypothesis
-            self._h0 if self.p_value > self._alpha else self._ha,
-            " "
-        ))
+        ]
+
+        if order:
+            for key in order:
+                for label, value in self._results.items():
+                    if label == key:
+                        report.append(format_output(label, value))
+                        continue
+        else:
+            for label, value in self._results.items():
+                report.append(format_output(label, value))
+
+        report.append(" ")
+        report.append(self._h0 if self.p_value > self._alpha else self._ha)
+        report.append(" ")
+
+        return "\n".join(report)
 
 
 class Comparison(Test):
     """Perform a test on two independent vectors of equal length."""
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        super(Comparison, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def data_prep(self, data):
         """Prepare the data for analysis"""
@@ -244,7 +285,6 @@ class NormTest(Test):
     """Tests for whether data is normally distributed or not."""
 
     _name = "Shapiro-Wilk test for normality"
-    _statistic_name = "W value"
     _h0 = "H0: Data is normally distributed"
     _ha = "HA: Data is not normally distributed"
 
@@ -261,14 +301,13 @@ class NormTest(Test):
             min_p = min(p_value)
             w_value = w_value[p_value.index(min_p)]
             p_value = min_p
-        self._results.update({'statistic': w_value, 'p_value': p_value})
+        self._results.update({'W value': w_value, 'p value': p_value})
 
 
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
 
     _name = "Kolmogorov-Smirnov Test"
-    _statistic_name = 'D value'
 
     def __init__(self, data, distribution='norm', parms=(), alpha=0.05, display=True):
         self._distribution = distribution
@@ -282,57 +321,72 @@ class KSTest(Test):
         if self._parms:
             args.append(self._parms)
         d_value, p_value = kstest(*args)
-        self._results.update({'statistic': d_value, 'p_value': p_value})
+        self._results.update({'D value': d_value, 'p value': p_value})
 
     @property
     def distribution(self):
         """Return the distribution that data is being compared against"""
         return self._distribution
 
+    @property
+    def statistic(self):
+        return self._results['D value']
+
+    @property
+    def d_value(self):
+        return self._results['D value']
+
 
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
     _name = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
-    _statistic_name = 't value'
     _h0 = "H0: Means are matched"
     _ha = "HA: Means are significantly different"
 
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
         self._mu = None
+        self._test = None
         if not is_iterable(ydata):
             self._mu = float(ydata)
             super(TTest, self).__init__(xdata, alpha=alpha, display=display)
         else:
-            super(TTest, self).__init__(xdata, alpha=alpha, display=display)
+            super(TTest, self).__init__(*(xdata, ydata), alpha=alpha, display=display)
 
     def run(self):
         if self._mu:
-            t, p = ttest_1samp(self._data, self._mu)
+            t, p = ttest_1samp(self._data, self._mu, axis=0)
             test = "1_sample"
         else:
             if EqualVariance(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
-                t, p = ttest_ind(*self._data, equal_var=True)
+                t, p = ttest_ind(*self._data, equal_var=True, axis=0)
                 test = 't_test'
             else:
-                t, p = ttest_ind(*self._data, equal_var=False)
+                t, p = ttest_ind(*self._data, equal_var=False, axis=0)
                 test = 'welch_t'
-        self._results.update({'p_value': p, 't_value': t, 'test': test})
+        self._test = test
+        self._results.update({'p value': p, 't value': float(t)})
 
-    def output(self):
-        return "\n".join((
-            ' ',
-            self._name[self._results['test']],
-            '-' * len(self._name[self._results['test']]),
-            ' ',
-            self._statistic_name[self._results['test']] + " = " + "{:.4f}".format(self._results['t_value']),
-            "p value = " + "{:.4f}".format(self.p_value),
-            " ",
-            # If the result is greater than the significance, print the null
-            # hypothesis, otherwise, the alternate hypothesis
-            self._h0 if self.p_value > self._alpha else self._ha,
-            " "
-        ))
+    @property
+    def test_type(self):
+        return self._test
+
+    @property
+    def mu(self):
+        return self._mu
+
+    @property
+    def t_value(self):
+        return self._results['t value']
+
+    @property
+    def statistic(self):
+        return self._results['t value']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
 class LinearRegression(Comparison):
@@ -346,39 +400,46 @@ class LinearRegression(Comparison):
     def run(self):
         slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.xdata)
         count = len(self.xdata)
-        self._results.update({'count': count,
-                              'slope': slope,
-                              'intercept': intercept,
-                              'r2': r2,
-                              'std_err': std_err,
-                              'p_value': p_value})
+        self._results.update({'Count': count,
+                              'Slope': slope,
+                              'Intercept': intercept,
+                              'R^2': r2,
+                              'Std Err': std_err,
+                              'p value': p_value})
 
-    def output(self):
-        return "\n".join((
-            " ",
-            self._name,
-            "-" * len(self._name),
-            " ",
-            "count     = " + str(self.results['count']),
-            "slope     = " + "{:.4f}".format(self.results['slope']),
-            "intercept = " + "{:.4f}".format(self.results['intercept']),
-            "R^2       = " + "{:.4f}".format(self.results['r2']),
-            "std err   = " + "{:.4f}".format(self.results['std_err']),
-            "p value   = " + "{:.4f}".format(self.results['p_value']),
-            " ",
-            self._h0 if self.p_value > self._alpha else self._ha,
-            " "
-        ))
+    @property
+    def slope(self):
+        return self._results['Slope']
+
+    @property
+    def intercept(self):
+        return self._results['Intercept']
+
+    @property
+    def r_squared(self):
+        return self._results['R^2']
+
+    @property
+    def std_err(self):
+        return self._results['Std Err']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name, order=['count', 'slope', 'intercept', 'R^2', 'std err', 'p value'])
 
 
 class Correlation(Comparison):
     """Performs a pearson or spearman correlation between two vectors."""
 
     _min_size = 3
-    _name = 'Correlation'
-    _statistic_name = 'r value'
+    _name = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        self._test = None
+        super(Correlation, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
         if NormTest(concatenate([self.xdata, self.ydata]), display=False, alpha=self._alpha).p_value > self._alpha:
@@ -387,52 +448,52 @@ class Correlation(Comparison):
         else:
             r_value, p_value = spearmanr(self.xdata, self.ydata)
             r = "spearman"
-        self._results.update({'r_value': r_value, 'p_value': p_value, 'type': r})
+        self._test = r
+        self._results.update({'r value': r_value, 'p value': p_value})
 
-    def output(self):
-        return "\n".join((
-            " ",
-            self.name,
-            "-" * len(self.name),
-            " ",
-            "Pearson Coeff: " if self.results['type'] == "pearson" else "Spearman Coeff: ",
-            "r value = " + "{:.4f}".format(self.results['r_value']),
-            "p value = " + "{:.4f}".format(self.results['p_value']),
-            " ",
-            self._h0 if self.p_value > self._alpha else self._ha,
-            " "
-        ))
+    @property
+    def r_value(self):
+        """The correlation coefficient returned by the the determined test type"""
+        return self._results['r value']
+
+    @property
+    def test_type(self):
+        """The test that was used to determine the correlation coefficient"""
+        return self._test
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
 class Anova(Test):
     """Performs a one-way ANOVA on a group of vectors."""
 
     _name = "Oneway ANOVA"
-    _statistic_name = 'f value'
     _h0 = "H0: Group means are matched"
     _ha = "HA: Group means are not matched"
 
     def run(self):
         f_value, p_value = f_oneway(*self.data)
-        self._results.update({'p_value': p_value, 'f_value': f_value})
+        self._results.update({'p value': p_value, 'f value': f_value})
 
     @property
     def f_value(self):
         """The f value returned by the ANOVA f test"""
-        return self._results['f_value']
+        return self._results['f value']
 
 
 class Kruskal(Test):
     """Performs a non-parametric Kruskal-Wallis test on a group of vectors."""
 
     _name = "Kruskal-Wallis"
-    _statistic_name = 'H value'
     _h0 = "H0: Group means are matched"
     _ha = "HA: Group means are not matched"
 
     def run(self):
         h_value, p_value = kruskal(*self.data)
-        self._results.update({'p_value': p_value, 'h_value': h_value})
+        self._results.update({'p value': p_value, 'h value': h_value})
 
     @property
     def h_value(self):
@@ -444,35 +505,50 @@ class EqualVariance(Test):
     """Checks a group of vectors for equal variance."""
 
     _name = {'Bartlett': 'Bartlett Test', 'Levene': 'Levene Test'}
-    _statistic_name = {'Bartlett': 'T value', 'Levene': 'W value'}
     _h0 = "H0: Variances are equal"
     _ha = "HA: Variances are not equal"
+
+    def __init__(self, *data, **kwargs):
+        self._test = None
+        super(EqualVariance, self).__init__(*data, **kwargs)
 
     def run(self):
         if len(self._data) < self._min_size:
             pass
         if NormTest(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
             statistic, p_value = bartlett(*self._data)
-            test = 'Bartlett'
+            self._test = 'Bartlett'
+            self._results.update({'p value': p_value, 'T value': statistic})
         else:
             statistic, p_value = levene(*self._data)
-            test = 'Levene'
-        self._results.update({'p_value': p_value, 'statistic': statistic, 'test': test})
+            self._test = 'Levene'
+            self._results.update({'p value': p_value, 'W value': statistic})
 
-    def output(self):
-        return "\n".join((
-            ' ',
-            self._name[self._results['test']],
-            '-' * len(self._name[self._results['test']]),
-            ' ',
-            self._statistic_name[self._results['test']] + " = " + "{:.4f}".format(self.statistic),
-            "p value = " + "{:.4f}".format(self.p_value),
-            # If the result is greater than the significance, print the null
-            # hypothesis, otherwise, the alternate hypothesis
-            " ",
-            self._h0 if self.p_value > self._alpha else self._ha,
-            " "
-        ))
+    @property
+    def t_value(self):
+        return self._results['T value']
+
+    @property
+    def w_value(self):
+        return self._results['W value']
+
+    @property
+    def statistic(self):
+        try:
+            s = self._results['W value']
+        except KeyError:
+            s = self._results['T value']
+        return s
+
+    @property
+    def test_type(self):
+        """The test that was used to check for equal variance"""
+        return self._results['test']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
 class VectorStatistics(Analysis):
@@ -507,40 +583,88 @@ class VectorStatistics(Analysis):
         q1 = percentile(self._data, 25)
         q3 = percentile(self._data, 75)
         iqr = q3 - q1
-        self._results = {"count": count,
-                         "mean": avg,
-                         "std": sd,
-                         "error": error,
-                         "median": med,
-                         "min": vmin,
-                         "max": vmax,
-                         "range": vrange,
-                         "skew": sk,
-                         "kurtosis": kurt,
-                         "q1": q1,
-                         "q3": q3,
-                         "iqr": iqr}
+        self._results = {"Count": count,
+                         "Mean": avg,
+                         "Std Dev": sd,
+                         "Std Error": error,
+                         "50%": med,
+                         "Minimum": vmin,
+                         "Maximum": vmax,
+                         "Range": vrange,
+                         "Skewness": sk,
+                         "Kurtosis": kurt,
+                         "25%": q1,
+                         "75%": q3,
+                         "IQR": iqr}
 
-    def output(self):
-        return "\n".join((
-            " ",
-            self._name,
-            "-" * len(self._name),
-            " ",
-            "Count     = " + str(self._results["count"]),
-            "Mean      = " + "{:.4f}".format(self._results['mean']),
-            "Std Dev   = " + "{:.4f}".format(self._results['std']),
-            "Std Error = " + "{:.4f}".format(self._results['error']),
-            "Skewness  = " + "{:.4f}".format(self._results['skew']),
-            "Kurtosis  = " + "{:.4f}".format(self._results['kurtosis']),
-            "Max       = " + "{:.4f}".format(self._results['max']),
-            "75%       = " + "{:.4f}".format(self._results['q3']),
-            "50%       = " + "{:.4f}".format(self._results['median']),
-            "25%       = " + "{:.4f}".format(self._results['q1']),
-            "Min       = " + "{:.4f}".format(self._results['min']),
-            "IQR       = " + "{:.4f}".format(self._results['iqr']),
-            "Range     = " + "{:.4f}".format(self._results['range'])
-        ))
+    @property
+    def count(self):
+        return self._results['Count']
+
+    @property
+    def mean(self):
+        return self._results['Mean']
+
+    @property
+    def std_dev(self):
+        return self._results['Std Dev']
+
+    @property
+    def std_err(self):
+        return self._results['Std Error']
+
+    @property
+    def median(self):
+        return self._results['50%']
+
+    @property
+    def minimum(self):
+        return self._results['Minimum']
+
+    @property
+    def maximum(self):
+        return self._results['Maximum']
+
+    @property
+    def range(self):
+        return self._results['Range']
+
+    @property
+    def skewness(self):
+        return self._results['Skewness']
+
+    @property
+    def kurtosis(self):
+        return self._results['Kurtosis']
+
+    @property
+    def q1(self):
+        return self._results['25%']
+
+    @property
+    def q3(self):
+        return self._results['75%']
+
+    @property
+    def iqr(self):
+        return self._results['IQR']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name, order=['Count',
+                                              'Mean',
+                                              'Std Dev',
+                                              'Std Error',
+                                              'Skewness',
+                                              'Kurtosis',
+                                              'Max',
+                                              '75%',
+                                              '50%',
+                                              '25%',
+                                              'Min',
+                                              'IQR',
+                                              'Range'])
 
 
 class GroupStatistics(Analysis):
@@ -593,7 +717,7 @@ class GroupStatistics(Analysis):
                           "min": vmin}
             self._results.append(row_result)
 
-    def output(self):
+    def output(self, name, order=list(), precision=5):
         size = 12
         header = ""
         line = ""
@@ -635,7 +759,7 @@ class GroupStatistics(Analysis):
         rows = "\n".join(rows)
         return "\n".join((
             " ",
-            self._name,
+            name,
             " ",
             header,
             "-" * len(header),
@@ -689,19 +813,18 @@ def analyze(
         # Show the box plot and stats
         GraphBoxplot(xdata, groups, label, yname=yname)
         GroupStatistics(xdata, groups)
-        p = EqualVariance(*xdata).results[0]
+
+        if len(xdata) == 2:
+            TTest(xdata[0], xdata[1])
+            pass
+
+        e = EqualVariance(*xdata)
 
         # If normally distributed and variances are equal, perform one-way ANOVA
         # Otherwise, perform a non-parametric Kruskal-Wallis test
-        if NormTest(*xdata, display=False, alpha=alpha).results[0] > alpha and p > alpha:
-            if len(xdata) == 2:
-                TTest(xdata[0], xdata[1])
-            else:
+        if e.test_type == 'Bartlett' and e.p_value > alpha:
                 Anova(*xdata)
         else:
-            if len(xdata) == 2:
-                TTest(xdata[0], xdata[1])
-            else:
                 Kruskal(*xdata)
         pass
 
@@ -721,12 +844,6 @@ def analyze(
         else:
             yname = 'Response'
 
-        # Convert xdata and ydata to Vectors
-        if not is_vector(xdata):
-            xdata = Vector(xdata)
-        if not is_vector(ydata):
-            ydata = Vector(ydata)
-
         # Show the scatter plot, correlation and regression stats
         GraphScatter(xdata, ydata, label, yname)
         LinearRegression(xdata, ydata)
@@ -742,10 +859,6 @@ def analyze(
             label = name
         elif xname:
             label = xname
-
-        # Convert xdata to a Vector
-        if not is_vector(xdata):
-            xdata = Vector(xdata)
 
         # Show the histogram and stats
         GraphHisto(xdata, name=label)

@@ -561,7 +561,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_val = 4.0
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), y_val,
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: TTest single type I error")
 
     def test_103_TTest_single_unmatched(self):
@@ -570,7 +570,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_val = 5.0
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), y_val,
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertFalse(True if True in results else False, "FAIL: TTest single type II error")
 
     def test_120_Kolmogorov_Smirnov_normal_test(self):
@@ -578,7 +578,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'norm'
         results = [True for _ in range(4) if KSTest(st.norm.rvs(size=1000), distro, alpha=alpha,
-                                                    display=False).results[0] > alpha]
+                                                    display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in norm GOF")
 
     def test_121_Kolmogorov_Smirnov_alpha_test(self):
@@ -587,7 +587,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'alpha'
         results = [True for _ in range(4) if KSTest(st.alpha.rvs(*parms, size=1000), distro, parms=parms, alpha=alpha,
-                                                    display=False).results[0] > alpha]
+                                                    display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in alpha GOF")
 
     def test_122_Kolmogorov_Smirnov_beta_test(self):
@@ -596,7 +596,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'beta'
         results = [True for _ in range(4) if KSTest(st.beta.rvs(*parms, size=1000), distro, parms=parms, alpha=alpha,
-                                                    display=False).results[0] > alpha]
+                                                    display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in beta GOF")
 
     def test_123_Kolmogorov_Smirnov_cauchy_test(self):
@@ -604,7 +604,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'cauchy'
         results = [True for _ in range(4) if KSTest(st.cauchy.rvs(size=1000), distro, alpha=alpha,
-                                                    display=False).results[0] > alpha]
+                                                    display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in cauchy GOF")
 
     def test_124_Kolmogorov_Smirnov_chi2_large_test(self):
@@ -613,7 +613,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'chi2'
         results = [True for _ in range(4) if KSTest(st.chi2.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).results[0] > alpha]
+                                                    alpha=alpha, display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in chi2 large GOF")
 
     def test_124_Kolmogorov_Smirnov_chi2_small_test(self):
@@ -622,7 +622,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'chi2'
         results = [True for _ in range(4) if KSTest(st.chi2.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).results[0] > alpha]
+                                                    alpha=alpha, display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
 
     def test_124_Kolmogorov_Smirnov_weibull_min_test(self):
@@ -631,7 +631,7 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'weibull_min'
         results = [True for _ in range(4) if KSTest(st.weibull_min.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).results[0] > alpha]
+                                                    alpha=alpha, display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
 
     def test_124_Kolmogorov_Smirnov_weibull_max_test(self):
@@ -640,14 +640,14 @@ class SciAnalysisTest(unittest.TestCase):
         alpha = 0.05
         distro = 'weibull_max'
         results = [True for _ in range(4) if KSTest(st.weibull_max.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).results[0] > alpha]
+                                                    alpha=alpha, display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
 
     def test_125_Norm_test(self):
         """Test the normal distribution check"""
         parms = [5, 0.1]
         alpha = 0.05
-        results = [True for _ in range(4) if NormTest(st.norm.rvs(*parms, size=1000), display=False).results[0] > alpha]
+        results = [True for _ in range(4) if NormTest(st.norm.rvs(*parms, size=1000), display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Normal test Type I error")
 
     def test_126_Norm_test_fail(self):
@@ -655,7 +655,7 @@ class SciAnalysisTest(unittest.TestCase):
         parms = [1.7]
         alpha = 0.05
         results = [True for _ in range(4) if NormTest(st.weibull_min.rvs(*parms, size=1000),
-                                                      display=False).results[0] > alpha]
+                                                      display=False).p_value > alpha]
         self.assertFalse(True if True in results else False, "FAIL: Normal test Type II error")
 
     def test_127_TTest_equal_variance_matched(self):
@@ -664,7 +664,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_parms = [4, 0.75]
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: TTest equal variance matched Type I error")
 
     def test_128_TTest_equal_variance_unmatched(self):
@@ -673,7 +673,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_parms = [4.5, 0.75]
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertFalse(True if True in results else False, "FAIL: TTest equal variance unmatched Type II error")
 
     def test_129_TTest_unequal_variance_matched(self):
@@ -682,7 +682,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_parms = [4, 1.35]
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: TTest different variance matched Type I error")
 
     def test_130_TTest_unequal_variance_unmatched(self):
@@ -691,7 +691,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_parms = [4.5, 1.12]
         alpha = 0.05
         results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).results[0] > alpha]
+                                                   display=False).p_value > alpha]
         self.assertFalse(True if True in results else False, "FAIL: TTest different variance unmatched Type II error")
 
     def test_131_LinRegress_corr(self):
@@ -700,7 +700,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
         self.assertFalse(LinearRegression(x_input_array, y_input_array, alpha=alpha,
-                                          display=False).results[0] > alpha, "FAIL: Linear Regression Type II error")
+                                          display=False).p_value > alpha, "FAIL: Linear Regression Type II error")
 
     def test_132_LinRegress_no_corr(self):
         """Test the Linear Regression class for uncorrelated data"""
@@ -708,7 +708,7 @@ class SciAnalysisTest(unittest.TestCase):
         x_input_array = np.random.randn(200)
         y_input_array = np.random.randn(200)
         self.assertTrue(LinearRegression(x_input_array, y_input_array,
-                                         display=False).results[0] > alpha, "FAIL: Linear Regression Type I error")
+                                         display=False).p_value > alpha, "FAIL: Linear Regression Type I error")
 
     def test_133_Correlation_corr_pearson(self):
         """Test the Correlation class for correlated normally distributed data"""
@@ -716,13 +716,13 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
         self.assertFalse(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                     display=False).results[0] > alpha, "FAIL: Correlation pearson Type II error")
+                                     display=False).p_value > alpha, "FAIL: Correlation pearson Type II error")
 
     def test_134_Correlation_no_corr_pearson(self):
         """Test the Correlation class for uncorrelated normally distributed data"""
         alpha = 0.05
         results = [True for _ in range(4) if Correlation(np.random.randn(1000), np.random.randn(1000),
-                                                         display=False).results[0] > alpha]
+                                                         display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Correlation pearson Type I error")
 
     def test_135_Correlation_corr_spearman(self):
@@ -731,7 +731,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
         self.assertFalse(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                     display=False).results[0] > alpha, "FAIL: Correlation spearman Type II error")
+                                     display=False).p_value > alpha, "FAIL: Correlation spearman Type II error")
 
     def test_136_Correlation_no_corr_spearman(self):
         """Test the Correlation class for uncorrelated randomly distributed data"""
@@ -739,7 +739,7 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = np.random.rand(100)
         alpha = 0.05
         self.assertTrue(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                    display=False).results[0] > alpha, "FAIL: Correlation spearman Type I error")
+                                    display=False).p_value > alpha, "FAIL: Correlation spearman Type I error")
 
     def test_137_EqualVariance_Bartlett_matched(self):
         """Test the EqualVariance class for normally distributed matched variances"""
@@ -750,7 +750,7 @@ class SciAnalysisTest(unittest.TestCase):
         results = [True for _ in range(4) if EqualVariance(st.norm.rvs(*x_parms, size=1000),
                                                            st.norm.rvs(*y_parms, size=1000),
                                                            st.norm.rvs(*z_parms, size=1000),
-                                                           display=False).results[0] > alpha]
+                                                           display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Equal variance bartlett Type I error")
 
     def test_138_EqualVariance_Bartlett_unmatched(self):
@@ -763,7 +763,7 @@ class SciAnalysisTest(unittest.TestCase):
         z_input_array = st.norm.rvs(*z_parms, size=1000)
         alpha = 0.05
         self.assertFalse(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                       display=False).results[0] > alpha, "FAIL: Equal variance bartlett Type II error")
+                                       display=False).p_value > alpha, "FAIL: Equal variance bartlett Type II error")
 
     def test_139_EqualVariance_Levine_matched(self):
         """Test the EqualVariance class for non-normally distributed matched variances"""
@@ -774,7 +774,7 @@ class SciAnalysisTest(unittest.TestCase):
         results = [True for _ in range(4) if EqualVariance(st.weibull_min.rvs(*x_parms, size=1000),
                                                            st.weibull_min.rvs(*y_parms, size=1000),
                                                            st.weibull_min.rvs(*z_parms, size=1000),
-                                                           display=False).results[0] > alpha]
+                                                           display=False).p_value > alpha]
         self.assertTrue(True if True in results else False, "FAIL: Unequal variance levine Type I error")
 
     def test_140_EqualVariance_Levine_unmatched(self):
@@ -786,7 +786,7 @@ class SciAnalysisTest(unittest.TestCase):
         results = [True for _ in range(4) if EqualVariance(st.weibull_min.rvs(*x_parms, size=1000),
                                                            st.norm.rvs(*y_parms, size=1000),
                                                            st.weibull_min.rvs(*z_parms, size=1000),
-                                                           display=False).results[0] > alpha]
+                                                           display=False).p_value > alpha]
         self.assertFalse(True if True in results else False, "FAIL: Unequal variance levine Type II error")
 
     def test_141_Kruskal_matched(self):
@@ -797,7 +797,7 @@ class SciAnalysisTest(unittest.TestCase):
         z_input_array = st.weibull_min.rvs(*x_parms, size=1000)
         alpha = 0.05
         self.assertTrue(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                display=True).results[0] > alpha, "FAIL: Kruskal Type I error")
+                                display=True).p_value > alpha, "FAIL: Kruskal Type I error")
 
     def test_142_Kruskal_unmatched(self):
         """Test the Kruskal Wallis class on unmatched data"""
@@ -808,7 +808,7 @@ class SciAnalysisTest(unittest.TestCase):
         z_input_array = st.norm.rvs(*z_parms, size=1000)
         alpha = 0.05
         self.assertFalse(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                 display=True).results[0] > alpha, "FAIL: Kruskal Type II error")
+                                 display=True).p_value > alpha, "FAIL: Kruskal Type II error")
 
     def test_143_ANOVA_matched(self):
         """Test the ANOVA class on matched data"""
@@ -818,7 +818,7 @@ class SciAnalysisTest(unittest.TestCase):
         z_input_array = st.norm.rvs(*x_parms, size=1000)
         alpha = 0.05
         self.assertTrue(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                              display=True).results[0] > alpha, "FAIL: ANOVA Type I error")
+                              display=True).p_value > alpha, "FAIL: ANOVA Type I error")
 
     def test_144_ANOVA_unmatched(self):
         """Test the ANOVA class on unmatched data"""
@@ -829,7 +829,7 @@ class SciAnalysisTest(unittest.TestCase):
         z_input_array = st.norm.rvs(*x_parms, size=1000)
         alpha = 0.05
         self.assertFalse(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                               display=True).results[0] > alpha, "FAIL: ANOVA Type II error")
+                               display=True).p_value > alpha, "FAIL: ANOVA Type II error")
 
     def test_145_GroupNorm_normal(self):
         """Test the GroupNorm class on normal data"""
@@ -838,8 +838,8 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = st.norm.rvs(*x_parms, size=1000)
         z_input_array = st.norm.rvs(*x_parms, size=1000)
         alpha = 0.05
-        self.assertTrue(GroupNormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                      display=True).results[0] > alpha, "FAIL: Group Norm Type I error")
+        self.assertTrue(NormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
+                                 display=True).p_value > alpha, "FAIL: Group Norm Type I error")
 
     def test_146_GroupNorm_non_normal(self):
         """Test the GroupNorm class on non-normal data"""
@@ -849,16 +849,16 @@ class SciAnalysisTest(unittest.TestCase):
         y_input_array = st.norm.rvs(*x_parms, size=1000)
         z_input_array = st.weibull_min.rvs(*z_parms, size=1000)
         alpha = 0.05
-        self.assertFalse(GroupNormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                       display=True).results[0] > alpha, "FAIL: Group Norm Type II error")
+        self.assertFalse(NormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
+                                  display=True).p_value > alpha, "FAIL: Group Norm Type II error")
 
     def test_147_Vector_stats(self):
         """Test the vector statistics class"""
         parms = [4, 1.75]
         comp = [100, parms[0], parms[1]]
         input_array = st.norm.rvs(*parms, size=comp[0])
-        results = VectorStatistics(input_array, sample=True, display=True).results
-        test = (results['count'], results['mean'], results['std'])
+        vs = VectorStatistics(input_array, sample=True, display=True)
+        test = (vs.count, vs.mean, vs.std_dev)
         check = [abs(comp[i] - test[i]) for i in range(3)]
         self.assertTrue(check[0] < 0.5 and check[1] < 0.5 and check[2] < 0.5, "FAIL: Stat delta is too large")
 
