@@ -23,15 +23,15 @@ from __future__ import print_function
 
 # Scipy imports
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
-    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem, ks_2samp, mannwhitneyu
 
 # Numpy imports
-from numpy import concatenate, mean, std, median, amin, amax, percentile
+from numpy import mean, std, median, amin, amax, percentile
 
 # Local imports
 from ..data.vector import Vector
 from ..operations.data_operations import is_dict, is_iterable, is_vector, is_group,\
-    is_dict_group, is_array, drop_nan, drop_nan_intersect
+    is_dict_group, drop_nan, drop_nan_intersect
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
@@ -99,13 +99,16 @@ class Analysis(object):
         """
         pass
 
-    def output(self, name, order=list(), precision=4):
+    def output(self, name, order=list(), no_format=list(), precision=4):
         """Print the results of the test in a user-friendly format"""
         label_max_length = 0
 
         def format_output(n, v):
             """Format the results with a consistent look"""
             return '{:{}s}'.format(n, label_max_length) + " = " + " " + '{:< .{}f}'.format(v, precision)
+
+        def no_precision_output(n, v):
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
 
         for label in self._results.keys():
             if len(label) > label_max_length:
@@ -122,7 +125,10 @@ class Analysis(object):
             for key in order:
                 for label, value in self._results.items():
                     if label == key:
-                        report.append(format_output(label, value))
+                        if label in no_format:
+                            report.append(no_precision_output(label, value))
+                        else:
+                            report.append(format_output(label, value))
                         continue
         else:
             for label, value in self._results.items():
@@ -137,6 +143,43 @@ class Analysis(object):
 
     # def __repr__(self):
     #    return self.output(self._name)
+
+
+class GroupAnalysis(Analysis):
+
+    def output(self, name, order=list(), no_format=list(), precision=4, spacing=14):
+        grid = list()
+
+        def format_header(names):
+            line = ""
+            for n in names:
+                line += '{:{}s}'.format(n, spacing)
+            return line
+
+        def format_row(_row, _order):
+            line = ""
+            for _label in _order:
+                for k, v in _row.items():
+                    if k == _label:
+                        if k in no_format:
+                            line += '{:<{}s}'.format(str(v), spacing)
+                        else:
+                            line += '{:< {}.{}f}'.format(v, spacing, precision)
+                        continue
+            return line
+
+        header = format_header(order)
+        for row in self._results:
+            grid.append(format_row(row, order))
+
+        return '\n'.join((
+            name,
+            " ",
+            header,
+            "-" * len(header),
+            '\n'.join(grid),
+            " "
+        ))
 
 
 class Test(Analysis):
@@ -166,7 +209,8 @@ class Test(Analysis):
         """Initialize the object"""
 
         self._alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
-        data = self.data_prep(args) if is_group(args) else self.data_prep(*args)
+        # data = self.data_prep(args) if is_group(args) else self.data_prep(*args)
+        data = self.data_prep(args)
         if len(data) <= 1:
             try:
                 data = data[0]
@@ -204,13 +248,16 @@ class Test(Analysis):
                 clean_list.append(v)
         return clean_list
 
-    def output(self, name, order=list(), precision=4):
+    def output(self, name, order=list(), no_format=list(), precision=4):
         """Print the results of the test in a user-friendly format"""
         label_max_length = 0
 
         def format_output(n, v):
             """Format the results with a consistent look"""
-            return '{:{}s}'.format(n, label_max_length) + " = " + " " + '{:< .{}f}'.format(v, precision)
+            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+
+        def no_precision_output(n, v):
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
 
         for label in self._results.keys():
             if len(label) > label_max_length:
@@ -227,7 +274,10 @@ class Test(Analysis):
             for key in order:
                 for label, value in self._results.items():
                     if label == key:
-                        report.append(format_output(label, value))
+                        if label in no_format:
+                            report.append(no_precision_output(label, value))
+                        else:
+                            report.append(format_output(label, value))
                         continue
         else:
             for label, value in self._results.items():
@@ -303,6 +353,14 @@ class NormTest(Test):
             p_value = min_p
         self._results.update({'W value': w_value, 'p value': p_value})
 
+    @property
+    def statistic(self):
+        return self._results['W value']
+
+    @property
+    def w_value(self):
+        return self._results['W value']
+
 
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
@@ -335,6 +393,49 @@ class KSTest(Test):
     @property
     def d_value(self):
         return self._results['D value']
+
+
+class TwoSampleKSTest(Test):
+    """Tests whether two independent vectors come from the same distribution"""
+
+    _name = "Two Sample Kolmogorov-Smirnov Test"
+    _h0 = "H0: Both samples come from the same distribution"
+    _ha = "HA: Samples do not come from the same distribution"
+
+    def __init__(self, a, b, alpha=0.05, display=True):
+        super(TwoSampleKSTest, self).__init__(a, b, alpha=alpha, display=display)
+
+    def run(self):
+        d_value, p_value = ks_2samp(*self._data)
+        self._results.update({'D value': d_value, 'p value': p_value})
+
+    @property
+    def statistic(self):
+        return self._results['D value']
+
+    @property
+    def d_value(self):
+        return self._results['D value']
+
+
+class MannWhitney(Test):
+    """Performs a Mann Whitney U Test on two vectors"""
+
+    _name = "Mann Whitney U Test"
+    _h0 = "H0: Locations are matched"
+    _ha = "HA: Locations are not matched"
+
+    def run(self):
+        u_value, p_value = mannwhitneyu(*self._data)
+        self._results.update({'u value': u_value, 'p value': p_value * 2})
+
+    @property
+    def statistic(self):
+        return self._results['u value']
+
+    @property
+    def u_value(self):
+        return self._results['u value']
 
 
 class TTest(Test):
@@ -397,8 +498,11 @@ class LinearRegression(Comparison):
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
 
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        super(LinearRegression, self).__init__(xdata, ydata, alpha=alpha, display=display)
+
     def run(self):
-        slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.xdata)
+        slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.ydata)
         count = len(self.xdata)
         self._results.update({'Count': count,
                               'Slope': slope,
@@ -426,7 +530,8 @@ class LinearRegression(Comparison):
     def __str__(self):
         """If the result is greater than the significance, print the null hypothesis, otherwise,
         the alternate hypothesis"""
-        return self.output(self._name, order=['count', 'slope', 'intercept', 'R^2', 'std err', 'p value'])
+        return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'R^2', 'Std Err', 'p value'],
+                           no_format=['Count'])
 
 
 class Correlation(Comparison):
@@ -442,7 +547,7 @@ class Correlation(Comparison):
         super(Correlation, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
-        if NormTest(concatenate([self.xdata, self.ydata]), display=False, alpha=self._alpha).p_value > self._alpha:
+        if NormTest(self.xdata, self.ydata, display=False, alpha=self._alpha).p_value > self._alpha:
             r_value, p_value = pearsonr(self.xdata, self.ydata)
             r = "pearson"
         else:
@@ -483,6 +588,10 @@ class Anova(Test):
         """The f value returned by the ANOVA f test"""
         return self._results['f value']
 
+    @property
+    def statistic(self):
+        return self._results['f value']
+
 
 class Kruskal(Test):
     """Performs a non-parametric Kruskal-Wallis test on a group of vectors."""
@@ -498,7 +607,11 @@ class Kruskal(Test):
     @property
     def h_value(self):
         """The h value returned by the Kruskal test"""
-        return self._results['h_value']
+        return self._results['h value']
+
+    @property
+    def statistic(self):
+        return self._results['h value']
 
 
 class EqualVariance(Test):
@@ -543,7 +656,7 @@ class EqualVariance(Test):
     @property
     def test_type(self):
         """The test that was used to check for equal variance"""
-        return self._results['test']
+        return self._test
 
     def __str__(self):
         """If the result is greater than the significance, print the null hypothesis, otherwise,
@@ -658,16 +771,16 @@ class VectorStatistics(Analysis):
                                               'Std Error',
                                               'Skewness',
                                               'Kurtosis',
-                                              'Max',
+                                              'Maximum',
                                               '75%',
                                               '50%',
                                               '25%',
-                                              'Min',
+                                              'Minimum',
                                               'IQR',
-                                              'Range'])
+                                              'Range'], no_format=['Count'])
 
 
-class GroupStatistics(Analysis):
+class GroupStatistics(GroupAnalysis):
     """Reports basic summary stats for a group of vectors."""
 
     _min_size = 1
@@ -698,7 +811,7 @@ class GroupStatistics(Analysis):
         self._results = list()
         self.run()
         if self._display:
-            str(self)
+            print(self)
 
     def run(self):
         for group, vector in self._data.items():
@@ -708,64 +821,18 @@ class GroupStatistics(Analysis):
             vmax = amax(vector)
             vmin = amin(vector)
             q2 = median(vector)
-            row_result = {"group": group,
-                          "count": count,
-                          "mean": avg,
-                          "std": sd,
-                          "max": vmax,
-                          "median": q2,
-                          "min": vmin}
+            row_result = {"Group": group,
+                          "Count": count,
+                          "Mean": avg,
+                          "Std Dev": sd,
+                          "Max": vmax,
+                          "Median": q2,
+                          "Min": vmin}
             self._results.append(row_result)
 
-    def output(self, name, order=list(), precision=5):
-        size = 12
-        header = ""
-        line = ""
-        rows = list()
-        offset = 0
-        shift = False
-        spacing = "{:.5f}"
-        labels = ["Count", "Mean", "Std.", "Min", "Q2", "Max", "Group"]
-
-        for s in labels:
-            header = header + s + " " * (size - len(s))
-        for v in self._results:
-            stats = [str(v["count"]),
-                     spacing.format(v["mean"]),
-                     spacing.format(v["std"]),
-                     spacing.format(v["min"]),
-                     spacing.format(v["median"]),
-                     spacing.format(v["max"]),
-                     str(v["group"])
-                     ]
-            for i, s in enumerate(stats):
-                if offset == 1 or shift:
-                    offset = -1
-                    shift = False
-                else:
-                    offset = 0
-                try:
-                    if stats[i + 1][0] == "-":
-                        if offset == -1:
-                            offset = 0
-                            shift = True
-                        else:
-                            offset = 1
-                    line = line + s + " " * (size - offset - len(s))
-                except IndexError:
-                    line = line + s + " " * (size - offset - len(s))
-            rows.append(line)
-            line = ""
-        rows = "\n".join(rows)
-        return "\n".join((
-            " ",
-            name,
-            " ",
-            header,
-            "-" * len(header),
-            rows,
-            " "
-        ))
+    def __str__(self):
+        return self.output(self._name, ['Count', 'Mean', 'Std Dev', 'Min', 'Median', 'Max', 'Group'],
+                           no_format=['Count', 'Group'])
 
 
 def analyze(

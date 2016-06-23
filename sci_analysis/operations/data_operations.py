@@ -67,7 +67,7 @@ def drop_nan(v):
     :param v: A sequence like object
     :return: A vector representation of v with "nan" values removed
     """
-    return Vector(v.data[~np.isnan(v.data)])
+    return None if Vector(v).is_empty() else Vector(v.data[~np.isnan(v.data)])
 
 
 def drop_nan_intersect(first, second):
@@ -79,19 +79,10 @@ def drop_nan_intersect(first, second):
     :param second: A sequence like object
     :return: A two element tuple of Vector objects with "nan" values removed
     """
+    if Vector(first).is_empty() or Vector(second).is_empty():
+        return None, None
     c = np.logical_and(~np.isnan(first.data), ~np.isnan(second.data))
     return Vector(first.data[c]), Vector(second.data[c])
-
-
-# def cat(list_of_data):
-#    """Concatenates sequences together into a Vector object"""
-#    output = []
-#    for d in list_of_data:
-#        if is_vector(d):
-#            output.append(d.data)
-#        else:
-#            output.append(d)
-#    return vector.Vector(output).data
 
 
 def is_vector(d):
@@ -149,11 +140,12 @@ def is_array(d):
     :param d: A variable of unknown type
     :return: True or False
     """
-    try:
-        d.dtype
-        return True
-    except AttributeError:
-        return False
+    return hasattr(d, 'dtype')
+    # try:
+    #     d.dtype
+    #     return True
+    # except AttributeError:
+    #     return False
 
 
 def is_dict(d):

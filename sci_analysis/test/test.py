@@ -9,7 +9,7 @@ import pandas as pd
 import scipy.stats as st
 
 from sci_analysis.operations.data_operations import is_array, is_dict, is_iterable, is_tuple, is_data, is_vector, \
-    is_group, is_dict_group, drop_nan, to_float, flatten
+    is_group, is_dict_group, drop_nan, drop_nan_intersect, to_float, flatten
 #analysis import analyze
 from sci_analysis.data.data import Data
 from sci_analysis.data.vector import Vector
@@ -317,6 +317,8 @@ class SciAnalysisTest(unittest.TestCase):
         'dict_of_lists': 1
     }
 
+# Test logic tests
+
     def test_001_is_array(self):
         """Tests the is_array method"""
         eval_array = {}
@@ -445,422 +447,1127 @@ class SciAnalysisTest(unittest.TestCase):
                 eval_dict_group[name] = 0
         self.assertTrue(eval_dict_group == self.ans_dict_group, "FAIL: is_dict_group test")
 
-    def test_020_to_float_list(self):
+# Test to_float function
+
+    def test_050_to_float_list(self):
         """Test the to_float int list conversion"""
         input_float = range(5)
         out_float = [0.0, 1.0, 2.0, 3.0, 4.0]
-        self.assertTrue(to_float(input_float) == out_float, "FAIL: Error to_float int list")
+        self.assertEqual(to_float(input_float), out_float, "FAIL: Error to_float int list")
 
-    def test_021_to_float_quoted_list(self):
+    def test_051_to_float_quoted_list(self):
         """Test the to_float string quoted num list conversion"""
         input_float = ["1", "2", "3.0", "4.5", "5.65"]
         out_float = [1.0, 2.0, 3.0, 4.5, 5.65]
-        self.assertTrue(to_float(input_float) == out_float, "FAIL: Error to_float quoted string num list")
+        self.assertEqual(to_float(input_float), out_float, "FAIL: Error to_float quoted string num list")
 
-    def test_022_to_float_str_list(self):
+    def test_052_to_float_str_list(self):
         """Test the to_float string list conversion"""
         input_float = ["one", "two", "three", "four", "five"]
         out_float = [float("nan")] * 5
-        self.assertTrue(np.array_equal(np.isnan(to_float(input_float)), np.isnan(out_float)), "FAIL: Error to_float string list")
+        self.assertTrue(np.array_equal(np.isnan(to_float(input_float)), np.isnan(out_float)),
+                        "FAIL: Error to_float string list")
 
-    def test_023_to_float_mixed_list(self):
+    def test_053_to_float_mixed_list(self):
         """Test the to_float mixed list conversion"""
         input_float = [1, "two", "3.0", 4.1, "5.65"]
         out_float = [1.0, float("nan"), 3.0, 4.1, 5.65]
-        self.assertTrue([y for y in to_float(input_float) if not np.isnan(y)] == [x for x in out_float if not np.isnan(x)], "FAIL: Error to_float mixed list")
+        self.assertEqual([y for y in to_float(input_float) if not np.isnan(y)],
+                         [x for x in out_float if not np.isnan(x)],
+                         "FAIL: Error to_float mixed list")
 
-    def test_024_to_float_missing_val_list(self):
+    def test_054_to_float_missing_val_list(self):
         """Test the to_float missing val list conversion"""
         input_float = ["1.4", "", 3.0, 4, ""]
         out_float = [1.4, float("nan"), 3.0, 4, float("nan")]
-        self.assertTrue([y for y in to_float(input_float) if not np.isnan(y)] == [x for x in out_float if not np.isnan(x)], "FAIL: Error to_float missing val list")
+        self.assertEqual([y for y in to_float(input_float) if not np.isnan(y)],
+                         [x for x in out_float if not np.isnan(x)],
+                         "FAIL: Error to_float missing val list")
 
-    def test_025_to_float_empty_list(self):
-        """Test the to_float empy list conversion"""
+    def test_055_to_float_empty_list(self):
+        """Test the to_float empty list conversion"""
         input_float = []
         out_float = []
-        self.assertTrue(to_float(input_float) == out_float, "FAIL: Error to_float empty list")
+        self.assertEqual(to_float(input_float), out_float, "FAIL: Error to_float empty list")
 
-    def test_040_flatten_2_dim(self):
+# Test flatten function
+
+    def test_060_flatten_2_dim(self):
         """Test the flatten method on a 2 dim array"""
-        input_flatten = [[1, 2, 3],[4, 5, 6]]
+        input_flatten = [[1, 2, 3], [4, 5, 6]]
         out_flatten = [1, 2, 3, 4, 5, 6]
-        self.assertTrue(flatten(input_flatten) == out_flatten, "FAIL: Error in flatten 2dim")
+        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 2dim")
 
-    def test_041_flatten_3_dim(self):
+    def test_061_flatten_3_dim(self):
         """Test the flatten method on a 3 dim array"""
         input_flatten = [[[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]]]
         out_flatten = [1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]
-        self.assertTrue(flatten(input_flatten) == out_flatten, "FAIL: Error in flatten 3dim")
+        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 3dim")
 
-    def test_042_flatten_4_dim(self):
+    def test_062_flatten_4_dim(self):
         """Test the flatten method on a 4 dim array"""
-        input_flatten = [[[[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]]], [[[111, 112, 113], [114, 115, 116]], [[1111, 1112, 1113], [1114, 1115, 1116]]]]
-        out_flatten = [1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 111, 112, 113, 114, 115, 116, 1111, 1112, 1113, 1114, 1115, 1116]
-        self.assertTrue(flatten(input_flatten) == out_flatten, "FAIL: Error in flatten 4dim")
+        input_flatten = [[[[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]]],
+                         [[[111, 112, 113], [114, 115, 116]], [[1111, 1112, 1113], [1114, 1115, 1116]]]]
+        out_flatten = [1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16,
+                       111, 112, 113, 114, 115, 116, 1111, 1112, 1113, 1114, 1115, 1116]
+        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 4dim")
 
-    def test_060_create_vector_mixed_list(self):
+# Test vector creation
+
+    def test_100_create_vector_mixed_list(self):
         """Test vector creation from a mixed list"""
         input_array = [1.0, "2", '3.0', "four", 5.65]
         out_array = np.array([1.0, 2.0, 3.0, float("nan"), 5.65])
-        self.assertTrue([y for y in Vector(input_array).data if not np.isnan(y)] == [x for x in out_array if not np.isnan(x)], "FAIL: Error in mixed list vector creation")
+        self.assertEqual([y for y in Vector(input_array).data if not np.isnan(y)],
+                         [x for x in out_array if not np.isnan(x)],
+                         "FAIL: Error in mixed list vector creation")
 
-    def test_061_create_vector_missing_val(self):
+    def test_101_create_vector_missing_val(self):
         """Test vector creation from a missing value list"""
         input_array = ["1.0", "", 3, '4.1', ""]
         out_array = np.array([1.0, float("nan"), 3.0, 4.1, float("nan")])
-        self.assertTrue([y for y in Vector(input_array).data if not np.isnan(y)] == [x for x in out_array if not np.isnan(x)], "FAIL: Error in missing val list vector creation")
+        self.assertEqual([y for y in Vector(input_array).data if not np.isnan(y)],
+                         [x for x in out_array if not np.isnan(x)],
+                         "FAIL: Error in missing val list vector creation")
 
-    def test_062_create_vector_empty_list(self):
+    def test_102_create_vector_empty_list(self):
         """Test vector creation from an empty list"""
         self.assertTrue(not Vector().data, "FAIL: Error in empty list vector creation")
 
-    def test_063_create_vector_2dim_array(self):
+    def test_103_create_vector_2dim_array(self):
         """Test vector creation from a 2dim list"""
         input_array = np.array([[1, 2, 3], [1, 2, 3]])
         out_array = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
-        self.assertTrue(np.array_equal(Vector(input_array).data, out_array), "FAIL: Error in 2dim array vector creation")
+        self.assertTrue(np.array_equal(Vector(input_array).data, out_array),
+                        "FAIL: Error in 2dim array vector creation")
 
-    def test_064_create_vector_dict(self):
+    def test_104_create_vector_dict(self):
         """Test vector creation from a dict"""
         input_array = {"one": 1, "two": 2.0, "three": "3", "four": "four"}
         out_array = [1., 2., 3., float("nan")]
-        self.assertTrue(sorted([y for y in Vector(input_array).data if not np.isnan(y)]) == sorted([x for x in out_array if not np.isnan(x)]), "FAIL: Error in dict vector creation")
+        self.assertEqual(sorted([y for y in Vector(input_array).data if not np.isnan(y)]),
+                         sorted([x for x in out_array if not np.isnan(x)]),
+                         "FAIL: Error in dict vector creation")
 
-    def test_065_create_vector_tuple(self):
+    def test_105_create_vector_tuple(self):
         """Test vector creation from a tuple"""
         input_array = (1, 2, 3, 4, 5)
         out_array = np.array([1., 2., 3., 4., 5.])
         self.assertTrue(np.array_equal(Vector(input_array).data, out_array), "FAIL: Error in tuple vector creation")
 
-    def test_066_create_vector_none(self):
+    def test_106_create_vector_0d(self):
+        """Test vector creation from a 0 dimension array"""
+        input_array = np.array(4)
+        self.assertTrue(float(Vector(input_array).data) == 4), "FAIL: Error vector creation from 0d array"
+
+    def test_120_create_vector_none(self):
         """Test vector creation from None"""
-        input_array = None
         self.assertTrue(Vector(None).is_empty(), "FAIL: Error vector creation from None")
 
-    def test_080_vector_is_empty(self):
+# Test vector is_empty method
+
+    def test_121_vector_is_empty_empty_list(self):
         """Test the vector is_empty method"""
         input_array = []
         self.assertTrue(Vector(input_array).is_empty(), "FAIL: Error vector is_empty")
 
-    def test_100_drop_nan(self):
+    def test_122_vector_is_empty_empty_array(self):
+        """Test the vector is_empty method"""
+        input_array = np.array([])
+        self.assertTrue(Vector(input_array).is_empty(), "FAIL: Error vector is_empty")
+
+# Test drop nan functions
+
+    def test_122_drop_nan(self):
         """Test the drop_nan method"""
         input_array = ["1.0", "", 3, '4.1', ""]
         out_array = np.array([1.0, 3.0, 4.1])
         self.assertTrue(np.array_equal(drop_nan(Vector(input_array)), out_array), "FAIL: Error in drop_nan")
 
-    def test_101_drop_nan_intersect(self):
+    def test_123_drop_nan_intersect(self):
         """Test the drop_nan_intersect method"""
         input_array_1 = [1., float("nan"), 3., float("nan"), 5.]
         input_array_2 = [11., float("nan"), 13., 14., 15.]
-        output_array = ()
+        output_array = [(1., 11.), (3., 13.), (5., 15.)]
+        inter = drop_nan_intersect(Vector(input_array_1), Vector(input_array_2))
+        self.assertTrue(zip(inter[0], inter[1]) == output_array, "FAIL: Error in drop_nan_intersect")
 
-    def test_102_TTest_single_matched(self):
+    def test_124_drop_nan_empty(self):
+        """Test the drop_nan method on an empty array"""
+        input_array = np.array([])
+        self.assertFalse(drop_nan(input_array), "FAIL: Error in drop_nan empty array")
+
+# Test TTest
+
+    def test_200_TTest_single_matched(self):
         """Test the TTest against a given matched value"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_val = 4.0
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), y_val,
-                                                   display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: TTest single type I error")
+        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).p_value > alpha,
+                        "FAIL: TTest single type I error")
 
-    def test_103_TTest_single_unmatched(self):
+    def test_201_TTest_single_matched_test_type(self):
+        """Test the TTest against a given matched value"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_val = 4.0
+        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).test_type, '1_sample',
+                         "FAIL: TTest incorrect test type")
+
+    def test_202_TTest_single_matched_mu(self):
+        """Test the TTest against a given matched value"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_val = 4.0
+        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).mu, y_val,
+                         "FAIL: TTest incorrect mu")
+
+    def test_203_TTest_single_matched_t_value(self):
+        """Test the TTest against a given matched value"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_val = 4.0
+        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).t_value,
+                        "FAIL: TTest t value not set")
+
+    def test_204_TTest_single_matched_statistic(self):
+        """Test the TTest against a given matched value"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_val = 4.0
+        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).statistic,
+                        "FAIL: TTest statistic not set")
+
+    def test_205_TTest_single_unmatched(self):
         """Test the TTest against a given unmatched value"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_val = 5.0
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), y_val,
-                                                   display=False).p_value > alpha]
-        self.assertFalse(True if True in results else False, "FAIL: TTest single type II error")
+        self.assertFalse(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).p_value > alpha,
+                         "FAIL: TTest single type II error")
 
-    def test_120_Kolmogorov_Smirnov_normal_test(self):
-        """Test the normal distribution detection"""
-        alpha = 0.05
-        distro = 'norm'
-        results = [True for _ in range(4) if KSTest(st.norm.rvs(size=1000), distro, alpha=alpha,
-                                                    display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in norm GOF")
-
-    def test_121_Kolmogorov_Smirnov_alpha_test(self):
-        """Test the alpha distribution detection"""
-        parms = [3.5]
-        alpha = 0.05
-        distro = 'alpha'
-        results = [True for _ in range(4) if KSTest(st.alpha.rvs(*parms, size=1000), distro, parms=parms, alpha=alpha,
-                                                    display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in alpha GOF")
-
-    def test_122_Kolmogorov_Smirnov_beta_test(self):
-        """Test the beta distribution detection"""
-        parms = [2.3, 0.6]
-        alpha = 0.05
-        distro = 'beta'
-        results = [True for _ in range(4) if KSTest(st.beta.rvs(*parms, size=1000), distro, parms=parms, alpha=alpha,
-                                                    display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in beta GOF")
-
-    def test_123_Kolmogorov_Smirnov_cauchy_test(self):
-        """Test the cauchy distribution detection"""
-        alpha = 0.05
-        distro = 'cauchy'
-        results = [True for _ in range(4) if KSTest(st.cauchy.rvs(size=1000), distro, alpha=alpha,
-                                                    display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in cauchy GOF")
-
-    def test_124_Kolmogorov_Smirnov_chi2_large_test(self):
-        """Test the chi squared distribution detection with sufficiently large dof"""
-        parms = [50]
-        alpha = 0.05
-        distro = 'chi2'
-        results = [True for _ in range(4) if KSTest(st.chi2.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in chi2 large GOF")
-
-    def test_124_Kolmogorov_Smirnov_chi2_small_test(self):
-        """Test the chi squared distribution detection with small dof"""
-        parms = [5]
-        alpha = 0.05
-        distro = 'chi2'
-        results = [True for _ in range(4) if KSTest(st.chi2.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
-
-    def test_124_Kolmogorov_Smirnov_weibull_min_test(self):
-        """Test the weibull min distribution detection"""
-        parms = [1.7]
-        alpha = 0.05
-        distro = 'weibull_min'
-        results = [True for _ in range(4) if KSTest(st.weibull_min.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
-
-    def test_124_Kolmogorov_Smirnov_weibull_max_test(self):
-        """Test the weibull min distribution detection"""
-        parms = [2.8]
-        alpha = 0.05
-        distro = 'weibull_max'
-        results = [True for _ in range(4) if KSTest(st.weibull_max.rvs(*parms, size=1000), distro, parms=parms,
-                                                    alpha=alpha, display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Error in chi2 small GOF")
-
-    def test_125_Norm_test(self):
-        """Test the normal distribution check"""
-        parms = [5, 0.1]
-        alpha = 0.05
-        results = [True for _ in range(4) if NormTest(st.norm.rvs(*parms, size=1000), display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Normal test Type I error")
-
-    def test_126_Norm_test_fail(self):
-        """Test the normal distribution check fails for a different distribution"""
-        parms = [1.7]
-        alpha = 0.05
-        results = [True for _ in range(4) if NormTest(st.weibull_min.rvs(*parms, size=1000),
-                                                      display=False).p_value > alpha]
-        self.assertFalse(True if True in results else False, "FAIL: Normal test Type II error")
-
-    def test_127_TTest_equal_variance_matched(self):
+    def test_206_TTest_equal_variance_matched(self):
         """Test the TTest with two samples with equal variance and matched means"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 0.75]
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: TTest equal variance matched Type I error")
+        self.assertGreater(TTest(st.norm.rvs(*x_parms, size=100),
+                                 st.norm.rvs(*y_parms, size=100), display=False).p_value,
+                           alpha, "FAIL: TTest equal variance matched Type I error")
 
-    def test_128_TTest_equal_variance_unmatched(self):
-        """Test the TTest with two samples with equal variance and different means"""
+    def test_207_TTest_equal_variance_matched_test_type(self):
+        """Test the TTest with two samples with equal variance and matched means"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100),
+                               st.norm.rvs(*y_parms, size=100), display=False).test_type, 't_test',
+                         "FAIL: TTest incorrect test type")
+
+    def test_208_TTest_equal_variance_matched_t_value(self):
+        """Test the TTest with two samples with equal variance and matched means"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        self.assertAlmostEqual(TTest(st.norm.rvs(*x_parms, size=100),
+                                     st.norm.rvs(*y_parms, size=100), display=False).t_value, -0.2592,
+                               msg="FAIL: TTest equal variance matched Type I error", delta=0.0001)
+
+    def test_209_TTest_equal_variance_unmatched(self):
+        """Test the TTest with two samples with equal variance and different means"""
+        np.random.seed(987654321)
+        x_parms = [4.0, 0.75]
         y_parms = [4.5, 0.75]
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).p_value > alpha]
-        self.assertFalse(True if True in results else False, "FAIL: TTest equal variance unmatched Type II error")
+        self.assertLess(TTest(st.norm.rvs(*x_parms, size=100),
+                              st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
+                        "FAIL: TTest equal variance unmatched Type II error")
 
-    def test_129_TTest_unequal_variance_matched(self):
+    def test_210_TTest_unequal_variance_matched(self):
         """Test the TTest with two samples with different variances and matched means"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 1.35]
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: TTest different variance matched Type I error")
+        self.assertGreater(TTest(st.norm.rvs(*x_parms, size=100),
+                                 st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
+                           "FAIL: TTest different variance matched Type I error")
 
-    def test_130_TTest_unequal_variance_unmatched(self):
+    def test_211_TTest_unequal_variance_unmatched(self):
         """Test the TTest with two samples with different variances and different means"""
+        np.random.seed(987654321)
         x_parms = [4.0, 0.75]
         y_parms = [4.5, 1.12]
         alpha = 0.05
-        results = [True for _ in range(4) if TTest(st.norm.rvs(*x_parms, size=1000), st.norm.rvs(*y_parms, size=1000),
-                                                   display=False).p_value > alpha]
-        self.assertFalse(True if True in results else False, "FAIL: TTest different variance unmatched Type II error")
+        self.assertLess(TTest(st.norm.rvs(*x_parms, size=100),
+                              st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
+                        "FAIL: TTest different variance unmatched Type II error")
 
-    def test_131_LinRegress_corr(self):
+    def test_212_TTest_unequal_variance_unmatched_test_type(self):
+        """Test the TTest with two samples with different variances and different means"""
+        np.random.seed(987654321)
+        x_parms = [4.0, 0.75]
+        y_parms = [4.5, 1.12]
+        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100),
+                               st.norm.rvs(*y_parms, size=100), display=False).test_type, 'welch_t',
+                         "FAIL: TTest incorrect test type")
+
+# Test KSTest
+
+    def test_250_Kolmogorov_Smirnov_normal_test(self):
+        """Test the normal distribution detection"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertGreater(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Error in norm GOF")
+
+    def test_251_Kolmogorov_Smirnov_normal_test_distribution_type(self):
+        """Test the normal distribution detection"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertEqual(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).distribution, distro,
+                         "FAIL: KSTest distribution not set")
+
+    def test_252_Kolmogorov_Smirnov_normal_test_statistic(self):
+        """Test the normal distribution detection"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertTrue(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).statistic,
+                        "FAIL: KSTest statistic not set")
+
+    def test_253_Kolmogorov_Smirnov_normal_test_D_value(self):
+        """Test the normal distribution detection"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertTrue(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).d_value,
+                        "FAIL: KSTest d_value not set")
+
+    def test_254_Kolmogorov_Smirnov_alpha_test_parms_missing(self):
+        """Test the KSTest to make sure an exception is raised if parms are missing"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'alpha'  # not to be confused with the sensitivity alpha
+        self.assertRaises(TypeError, lambda: KSTest(st.alpha.rvs(size=100), distro, alpha=alpha, display=False),
+                          "FAIL: missing parms does not raise exception")
+
+    def test_255_Kolmogorov_Smirnov_alpha_test(self):
+        """Test the alpha distribution detection"""
+        np.random.seed(987654321)
+        parms = [3.5]
+        alpha = 0.05
+        distro = 'alpha'
+        self.assertGreater(KSTest(st.alpha.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha, "FAIL: Error in alpha GOF")
+
+    def test_256_Kolmogorov_Smirnov_beta_test(self):
+        """Test the beta distribution detection"""
+        np.random.seed(987654321)
+        parms = [2.3, 0.6]
+        alpha = 0.05
+        distro = 'beta'
+        self.assertGreater(KSTest(st.beta.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha, "FAIL: Error in beta GOF")
+
+    def test_257_Kolmogorov_Smirnov_cauchy_test(self):
+        """Test the cauchy distribution detection"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'cauchy'
+        self.assertGreater(KSTest(st.cauchy.rvs(size=100), distro,
+                                  alpha=alpha, display=False).p_value, alpha, "FAIL: Error in cauchy GOF")
+
+    def test_258_Kolmogorov_Smirnov_chi2_large_test(self):
+        """Test the chi squared distribution detection with sufficiently large dof"""
+        np.random.seed(987654321)
+        parms = [50]
+        alpha = 0.05
+        distro = 'chi2'
+        self.assertGreater(KSTest(st.chi2.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Error in chi2 large GOF")
+
+    def test_259_Kolmogorov_Smirnov_chi2_small_test(self):
+        """Test the chi squared distribution detection with small dof"""
+        np.random.seed(987654321)
+        parms = [5]
+        alpha = 0.05
+        distro = 'chi2'
+        self.assertGreater(KSTest(st.chi2.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Error in chi2 small GOF")
+
+    def test_260_Kolmogorov_Smirnov_weibull_min_test(self):
+        """Test the weibull min distribution detection"""
+        np.random.seed(987654321)
+        parms = [1.7]
+        alpha = 0.05
+        distro = 'weibull_min'
+        self.assertGreater(KSTest(st.weibull_min.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Error in Weibull min GOF")
+
+    def test_261_Kolmogorov_Smirnov_weibull_max_test(self):
+        """Test the weibull min distribution detection"""
+        np.random.seed(987654321)
+        parms = [2.8]
+        alpha = 0.05
+        distro = 'weibull_max'
+        self.assertGreater(KSTest(st.weibull_max.rvs(*parms, size=100), distro,
+                                  parms=parms, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Error in Weibull max GOF")
+
+# Test NormTest
+
+    def test_300_Norm_test_single(self):
+        """Test the normal distribution check"""
+        np.random.seed(987654321)
+        parms = [5, 0.1]
+        alpha = 0.05
+        self.assertGreater(NormTest(st.norm.rvs(*parms, size=100), display=False, alpha=alpha).p_value, alpha,
+                           "FAIL: Normal test Type I error")
+
+    def test_301_Norm_test_single_fail(self):
+        """Test the normal distribution check fails for a different distribution"""
+        np.random.seed(987654321)
+        parms = [1.7]
+        alpha = 0.05
+        self.assertLess(NormTest(st.weibull_min.rvs(*parms, size=100), alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: Normal test Type II error")
+
+    def test_302_Norm_test_statistic(self):
+        """Test the normal distribution statistic value is set"""
+        np.random.seed(987654321)
+        parms = [5, 0.1]
+        alpha = 0.05
+        self.assertTrue(NormTest(st.norm.rvs(*parms, size=100), alpha=alpha, display=False).statistic,
+                        "FAIL: Normal test statistic not set")
+
+    def test_303_Norm_test_W_value(self):
+        """Test the normal distribution W value is set"""
+        np.random.seed(987654321)
+        parms = [5, 0.1]
+        alpha = 0.05
+        self.assertTrue(NormTest(st.norm.rvs(*parms, size=100), alpha=alpha, display=False).w_value,
+                        "FAIL: Normal test W value not set")
+
+    def test_304_Norm_test_multi_pass(self):
+        """Test if multiple vectors are from the normal distribution"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        groups = [st.norm.rvs(5, 0.1, size=100), st.norm.rvs(4, 0.75, size=75), st.norm.rvs(1, 1, size=50)]
+        self.assertGreater(NormTest(*groups, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Normal test Type I error")
+
+    def test_305_Norm_test_multi_fail(self):
+        """Test if multiple vectors are from the normal distribution, with one failing"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        groups = [st.norm.rvs(5, 0.1, size=100), st.weibull_min.rvs(1.7, size=75), st.norm.rvs(1, 1, size=50)]
+        self.assertLess(NormTest(*groups, alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: Normal test Type II error")
+
+# Test LinearRegression
+
+    def test_350_LinRegress_corr(self):
         """Test the Linear Regression class for correlation"""
+        np.random.seed(987654321)
         x_input_array = range(1, 101)
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
-        self.assertFalse(LinearRegression(x_input_array, y_input_array, alpha=alpha,
-                                          display=False).p_value > alpha, "FAIL: Linear Regression Type II error")
+        self.assertLess(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: Linear Regression Type II error")
 
-    def test_132_LinRegress_no_corr(self):
+    def test_351_LinRegress_no_corr(self):
         """Test the Linear Regression class for uncorrelated data"""
+        np.random.seed(987654321)
         alpha = 0.05
-        x_input_array = np.random.randn(200)
-        y_input_array = np.random.randn(200)
-        self.assertTrue(LinearRegression(x_input_array, y_input_array,
-                                         display=False).p_value > alpha, "FAIL: Linear Regression Type I error")
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertGreater(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Linear Regression Type I error")
 
-    def test_133_Correlation_corr_pearson(self):
+    def test_352_LinRegress_no_corr_slope(self):
+        """Test the Linear Regression slope"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).slope, -0.0969, delta=0.0001,
+                               msg="FAIL: Linear Regression slope")
+
+    def test_353_LinRegress_no_corr_intercept(self):
+        """Test the Linear Regression intercept"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).intercept, -0.0397, delta=0.0001,
+                               msg="FAIL: Linear Regression intercept")
+
+    def test_354_LinRegress_no_corr_r2(self):
+        """Test the Linear Regression R^2"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).r_squared, -0.1029, delta=0.0001,
+                               msg="FAIL: Linear Regression R^2")
+
+    def test_355_LinRegress_no_corr_std_err(self):
+        """Test the Linear Regression std err"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).std_err, 0.0666, delta=0.0001,
+                               msg="FAIL: Linear Regression std err")
+
+# Test Correlation
+
+    def test_400_Correlation_corr_pearson(self):
         """Test the Correlation class for correlated normally distributed data"""
-        x_input_array = list(np.random.randn(200))
+        np.random.seed(987654321)
+        x_input_array = list(st.norm.rvs(size=100))
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
-        self.assertFalse(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                     display=False).p_value > alpha, "FAIL: Correlation pearson Type II error")
+        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: Correlation pearson Type II error")
 
-    def test_134_Correlation_no_corr_pearson(self):
+    def test_401_Correlation_corr_pearson_test_type(self):
+        """Test the Correlation class for correlated normally distributed data"""
+        np.random.seed(987654321)
+        x_input_array = list(st.norm.rvs(size=100))
+        y_input_array = [x * 3 for x in x_input_array]
+        alpha = 0.05
+        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'pearson',
+                         "FAIL: Correlation pearson wrong type")
+
+    def test_402_Correlation_no_corr_pearson(self):
         """Test the Correlation class for uncorrelated normally distributed data"""
+        np.random.seed(987654321)
         alpha = 0.05
-        results = [True for _ in range(4) if Correlation(np.random.randn(1000), np.random.randn(1000),
-                                                         display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Correlation pearson Type I error")
+        self.assertGreater(Correlation(st.norm.rvs(size=100),
+                                       st.norm.rvs(size=100),
+                                       alpha=alpha,
+                                       display=False).p_value, alpha,
+                           "FAIL: Correlation pearson Type I error")
 
-    def test_135_Correlation_corr_spearman(self):
+    def test_403_Correlation_no_corr_pearson_test_type(self):
+        """Test the Correlation class for uncorrelated normally distributed data"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertEqual(Correlation(st.norm.rvs(size=100),
+                                     st.norm.rvs(size=100),
+                                     alpha=alpha,
+                                     display=False).test_type, 'pearson',
+                         "FAIL: Correlation pearson wrong type")
+
+    def test_404_Correlation_no_corr_pearson_r_value(self):
+        """Test the Correlation class for uncorrelated normally distributed data"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertAlmostEqual(Correlation(st.norm.rvs(size=100),
+                               st.norm.rvs(size=100),
+                               alpha=alpha,
+                               display=False).r_value, -0.0055,
+                               delta=0.0001,
+                               msg="FAIL: Correlation pearson r value")
+
+    def test_405_Correlation_corr_spearman(self):
         """Test the Correlation class for correlated randomly distributed data"""
-        x_input_array = list(np.random.rand(100))
+        np.random.seed(987654321)
+        x_input_array = list(st.weibull_min.rvs(1.7, size=100))
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
-        self.assertFalse(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                     display=False).p_value > alpha, "FAIL: Correlation spearman Type II error")
+        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: Correlation spearman Type II error")
 
-    def test_136_Correlation_no_corr_spearman(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        x_input_array = np.random.rand(100)
-        y_input_array = np.random.rand(100)
+    def test_406_Correlation_corr_spearman_test_type(self):
+        """Test the Correlation class for correlated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = list(st.weibull_min.rvs(1.7, size=100))
+        y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
-        self.assertTrue(Correlation(x_input_array, y_input_array, alpha=alpha,
-                                    display=False).p_value > alpha, "FAIL: Correlation spearman Type I error")
+        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'spearman',
+                         "FAIL: Correlation spearman wrong type")
 
-    def test_137_EqualVariance_Bartlett_matched(self):
+    def test_407_Correlation_no_corr_spearman(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertGreater(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+                           "FAIL: Correlation spearman Type I error")
+
+    def test_408_Correlation_no_corr_spearman_test_type(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'spearman',
+                         "FAIL: Correlation spearman wrong type")
+
+    def test_409_Correlation_no_corr_spearman_xdata(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).xdata,
+                                       x_input_array),
+                        "FAIL: Correlation spearman xdata")
+
+    def test_410_Correlation_no_corr_spearman_predictor(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).predictor,
+                                       x_input_array),
+                        "FAIL: Correlation spearman predictor")
+
+    def test_411_Correlation_no_corr_spearman_ydata(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).ydata,
+                                       y_input_array),
+                        "FAIL: Correlation spearman ydata")
+
+    def test_412_Correlation_no_corr_spearman_response(self):
+        """Test the Correlation class for uncorrelated randomly distributed data"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.weibull_min.rvs(1.7, size=100)
+        alpha = 0.05
+        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).response,
+                                       y_input_array),
+                        "FAIL: Correlation spearman response")
+
+# Test EqualVariance
+
+    def test_450_EqualVariance_Bartlett_matched(self):
         """Test the EqualVariance class for normally distributed matched variances"""
+        np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 0.75]
         z_parms = [4, 0.75]
-        alpha = 0.05
-        results = [True for _ in range(4) if EqualVariance(st.norm.rvs(*x_parms, size=1000),
-                                                           st.norm.rvs(*y_parms, size=1000),
-                                                           st.norm.rvs(*z_parms, size=1000),
-                                                           display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Equal variance bartlett Type I error")
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
+                           a,
+                           "FAIL: Equal variance Bartlett Type I error")
 
-    def test_138_EqualVariance_Bartlett_unmatched(self):
+    def test_451_EqualVariance_Bartlett_matched_test_type(self):
+        """Test the EqualVariance class for normally distributed matched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
+                         "Bartlett",
+                         "FAIL: Equal variance Bartlett test type")
+
+    def test_452_EqualVariance_Bartlett_unmatched(self):
         """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
         x_parms = [4, 1.35]
         y_parms = [4, 1.35]
         z_parms = [4, 0.75]
-        x_input_array = st.norm.rvs(*x_parms, size=1000)
-        y_input_array = st.norm.rvs(*y_parms, size=1000)
-        z_input_array = st.norm.rvs(*z_parms, size=1000)
-        alpha = 0.05
-        self.assertFalse(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                       display=False).p_value > alpha, "FAIL: Equal variance bartlett Type II error")
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertLess(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value, a,
+                        "FAIL: Equal variance bartlett Type II error")
 
-    def test_139_EqualVariance_Levine_matched(self):
+    def test_453_EqualVariance_Bartlett_unmatched_test_type(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.35]
+        y_parms = [4, 1.35]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
+                         "Bartlett",
+                         "FAIL: Equal variance bartlett test type")
+
+    def test_454_EqualVariance_Bartlett_unmatched_statistic(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.35]
+        y_parms = [4, 1.35]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertAlmostEqual(EqualVariance(x_input_array, y_input_array, z_input_array,
+                                             alpha=a,
+                                             display=False).statistic,
+                               43.0402,
+                               delta=0.0001,
+                               msg="FAIL: Equal variance bartlett statistic")
+
+    def test_455_EqualVariance_Bartlett_unmatched_t_value(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.35]
+        y_parms = [4, 1.35]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertAlmostEqual(EqualVariance(x_input_array, y_input_array, z_input_array,
+                                             alpha=a,
+                                             display=False).t_value,
+                               43.0402,
+                               delta=0.0001,
+                               msg="FAIL: Equal variance bartlett t value")
+
+    def test_456_EqualVariance_Bartlett_unmatched_w_value(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.35]
+        y_parms = [4, 1.35]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertRaises(KeyError, lambda: EqualVariance(x_input_array, y_input_array, z_input_array,
+                                                          alpha=a,
+                                                          display=False).w_value)
+
+    # TODO: Update this to use a specific exception in the future
+    def test_457_EqualVariance_Bartlett_single_argument(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.35]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        a = 0.05
+        self.assertRaises(TypeError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
+
+    def test_458_EqualVariance_Levene_matched(self):
         """Test the EqualVariance class for non-normally distributed matched variances"""
+        np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
         z_parms = [1.7]
-        alpha = 0.05
-        results = [True for _ in range(4) if EqualVariance(st.weibull_min.rvs(*x_parms, size=1000),
-                                                           st.weibull_min.rvs(*y_parms, size=1000),
-                                                           st.weibull_min.rvs(*z_parms, size=1000),
-                                                           display=False).p_value > alpha]
-        self.assertTrue(True if True in results else False, "FAIL: Unequal variance levine Type I error")
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.weibull_min.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
+                           a,
+                           "FAIL: Unequal variance levene Type I error")
 
-    def test_140_EqualVariance_Levine_unmatched(self):
+    def test_459_EqualVariance_Levene_matched_test_type(self):
+        """Test the EqualVariance class for non-normally distributed matched variances"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [1.7]
+        z_parms = [1.7]
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.weibull_min.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
+                         "Levene",
+                         "FAIL: Unequal variance levene test type")
+
+    def test_460_EqualVariance_Levene_unmatched(self):
         """Test the EqualVariance class for non-normally distributed unmatched variances"""
+        np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [4, 0.75]
         z_parms = [1.7]
-        alpha = 0.05
-        results = [True for _ in range(4) if EqualVariance(st.weibull_min.rvs(*x_parms, size=1000),
-                                                           st.norm.rvs(*y_parms, size=1000),
-                                                           st.weibull_min.rvs(*z_parms, size=1000),
-                                                           display=False).p_value > alpha]
-        self.assertFalse(True if True in results else False, "FAIL: Unequal variance levine Type II error")
+        a = 0.05
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        self.assertLess(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value, a,
+                        "FAIL: Unequal variance levene Type II error")
 
-    def test_141_Kruskal_matched(self):
+    def test_461_EqualVariance_Levene_unmatched_test_type(self):
+        """Test the EqualVariance class for non-normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [4, 0.75]
+        z_parms = [1.7]
+        a = 0.05
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
+                         "Levene",
+                         "FAIL: Unequal variance levene test type")
+
+    def test_462_EqualVariance_Levene_unmatched_statistic(self):
+        """Test the EqualVariance class for non-normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [4, 0.75]
+        z_parms = [1.7]
+        a = 0.05
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        self.assertAlmostEqual(EqualVariance(x_input_array,
+                                             y_input_array,
+                                             z_input_array,
+                                             alpha=a,
+                                             display=False).statistic,
+                               11.2166,
+                               delta=0.0001,
+                               msg="FAIL: Unequal variance levene statistic")
+
+    def test_463_EqualVariance_Levene_unmatched_w_value(self):
+        """Test the EqualVariance class for non-normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [4, 0.75]
+        z_parms = [1.7]
+        a = 0.05
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        self.assertAlmostEqual(EqualVariance(x_input_array,
+                                             y_input_array,
+                                             z_input_array,
+                                             alpha=a,
+                                             display=False).w_value,
+                               11.2166,
+                               delta=0.0001,
+                               msg="FAIL: Unequal variance levene w value")
+
+    def test_464_EqualVariance_Levene_unmatched_t_value(self):
+        """Test the EqualVariance class for non-normally distributed unmatched variances"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [4, 0.75]
+        z_parms = [1.7]
+        a = 0.05
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*y_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
+        self.assertRaises(KeyError, lambda: EqualVariance(x_input_array,
+                                                          y_input_array,
+                                                          z_input_array,
+                                                          alpha=a,
+                                                          display=False).t_value)
+
+# Test Kruskal
+
+    def test_500_Kruskal_matched(self):
         """Test the Kruskal Wallis class on matched data"""
+        np.random.seed(987654321)
         x_parms = [1.7]
-        x_input_array = st.weibull_min.rvs(*x_parms, size=1000)
-        y_input_array = st.weibull_min.rvs(*x_parms, size=1000)
-        z_input_array = st.weibull_min.rvs(*x_parms, size=1000)
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*x_parms, size=100)
         alpha = 0.05
-        self.assertTrue(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                display=True).p_value > alpha, "FAIL: Kruskal Type I error")
+        self.assertGreater(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
+                           alpha,
+                           "FAIL: Kruskal Type I error")
 
-    def test_142_Kruskal_unmatched(self):
+    def test_501_Kruskal_matched_statistic(self):
+        """Test the Kruskal Wallis class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        a = 0.05
+        self.assertAlmostEqual(Kruskal(x_input_array, y_input_array, z_input_array, alpha=a, display=False).statistic,
+                               0.4042,
+                               delta=0.0001,
+                               msg="FAIL: Kruskal statistic")
+
+    def test_502_Kruskal_matched_h_value(self):
+        """Test the Kruskal Wallis class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        y_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        z_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        a = 0.05
+        self.assertAlmostEqual(Kruskal(x_input_array, y_input_array, z_input_array, alpha=a, display=False).h_value,
+                               0.4042,
+                               delta=0.0001,
+                               msg="FAIL: Kruskal h value")
+
+    def test_503_Kruskal_matched_single_argument(self):
+        """Test the Kruskal Wallis class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        a = 0.05
+        self.assertRaises(TypeError, lambda: Kruskal(x_input_array, alpha=a, display=False).p_value)
+
+    def test_504_Kruskal_unmatched(self):
         """Test the Kruskal Wallis class on unmatched data"""
-        x_parms = [1.7]
-        z_parms = [1.1]
-        x_input_array = st.weibull_min.rvs(*x_parms, size=1000)
-        y_input_array = st.weibull_min.rvs(*x_parms, size=1000)
-        z_input_array = st.norm.rvs(*z_parms, size=1000)
+        np.random.seed(987654321)
+        x_parms = [1.7, 1]
+        z_parms = [0.8, 1]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*x_parms, size=100)
+        z_input_array = st.norm.rvs(*z_parms, size=100)
         alpha = 0.05
-        self.assertFalse(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                 display=True).p_value > alpha, "FAIL: Kruskal Type II error")
+        self.assertLess(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
+                        alpha,
+                        "FAIL: Kruskal Type II error")
 
-    def test_143_ANOVA_matched(self):
+# Test ANOVA
+
+    def test_550_ANOVA_matched(self):
         """Test the ANOVA class on matched data"""
+        np.random.seed(987654321)
         x_parms = [4, 1.75]
-        x_input_array = st.norm.rvs(*x_parms, size=1000)
-        y_input_array = st.norm.rvs(*x_parms, size=1000)
-        z_input_array = st.norm.rvs(*x_parms, size=1000)
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*x_parms, size=100)
+        z_input_array = st.norm.rvs(*x_parms, size=100)
         alpha = 0.05
-        self.assertTrue(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                              display=True).p_value > alpha, "FAIL: ANOVA Type I error")
+        self.assertGreater(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
+                           alpha,
+                           "FAIL: ANOVA Type I error")
 
-    def test_144_ANOVA_unmatched(self):
+    def test_551_ANOVA_matched_statistic(self):
+        """Test the ANOVA class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*x_parms, size=100)
+        z_input_array = st.norm.rvs(*x_parms, size=100)
+        alpha = 0.05
+        self.assertAlmostEqual(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).statistic,
+                               0.1076,
+                               delta=0.0001,
+                               msg="FAIL: ANOVA statistic")
+
+    def test_552_ANOVA_matched_f_value(self):
+        """Test the ANOVA class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [4, 1.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = st.norm.rvs(*x_parms, size=100)
+        z_input_array = st.norm.rvs(*x_parms, size=100)
+        alpha = 0.05
+        self.assertAlmostEqual(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).f_value,
+                               0.1076,
+                               delta=0.0001,
+                               msg="FAIL: ANOVA f value")
+
+    def test_553_ANOVA_unmatched(self):
         """Test the ANOVA class on unmatched data"""
+        np.random.seed(987654321)
         x_parms = [4, 1.75]
         y_parms = [6, 1.75]
         x_input_array = st.norm.rvs(*x_parms, size=1000)
         y_input_array =st.norm.rvs(*y_parms, size=1000)
         z_input_array = st.norm.rvs(*x_parms, size=1000)
         alpha = 0.05
-        self.assertFalse(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                               display=True).p_value > alpha, "FAIL: ANOVA Type II error")
+        self.assertLess(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value, alpha,
+                        "FAIL: ANOVA Type II error")
 
-    def test_145_GroupNorm_normal(self):
-        """Test the GroupNorm class on normal data"""
-        x_parms = [4, 1.75]
-        x_input_array = st.norm.rvs(*x_parms, size=1000)
-        y_input_array = st.norm.rvs(*x_parms, size=1000)
-        z_input_array = st.norm.rvs(*x_parms, size=1000)
-        alpha = 0.05
-        self.assertTrue(NormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                 display=True).p_value > alpha, "FAIL: Group Norm Type I error")
+# Test VectorStatistics
 
-    def test_146_GroupNorm_non_normal(self):
-        """Test the GroupNorm class on non-normal data"""
-        x_parms = [4, 1.75]
-        z_parms = [1.7]
-        x_input_array = st.norm.rvs(*x_parms, size=1000)
-        y_input_array = st.norm.rvs(*x_parms, size=1000)
-        z_input_array = st.weibull_min.rvs(*z_parms, size=1000)
-        alpha = 0.05
-        self.assertFalse(NormTest(x_input_array, y_input_array, z_input_array, alpha=alpha,
-                                  display=True).p_value > alpha, "FAIL: Group Norm Type II error")
-
-    def test_147_Vector_stats(self):
+    def test_1000_Vector_stats_count(self):
         """Test the vector statistics class"""
+        np.random.seed(987654321)
         parms = [4, 1.75]
-        comp = [100, parms[0], parms[1]]
-        input_array = st.norm.rvs(*parms, size=comp[0])
-        vs = VectorStatistics(input_array, sample=True, display=True)
-        test = (vs.count, vs.mean, vs.std_dev)
-        check = [abs(comp[i] - test[i]) for i in range(3)]
-        self.assertTrue(check[0] < 0.5 and check[1] < 0.5 and check[2] < 0.5, "FAIL: Stat delta is too large")
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertEqual(VectorStatistics(input_array, sample=True, display=False).count, 100, "FAIL: Stat count")
+
+    def test_1001_Vector_stats_mean(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).mean,
+                               4.0145,
+                               delta=0.0001,
+                               msg="FAIL: Stat mean")
+
+    def test_1002_Vector_stats_std_dev_sample(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).std_dev,
+                               1.8622,
+                               delta=0.0001,
+                               msg="FAIL: Stat std dev")
+
+    def test_1003_Vector_stats_std_dev_population(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=False, display=False).std_dev,
+                               1.8529,
+                               delta=0.0001,
+                               msg="FAIL: Stat std dev")
+
+    def test_1004_Vector_stats_std_error_sample(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).std_err,
+                               0.1862,
+                               delta=0.0001,
+                               msg="FAIL: Stat std error")
+
+    def test_1004_Vector_stats_std_error_population(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=False, display=False).std_err,
+                               0.1853,
+                               delta=0.0001,
+                               msg="FAIL: Stat std error")
+
+    def test_1005_Vector_stats_skewness(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).skewness,
+                               -0.0256,
+                               delta=0.0001,
+                               msg="FAIL: Stat skewness")
+
+    def test_1006_Vector_stats_kurtosis(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).kurtosis,
+                               -0.4830,
+                               delta=0.0001,
+                               msg="FAIL: Stat kurtosis")
+
+    def test_1007_Vector_stats_maximum(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).maximum,
+                               7.9315,
+                               delta=0.0001,
+                               msg="FAIL: Stat maximum")
+
+    def test_1008_Vector_stats_q3(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).q3,
+                               5.0664,
+                               delta=0.0001,
+                               msg="FAIL: Stat q3")
+
+    def test_1009_Vector_stats_median(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).median,
+                               4.1331,
+                               delta=0.0001,
+                               msg="FAIL: Stat median")
+
+    def test_1010_Vector_stats_q1(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).q1,
+                               2.6576,
+                               delta=0.0001,
+                               msg="FAIL: Stat q1")
+
+    def test_1011_Vector_stats_minimum(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).minimum,
+                               -0.3256,
+                               delta=0.0001,
+                               msg="FAIL: Stat minimum")
+
+    def test_1012_Vector_stats_range(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).range,
+                               8.2571,
+                               delta=0.0001,
+                               msg="FAIL: Stat range")
+
+    def test_1013_Vector_stats_iqr(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertAlmostEqual(VectorStatistics(input_array, sample=True, display=False).iqr,
+                               2.4088,
+                               delta=0.0001,
+                               msg="FAIL: Stat iqr")
+
+    def test_1014_Vector_stats_name(self):
+        """Test the vector statistics class"""
+        np.random.seed(987654321)
+        parms = [4, 1.75]
+        input_array = st.norm.rvs(*parms, size=100)
+        self.assertEqual(VectorStatistics(input_array, sample=True, display=False).name,
+                         "Statistics",
+                         "FAIL: Stat name")
+
+    def test_1015_Vector_stats_min_size(self):
+        """Test the vector statistics class"""
+        input_array = np.array([14])
+        self.assertFalse(VectorStatistics(input_array, sample=True, display=False).data, "FAIL: Stats not None")
+
+    def test_1016_Vector_stats_empty_array(self):
+        """Test the vector statistics class"""
+        self.assertFalse(VectorStatistics(np.array([]), sample=True, display=False).data,
+                         "FAIL: Stats not None")
 
 
 if __name__ == '__main__':

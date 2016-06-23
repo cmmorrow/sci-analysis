@@ -18,10 +18,11 @@ class Data(object):
     def is_empty(self):
         """Tests if this Data object's data member equals 'None' and returns
         the result."""
-        if self.data is None:
-            return True
-        else:
-            return False
+        return True if self.data else False
+        # if not self.data:
+        #     return True
+        # else:
+        #     return False
 
     def __repr__(self):
         """Prints the Data object using the same representation as its data member"""
