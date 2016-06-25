@@ -444,6 +444,7 @@ class TTest(Test):
     _name = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
     _h0 = "H0: Means are matched"
     _ha = "HA: Means are significantly different"
+    _min_size = 3
 
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
         self._mu = None

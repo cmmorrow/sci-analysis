@@ -10,31 +10,34 @@ class Data(object):
 
     data_type = "Data"
 
-    def __init__(self, d=None, n=None):
+    def __init__(self, v=None, n=None):
         """Sets the data and name members."""
-        self.data = d
-        self.name = n
+        self._values = v
+        self._name = n
 
     def is_empty(self):
         """Tests if this Data object's data member equals 'None' and returns
         the result."""
-        return True if self.data else False
-        # if not self.data:
-        #     return True
-        # else:
-        #     return False
+        return True if self._values is None else False
+
+    @property
+    def data(self):
+        return self._values
+
+    @property
+    def name(self):
+        return self._name
 
     def __repr__(self):
         """Prints the Data object using the same representation as its data member"""
-        return self.data.__repr__()
+        return self._values.__repr__()
 
     def __len__(self):
         """Returns the length of the data member. If data is not defined, 0 is
         returned. If the data member is a scalar value, 1 is returned."""
-        if self.data is not None:
+        if self._values is not None:
             try:
-                l = len(self.data)
-                return l
+                return len(self._values)
             except TypeError:
                 return 1
         else:
@@ -48,19 +51,19 @@ class Data(object):
         by item, or returns None if no such index exists
         """
         try:
-            return self.data[item]
+            return self._values[item]
         except (IndexError, AttributeError):
             return None
 
     def __contains__(self, item):
         try:
-            return item in self.data
+            return item in self._values
         except AttributeError:
             return None
 
     def __iter__(self):
         """Give this Data object the iterative behavior of its data member."""
         try:
-            return self.data.__iter__()
+            return self._values.__iter__()
         except AttributeError:
             return None
