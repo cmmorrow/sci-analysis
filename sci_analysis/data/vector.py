@@ -67,7 +67,9 @@ class Vector(Data):
 
         :return: True or False
         """
-        return True if self._values is None or len(self._values) == 0 else False
+        # return True if self._values is None or len(self._values) == 0 else False
+        # return True if self._values is None else False
+        return True if len(self._values) == 0 else False
 
 # Perform the operations import at the end to avoid cyclical imports.
 from ..operations.data_operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten

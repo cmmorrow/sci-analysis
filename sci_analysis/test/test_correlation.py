@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Correlation
+from ..analysis.analysis import Correlation, MinimumSizeError, UnequalVectorLengthError, EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -130,6 +130,43 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).response,
                                        y_input_array),
                         "FAIL: Correlation spearman response")
+
+    def test_413_Correlation_no_corr_pearson_just_above_min_size(self):
+        """Test the Correlation class for uncorrelated normally distributed data just above the minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertTrue(Correlation(st.norm.rvs(size=4),
+                                    st.norm.rvs(size=4),
+                                    alpha=alpha,
+                                    display=False).p_value,
+                        "FAIL: Correlation pearson just above minimum size")
+
+    def test_414_Correlation_no_corr_pearson_at_min_size(self):
+        """Test the Correlation class for uncorrelated normally distributed data at the minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertRaises(MinimumSizeError, lambda: Correlation(st.norm.rvs(size=3),
+                                                                st.norm.rvs(size=3),
+                                                                alpha=alpha,
+                                                                display=False).p_value)
+
+    def test_415_Correlation_no_corr_pearson_unequal_vectors(self):
+        """Test the Correlation class for uncorrelated normally distributed data with unequal vectors"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertRaises(UnequalVectorLengthError, lambda: Correlation(st.norm.rvs(size=100),
+                                                                        st.norm.rvs(size=95),
+                                                                        alpha=alpha,
+                                                                        display=False).p_value)
+
+    def test_415_Correlation_no_corr_pearson_empty_vector(self):
+        """Test the Correlation class for uncorrelated normally distributed data with an empty vector"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertRaises(EmptyVectorError, lambda: Correlation(["one", "two", "three", "four", "five"],
+                                                                st.norm.rvs(size=5),
+                                                                alpha=alpha,
+                                                                display=False).p_value)
 
 
 if __name__ == '__main__':

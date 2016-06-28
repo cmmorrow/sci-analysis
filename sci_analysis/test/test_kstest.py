@@ -2,7 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
-from ..analysis.analysis import KSTest
+from ..analysis.analysis import KSTest, MinimumSizeError, EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -111,6 +111,33 @@ class MyTestCase(unittest.TestCase):
         self.assertGreater(KSTest(st.weibull_max.rvs(*parms, size=100), distro,
                                   parms=parms, alpha=alpha, display=False).p_value, alpha,
                            "FAIL: Error in Weibull max GOF")
+
+    def test_262_Kolmogorov_Smirnov_normal_test_at_min_size(self):
+        """Test the normal distribution detection at the minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertRaises(MinimumSizeError, lambda: KSTest(st.norm.rvs(size=2),
+                                                           distro,
+                                                           alpha=alpha,
+                                                           display=False).p_value)
+
+    def test_263_Kolmogorov_Smirnov_normal_test_just_above_min_size(self):
+        """Test the normal distribution detection just above the minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertTrue(KSTest(st.norm.rvs(size=3), distro, alpha=alpha, display=False).p_value)
+
+    def test_264_Kolmogorov_Smirnov_normal_test_empty_vector(self):
+        """Test the normal distribution detection with an empty vector"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        distro = 'norm'
+        self.assertRaises(EmptyVectorError, lambda: KSTest(["one", "two", "three", "four"],
+                                                           distro,
+                                                           alpha=alpha,
+                                                           display=False).p_value)
 
 
 if __name__ == '__main__':

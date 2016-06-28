@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import VectorStatistics
+from ..analysis.analysis import VectorStatistics, EmptyVectorError, MinimumSizeError
 
 
 class MyTestCase(unittest.TestCase):
@@ -163,14 +163,19 @@ class MyTestCase(unittest.TestCase):
                          "FAIL: Stat name")
 
     def test_1015_Vector_stats_min_size(self):
-        """Test the vector statistics class"""
+        """Test the vector statistics at min size"""
         input_array = np.array([14])
-        self.assertFalse(VectorStatistics(input_array, sample=True, display=False).data, "FAIL: Stats not None")
+        self.assertRaises(MinimumSizeError, lambda: VectorStatistics(input_array, sample=True, display=False).data)
 
-    def test_1016_Vector_stats_empty_array(self):
-        """Test the vector statistics class"""
-        self.assertFalse(VectorStatistics(np.array([]), sample=True, display=False).data,
-                         "FAIL: Stats not None")
+    def test_1016_Vector_stats_just_above_min_size(self):
+        """Test the vector statistics just above min size"""
+        input_array = np.array([14, 21])
+        self.assertTrue(VectorStatistics(input_array, sample=True, display=False).data,
+                        "FAIL: Vector statistics at just above min size")
+
+    def test_1017_Vector_stats_empty_array(self):
+        """Test the vector statistics with empty array"""
+        self.assertRaises(EmptyVectorError, lambda: VectorStatistics(np.array([]), sample=True, display=False).data)
 
 
 if __name__ == '__main__':

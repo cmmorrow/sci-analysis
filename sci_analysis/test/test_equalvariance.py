@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import EqualVariance
+from ..analysis.analysis import EqualVariance, MinimumSizeError, EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -226,6 +226,55 @@ class MyTestCase(unittest.TestCase):
                                                           z_input_array,
                                                           alpha=a,
                                                           display=False).t_value)
+
+    def test_465_EqualVariance_Bartlett_matched_just_above_min_size(self):
+        """Test the EqualVariance class for normally distributed matched variances just above min size"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=3)
+        y_input_array = st.norm.rvs(*y_parms, size=3)
+        z_input_array = st.norm.rvs(*z_parms, size=3)
+        a = 0.05
+        self.assertTrue(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
+                        "FAIL: Equal variance Bartlett just above min size")
+
+    def test_466_EqualVariance_Bartlett_matched_at_min_size(self):
+        """Test the EqualVariance class for normally distributed matched variances at min size"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=2)
+        y_input_array = st.norm.rvs(*y_parms, size=9)
+        z_input_array = st.norm.rvs(*z_parms, size=47)
+        a = 0.05
+        self.assertTrue(MinimumSizeError, lambda: EqualVariance(x_input_array, y_input_array, z_input_array,
+                                                                alpha=a,
+                                                                display=False).p_value)
+
+    def test_467_EqualVariance_Bartlett_matched_single_empty_vector(self):
+        """Test the EqualVariance class for normally distributed matched variances single empty vector"""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        z_parms = [4, 0.75]
+        x_input_array = st.norm.rvs(*x_parms, size=100)
+        y_input_array = ["one", "two", "three", "four", "five"]
+        z_input_array = st.norm.rvs(*z_parms, size=100)
+        a = 0.05
+        self.assertTrue(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
+                        "FAIL: Equal variance Bartlett should pass with single empty vector")
+
+    def test_466_EqualVariance_Bartlett_all_empty_vectors(self):
+        """Test the EqualVariance class for normally distributed matched variances with all empty vectors"""
+        np.random.seed(987654321)
+        x_input_array = [float("nan"), float("nan"), float("nan"), "four", float("nan")]
+        y_input_array = ["one", "two", "three", "four", "five"]
+        a = 0.05
+        self.assertTrue(EmptyVectorError, lambda: EqualVariance(x_input_array, y_input_array,
+                                                                alpha=a,
+                                                                display=False).p_value)
 
 
 if __name__ == '__main__':

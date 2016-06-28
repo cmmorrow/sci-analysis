@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import LinearRegression
+from ..analysis.analysis import LinearRegression, MinimumSizeError, UnequalVectorLengthError, EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -67,6 +67,45 @@ class MyTestCase(unittest.TestCase):
                                                 alpha=alpha,
                                                 display=False).std_err, 0.0666, delta=0.0001,
                                msg="FAIL: Linear Regression std err")
+
+    def test_356_LinRegress_no_corr_just_above_min_size(self):
+        """Test the Linear Regression class for uncorrelated data just above minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=4)
+        y_input_array = st.norm.rvs(size=4)
+        self.assertTrue(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value,
+                        "FAIL: Linear Regression just above minimum size")
+
+    def test_357_LinRegress_no_corr_at_min_size(self):
+        """Test the Linear Regression class for uncorrelated data at minimum size"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=3)
+        y_input_array = st.norm.rvs(size=3)
+        self.assertRaises(MinimumSizeError, lambda: LinearRegression(x_input_array, y_input_array,
+                                                                     alpha=alpha,
+                                                                     display=False).p_value)
+
+    def test_358_LinRegress_no_corr_unequal_vectors(self):
+        """Test the Linear Regression class for uncorrelated data with unequal vectors"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=184)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertRaises(UnequalVectorLengthError, lambda: LinearRegression(x_input_array, y_input_array,
+                                                                             alpha=alpha,
+                                                                             display=False).p_value)
+
+    def test_359_LinRegress_no_corr_empty_vector(self):
+        """Test the Linear Regression class for uncorrelated data with an empty vector"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = [float("nan"), "two", "three", "four", float("nan")]
+        y_input_array = st.norm.rvs(size=5)
+        self.assertRaises(EmptyVectorError, lambda: LinearRegression(x_input_array, y_input_array,
+                                                                     alpha=alpha,
+                                                                     display=False).p_value)
 
 
 if __name__ == '__main__':

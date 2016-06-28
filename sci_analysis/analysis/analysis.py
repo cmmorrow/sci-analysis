@@ -35,6 +35,18 @@ from ..operations.data_operations import is_dict, is_iterable, is_vector, is_gro
 from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
+class MinimumSizeError(Exception):
+    pass
+
+
+class EmptyVectorError(Exception):
+    pass
+
+
+class UnequalVectorLengthError(Exception):
+    pass
+
+
 class Analysis(object):
     """Generic analysis root class.
 
@@ -215,7 +227,7 @@ class Test(Analysis):
             try:
                 data = data[0]
             except IndexError:
-                pass
+                raise EmptyVectorError("Passed data is empty")
 
         # set the _data and _display members
         super(Test, self).__init__(data, display=(kwargs['display'] if 'display' in kwargs else True))
@@ -243,8 +255,11 @@ class Test(Analysis):
                     continue
             else:
                 v = drop_nan(d) if is_vector(d) else drop_nan(Vector(d))
-                if v.is_empty() or len(v) <= self._min_size:
+                if not v:
                     continue
+                if len(v) <= self._min_size:
+                    raise MinimumSizeError("length of data is less than the minimum size {}"
+                                           .format(self._min_size))
                 clean_list.append(v)
         return clean_list
 
@@ -293,6 +308,8 @@ class Test(Analysis):
 class Comparison(Test):
     """Perform a test on two independent vectors of equal length."""
 
+    _min_size = 3
+
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
         super(Comparison, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
@@ -301,13 +318,13 @@ class Comparison(Test):
         xdata = data[0] if is_vector(data[0]) else Vector(data[0])
         ydata = data[1] if is_vector(data[1]) else Vector(data[1])
         if len(xdata) != len(ydata):
-            pass
-        elif len(xdata) <= self._min_size or len(xdata) <= self._min_size:
-            pass
-        elif xdata.is_empty() or ydata.is_empty():
-            pass
+            raise UnequalVectorLengthError("x and y data lengths are not equal")
+        elif len(xdata) <= self._min_size or len(ydata) <= self._min_size:
+            raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
         else:
             xdata, ydata = drop_nan_intersect(xdata, ydata)
+            if len(xdata) <= self._min_size or len(ydata) <= self._min_size:
+                raise EmptyVectorError("x or y data is empty")
         return [xdata, ydata]
 
     @property
@@ -424,6 +441,7 @@ class MannWhitney(Test):
     _name = "Mann Whitney U Test"
     _h0 = "H0: Locations are matched"
     _ha = "HA: Locations are not matched"
+    _min_size = 30
 
     def run(self):
         u_value, p_value = mannwhitneyu(*self._data)
@@ -453,7 +471,7 @@ class TTest(Test):
             self._mu = float(ydata)
             super(TTest, self).__init__(xdata, alpha=alpha, display=display)
         else:
-            super(TTest, self).__init__(*(xdata, ydata), alpha=alpha, display=display)
+            super(TTest, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
         if self._mu:
@@ -494,7 +512,6 @@ class TTest(Test):
 class LinearRegression(Comparison):
     """Performs a linear regression between two vectors."""
 
-    _min_size = 3
     _name = "Linear Regression"
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
@@ -538,7 +555,6 @@ class LinearRegression(Comparison):
 class Correlation(Comparison):
     """Performs a pearson or spearman correlation between two vectors."""
 
-    _min_size = 3
     _name = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
@@ -668,7 +684,7 @@ class EqualVariance(Test):
 class VectorStatistics(Analysis):
     """Reports basic summary stats for a provided vector."""
 
-    _min_size = 2
+    _min_size = 1
     _name = 'Statistics'
 
     def __init__(self, data, sample=True, display=True):
@@ -678,7 +694,11 @@ class VectorStatistics(Analysis):
 
     def data_prep(self, data):
         v = drop_nan(data) if is_vector(data) else drop_nan(Vector(data))
-        return None if v.is_empty() or len(v) < self._min_size else v
+        if not v:
+            raise EmptyVectorError("data is empty")
+        if len(v) <= self._min_size:
+            raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+        return v
 
     def run(self):
         dof = 0
@@ -787,10 +807,17 @@ class GroupStatistics(GroupAnalysis):
     _min_size = 1
     _name = 'Group Statistics'
 
-    def __init__(self, data, groups=None, display=True):
-        if not is_dict(data):
-            data = dict(zip(groups, data)) if groups else dict(zip(list(range(1, len(data) + 1)), data))
-        super(GroupStatistics, self).__init__(self.data_prep(data), display=display)
+    def __init__(self, *data, **kwargs):
+        groups = kwargs['groups'] if 'groups' in kwargs else None
+        display = kwargs['display'] if 'display' in kwargs else True
+        if not is_dict(data[0]):
+            _data = dict(zip(groups, data)) if groups else dict(zip(list(range(1, len(data) + 1)), data))
+        else:
+            _data = data[0]
+        _data = self.data_prep(_data)
+        if len(_data) < 1:
+            raise EmptyVectorError("data is empty")
+        super(GroupStatistics, self).__init__(_data, display=display)
         self.logic()
 
     def data_prep(self, data):
@@ -799,11 +826,12 @@ class GroupStatistics(GroupAnalysis):
             if len(d) == 0:
                 continue
             else:
-                if not is_vector(d):
-                    v = Vector(d)
-                if len(v) < self._min_size:
+                v = drop_nan(d) if is_vector(d) else drop_nan(Vector(d))
+                if not v:
                     continue
-                clean_data.update({i: drop_nan(v)})
+                if len(v) <= self._min_size:
+                    raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+                clean_data.update({i: v})
         return clean_data
 
     def logic(self):
