@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Correlation, MinimumSizeError, UnequalVectorLengthError, EmptyVectorError
+from ..analysis.analysis import Correlation, MinimumSizeError, NoDataError
+from ..data.data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):
@@ -154,19 +155,20 @@ class MyTestCase(unittest.TestCase):
         """Test the Correlation class for uncorrelated normally distributed data with unequal vectors"""
         np.random.seed(987654321)
         alpha = 0.05
-        self.assertRaises(UnequalVectorLengthError, lambda: Correlation(st.norm.rvs(size=100),
-                                                                        st.norm.rvs(size=95),
+        x_input_array = st.norm.rvs(size=87)
+        y_input_array = st.norm.rvs(size=100)
+        self.assertRaises(UnequalVectorLengthError, lambda: Correlation(x_input_array, y_input_array,
                                                                         alpha=alpha,
                                                                         display=False).p_value)
 
-    def test_415_Correlation_no_corr_pearson_empty_vector(self):
+    def test_416_Correlation_no_corr_pearson_empty_vector(self):
         """Test the Correlation class for uncorrelated normally distributed data with an empty vector"""
         np.random.seed(987654321)
         alpha = 0.05
-        self.assertRaises(EmptyVectorError, lambda: Correlation(["one", "two", "three", "four", "five"],
-                                                                st.norm.rvs(size=5),
-                                                                alpha=alpha,
-                                                                display=False).p_value)
+        self.assertRaises(NoDataError, lambda: Correlation(["one", "two", "three", "four", "five"],
+                                                           st.norm.rvs(size=5),
+                                                           alpha=alpha,
+                                                           display=False).p_value)
 
 
 if __name__ == '__main__':

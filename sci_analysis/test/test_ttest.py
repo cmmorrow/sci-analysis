@@ -2,7 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
-from ..analysis.analysis import TTest, MinimumSizeError
+from ..analysis.analysis import TTest, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -157,6 +157,15 @@ class MyTestCase(unittest.TestCase):
                                                           st.norm.rvs(*y_parms, size=3),
                                                           alpha=alpha,
                                                           display=False).p_value)
+
+    def test_216_TTest_equal_variance_matched_one_missing_array(self):
+        """Test the TTest test with one missing array"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        self.assertRaises(NoDataError, lambda: TTest([1.1, 1.0, 0.9, 0.8],
+                                                     ["one", "two", "three", "four"],
+                                                     alpha=alpha,
+                                                     display=False).p_value)
 
 
 if __name__ == '__main__':

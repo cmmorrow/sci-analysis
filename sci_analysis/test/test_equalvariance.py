@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import EqualVariance, MinimumSizeError, EmptyVectorError
+from analysis.analysis import EqualVariance, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -272,9 +272,9 @@ class MyTestCase(unittest.TestCase):
         x_input_array = [float("nan"), float("nan"), float("nan"), "four", float("nan")]
         y_input_array = ["one", "two", "three", "four", "five"]
         a = 0.05
-        self.assertTrue(EmptyVectorError, lambda: EqualVariance(x_input_array, y_input_array,
-                                                                alpha=a,
-                                                                display=False).p_value)
+        self.assertTrue(NoDataError, lambda: EqualVariance(x_input_array, y_input_array,
+                                                           alpha=a,
+                                                           display=False).p_value)
 
 
 if __name__ == '__main__':

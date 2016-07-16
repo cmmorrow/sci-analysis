@@ -17,40 +17,33 @@ Functions:
 """
 from __future__ import absolute_import
 
-import numpy as np
-
-from ..data.data import Data
-try:
-    from ..data.vector import Vector
-except ImportError:
-    import sys
-    Vector = sys.modules["sci_analysis.data.vector.Vector"]
+# from ..graphs.graph import Graph
 
 
-def to_float(d):
+def to_float(seq):
     """Takes a data argument d, tries to convert d to a float and returns
     the result. Otherwise, "nan" is returned.
 
-    :param d: Data of unspecified type
+    :param seq: Data of unspecified type
     :return: d converted to a float or "nan"
     """
     float_list = []
-    for i in range(len(d)):
+    for i in range(len(seq)):
         try:
-            float_list.append(float(d[i]))
+            float_list.append(float(seq[i]))
         except (ValueError, TypeError):
             float_list.append(float("nan"))
     return float_list
 
 
-def flatten(d):
+def flatten(seq):
     """Reduces the dimension of data d by one.
 
-    :param d: A sequence of data
+    :param seq: A sequence of data
     :return: The flattened sequence
     """
     flat = []
-    for row in d:
+    for row in seq:
         if is_iterable(row):
             for col in flatten(row):
                 flat.append(col)
@@ -59,117 +52,70 @@ def flatten(d):
     return flat
 
 
-def drop_nan(v):
-    """ Removes NaN values from the given sequence v and returns the equivalent
-    Vector object. The length of the returned Vector is the length of v minus
-    the number of "nan" values removed from v.
-
-    :param v: A sequence like object
-    :return: A vector representation of v with "nan" values removed
-    """
-    return None if Vector(v).is_empty() else Vector(v.data[~np.isnan(v.data)])
+# def is_graph(obj):
+#     """Checks if the argument is a Graph object
+#
+#     :param obj: A variable of unknown type
+#     :return: True or False
+#     """
+#     return True if isinstance(obj, Graph) else False
 
 
-def drop_nan_intersect(first, second):
-    """Takes two sequence like arguments first and second, and creates a
-    tuple of sequences where only non-NaN values are given. This is accomplished
-    by removing values that are "nan" on matching indicies of either first or second.
-
-    :param first: A sequence like object
-    :param second: A sequence like object
-    :return: A two element tuple of Vector objects with "nan" values removed
-    """
-    if Vector(first).is_empty() or Vector(second).is_empty():
-        return None, None
-    c = np.logical_and(~np.isnan(first.data), ~np.isnan(second.data))
-    return Vector(first.data[c]), Vector(second.data[c])
-
-
-def is_vector(d):
-    """Checks if the argument is a Vector object.
-
-    :param d: A variable of unknown type
-    :return: True or False
-    """
-    if isinstance(d, Vector):
-        return True
-    else:
-        return False
-
-
-def is_data(d):
-    """Checks if the argument is a Data object.
-
-    :param d: A variable of unknown type
-    :return: True or False
-    """
-    if isinstance(d, Data):
-        return True
-    else:
-        return False
-
-
-def is_tuple(d):
+def is_tuple(seq):
     """Checks if the argument is a tuple.
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
-    if isinstance(d, tuple):
+    if isinstance(seq, tuple):
         return True
     else:
         return False
 
 
-def is_iterable(d):
+def is_iterable(seq):
     """Checks if the argument is sequence-like but not a string.
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
     try:
-        d.__iter__()
+        seq.__iter__()
         return True
     except (AttributeError, TypeError):
         return False
 
 
-def is_array(d):
+def is_array(seq):
     """Tests if the argument is a numPy Array object.
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
-    return hasattr(d, 'dtype')
-    # try:
-    #     d.dtype
-    #     return True
-    # except AttributeError:
-    #     return False
+    return hasattr(seq, 'dtype')
 
 
-def is_dict(d):
+def is_dict(seq):
     """Tests if the argument is a dictionary object.
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
-    """"""
     try:
-        list(d.items())
+        seq.items()
         return True
     except AttributeError:
         return False
 
 
-def is_group(d):
+def is_group(seq):
     """Tests if the argument is a list of iterables.
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
     try:
-        if any(is_iterable(x) for x in d):
+        if any(is_iterable(x) for x in seq):
             return True
         else:
             return False
@@ -177,14 +123,14 @@ def is_group(d):
         return False
 
 
-def is_dict_group(d):
+def is_dict_group(seq):
     """Tests if the argument is a dict of iterables
 
-    :param d: A variable of unknown type
+    :param seq: A variable of unknown type
     :return: True or False
     """
     try:
-        if is_group(list(d.values())):
+        if is_group(list(seq.values())):
             return True
         else:
             return False

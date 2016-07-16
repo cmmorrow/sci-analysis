@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import MannWhitney, MinimumSizeError
+from analysis.analysis import MannWhitney, MinimumSizeError, NoDataError
 
 
 class TestMannWhitney(unittest.TestCase):
@@ -89,6 +89,21 @@ class TestMannWhitney(unittest.TestCase):
         self.assertRaises(MinimumSizeError, lambda: MannWhitney(st.weibull_min.rvs(*x_parms, size=45),
                                                                 st.weibull_min.rvs(*y_parms, size=30),
                                                                 alpha=alpha, display=False).p_value)
+
+    def test_MannWhitney_one_missing_array(self):
+        """Test the MannWhitney U test with one missing array"""
+        alpha = 0.05
+        self.assertRaises(MinimumSizeError, lambda: MannWhitney([1.2, 0.9, 1.4, 1.0], ["one", "two", "three", "four"],
+                                                                alpha=alpha,
+                                                                display=False))
+
+    def test_MannWhitney_two_missing_arrays(self):
+        """Test the MannWhitney U test with two missing arrays"""
+        alpha = 0.05
+        self.assertRaises(NoDataError, lambda: MannWhitney(["five", "six", "seven", "eight"],
+                                                           ["one", "two", "three", "four"],
+                                                           alpha=alpha,
+                                                           display=False))
 
 
 if __name__ == '__main__':

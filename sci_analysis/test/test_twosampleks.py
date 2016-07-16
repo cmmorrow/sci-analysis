@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import TwoSampleKSTest, MinimumSizeError, EmptyVectorError
+from analysis.analysis import TwoSampleKSTest, MinimumSizeError, NoDataError
 
 
 class TestTwoSampleKS(unittest.TestCase):
@@ -87,10 +87,10 @@ class TestTwoSampleKS(unittest.TestCase):
         """Test the Two Sample KS Test with empty vectors"""
         np.random.seed(987654321)
         alpha = 0.05
-        self.assertRaises(EmptyVectorError, lambda: TwoSampleKSTest([float("nan"), float("nan"), "one", float("nan")],
-                                                                    ["one", "two", "three", "four"],
-                                                                    alpha=alpha,
-                                                                    display=False).p_value)
+        self.assertRaises(NoDataError, lambda: TwoSampleKSTest([float("nan"), float("nan"), "one", float("nan")],
+                                                               ["one", "two", "three", "four"],
+                                                               alpha=alpha,
+                                                               display=False).p_value)
 
 
 if __name__ == '__main__':

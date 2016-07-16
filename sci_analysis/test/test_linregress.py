@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import LinearRegression, MinimumSizeError, UnequalVectorLengthError, EmptyVectorError
+from analysis.analysis import LinearRegression, MinimumSizeError, NoDataError
+from data.data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):
@@ -103,9 +104,29 @@ class MyTestCase(unittest.TestCase):
         alpha = 0.05
         x_input_array = [float("nan"), "two", "three", "four", float("nan")]
         y_input_array = st.norm.rvs(size=5)
-        self.assertRaises(EmptyVectorError, lambda: LinearRegression(x_input_array, y_input_array,
-                                                                     alpha=alpha,
-                                                                     display=False).p_value)
+        self.assertRaises(NoDataError, lambda: LinearRegression(x_input_array, y_input_array,
+                                                                alpha=alpha,
+                                                                display=False).p_value)
+
+    def test_360_LinRegress_no_corr_two_empty_vectors(self):
+        """Test the Linear Regression class for uncorrelated data with two empty vectors"""
+        alpha = 0.05
+        x_input_array = [float("nan"), "two", "three", "four", float("nan")]
+        y_input_array = ["one", "two", float("nan"), "four", float("nan")]
+        self.assertRaises(NoDataError, lambda: LinearRegression(x_input_array, y_input_array,
+                                                                alpha=alpha,
+                                                                display=False).p_value)
+
+    def test_361_LinRegress_no_corr_statistic(self):
+        """Test the Linear Regression R^2"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).statistic, -0.1029, delta=0.0001,
+                               msg="FAIL: Linear Regression statistic")
 
 
 if __name__ == '__main__':

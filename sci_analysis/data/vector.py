@@ -7,13 +7,21 @@ from __future__ import absolute_import
 import numpy as np
 
 # Import from local
-from .data import Data
+from data.data import Data
+from operations.data_operations import drop_nan, drop_nan_intersect, is_vector, is_array, is_dict, is_iterable, \
+    to_float, flatten
+
+
+class EmptyVectorError(Exception):
+    pass
+
+
+class UnequalVectorLengthError(Exception):
+    pass
 
 
 class Vector(Data):
     """The base data container class used by sci_analysis."""
-
-    data_type = "Vector"
 
     def __init__(self, sequence=None, name=None):
         """Takes a sequence like object and converts it to a numPy Array of
@@ -24,6 +32,7 @@ class Vector(Data):
         :return: A Vector object
         """
 
+        self._prepared = False
         super(Vector, self).__init__(v=sequence, n=name)
         if is_vector(sequence):
             self._values = sequence.data
@@ -48,28 +57,43 @@ class Vector(Data):
             self._values = self._values.flatten()
 
     @property
-    def type(self):
+    def data_type(self):
         return self._type
 
-    def append_vector(self, vector):
-        """Appends sequence from vector to this Vector.
+    @property
+    def prepared(self):
+        return self._prepared
 
-        :param vector: A numPy Array or Vector object
-        :return: A copy of the new Vector
+    def data_prep(self, other=None):
         """
-        if is_array(vector):
-            return np.append(self._values, vector)
-        elif is_vector(vector):
-            return np.append(self._values, vector.data)
+
+        :param other:
+        :return:
+        """
+        if self._prepared:
+            return self.data
+        if other:
+            vector = other if is_vector(other) else Vector(other)
+            if len(self.data) != len(vector):
+                raise UnequalVectorLengthError("x and y data lengths are not equal")
+            self._prepared = True
+            return drop_nan_intersect(self.data, vector)
+        elif not is_iterable(self.data):
+            self._prepared = True
+            return float(self.data)
+        else:
+            v = drop_nan(self.data) if is_vector(self.data) else drop_nan(Vector(self.data))
+            if not v:
+                raise EmptyVectorError("Passed data is empty")
+            self._prepared = True
+            return v
 
     def is_empty(self):
         """Overrides the super class's method to also check for length of zero.
 
         :return: True or False
         """
-        # return True if self._values is None or len(self._values) == 0 else False
-        # return True if self._values is None else False
         return True if len(self._values) == 0 else False
 
 # Perform the operations import at the end to avoid cyclical imports.
-from ..operations.data_operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten
+# from ..operations.data_operations import is_iterable, is_array, is_dict, to_float, is_vector, flatten

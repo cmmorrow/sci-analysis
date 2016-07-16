@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Kruskal, MinimumSizeError, EmptyVectorError
+from analysis.analysis import Kruskal, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -106,9 +106,9 @@ class MyTestCase(unittest.TestCase):
         x_input_array = [float("nan"), float("nan"), float("nan"), "four", float("nan")]
         y_input_array = ["one", "two", "three", "four", "five"]
         alpha = 0.05
-        self.assertRaises(EmptyVectorError, lambda: Kruskal(x_input_array, y_input_array,
-                                                            alpha=alpha,
-                                                            display=False).p_value)
+        self.assertRaises(NoDataError, lambda: Kruskal(x_input_array, y_input_array,
+                                                       alpha=alpha,
+                                                       display=False).p_value)
 
 
 if __name__ == '__main__':

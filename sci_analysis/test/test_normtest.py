@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import NormTest, MinimumSizeError, EmptyVectorError
+from analysis.analysis import NormTest, MinimumSizeError, NoDataError
+from data.data import EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -90,7 +91,7 @@ class MyTestCase(unittest.TestCase):
         """Test with empty vector"""
         np.random.seed(987654321)
         alpha = 0.05
-        self.assertRaises(EmptyVectorError, lambda: NormTest(["one", "two", "three", "four"],
+        self.assertRaises(NoDataError, lambda: NormTest(["one", "two", "three", "four"],
                                                              alpha=alpha,
                                                              display=False).p_value)
 
@@ -99,7 +100,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         groups = [[float("nan"), float("nan"), "three", float("nan")], ["one", "two", "three", "four"]]
-        self.assertRaises(EmptyVectorError, lambda: NormTest(*groups, alpha=alpha, display=False).p_value)
+        self.assertRaises(NoDataError, lambda: NormTest(*groups, alpha=alpha, display=False).p_value)
 
     def test_312_Norm_test_multi_with_single_scalar(self):
         """Test if multiple vectors are from the normal distribution with single scalar"""
@@ -114,7 +115,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         groups = ["this", "is", "a", "string"]
-        self.assertRaises(EmptyVectorError, lambda: NormTest(*groups, alpha=alpha, display=False).p_value)
+        self.assertRaises(NoDataError, lambda: NormTest(*groups, alpha=alpha, display=False))
 
 
 if __name__ == '__main__':

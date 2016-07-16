@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import GroupStatistics, MinimumSizeError, EmptyVectorError
+from analysis.analysis import GroupStatistics, MinimumSizeError, NoDataError
 
 
 class TestGroupStatistics(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestGroupStatistics(unittest.TestCase):
         x_input_array = ["this", "is", "a", "string"]
         y_input_array = [float("nan"), float("nan"), "three", float("nan")]
         data = {"one": x_input_array, "two": y_input_array}
-        self.assertRaises(EmptyVectorError, lambda: GroupStatistics(data, display=True))
+        self.assertRaises(NoDataError, lambda: GroupStatistics(data, display=True))
 
     def test_0008_group_statistics_dict_empty_zero_length(self):
         """Test the Group Statistic class with data passed as zero length vectors"""
@@ -77,7 +77,7 @@ class TestGroupStatistics(unittest.TestCase):
         x_input_array = np.array([])
         y_input_array = []
         data = {"one": x_input_array, "two": y_input_array}
-        self.assertRaises(EmptyVectorError, lambda: GroupStatistics(data, display=True))
+        self.assertRaises(NoDataError, lambda: GroupStatistics(data, display=True))
 
 
 if __name__ == '__main__':

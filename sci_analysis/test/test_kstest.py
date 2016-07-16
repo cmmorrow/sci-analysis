@@ -2,7 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
-from ..analysis.analysis import KSTest, MinimumSizeError, EmptyVectorError
+from analysis.analysis import KSTest, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -11,8 +11,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         distro = 'norm'
-        self.assertGreater(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).p_value, alpha,
-                           "FAIL: Error in norm GOF")
+        self.assertGreater(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).p_value, alpha)
 
     def test_251_Kolmogorov_Smirnov_normal_test_distribution_type(self):
         """Test the normal distribution detection"""
@@ -134,10 +133,10 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         distro = 'norm'
-        self.assertRaises(EmptyVectorError, lambda: KSTest(["one", "two", "three", "four"],
-                                                           distro,
-                                                           alpha=alpha,
-                                                           display=False).p_value)
+        self.assertRaises(NoDataError, lambda: KSTest(["one", "two", "three", "four"],
+                                                      distro,
+                                                      alpha=alpha,
+                                                      display=False).p_value)
 
 
 if __name__ == '__main__':
