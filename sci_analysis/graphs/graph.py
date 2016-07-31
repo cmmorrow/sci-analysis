@@ -9,8 +9,7 @@ Classes:
 from __future__ import absolute_import
 from __future__ import print_function
 # matplotlib imports
-from matplotlib.pyplot import show, subplot, subplot2grid, plot, grid, yticks, \
-    xlabel, ylabel, figure, boxplot, hist, legend, setp, savefig, contour
+from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig
 from matplotlib.gridspec import GridSpec
 
 # Numpy imports
@@ -20,155 +19,22 @@ from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack
 from scipy.stats import probplot, gaussian_kde
 
 # local imports
-from data.vector import Vector
-from operations.data_operations import is_iterable, is_dict
+from data.data import assign
+from operations.data_operations import is_dict
 # TODO: Add preferences back in a future version
 # from ..preferences.preferences import GraphPreferences
 # from six.moves import range
 
 
-class Grid(object):
+class MinimumSizeError(Exception):
+    pass
 
-    def __init__(self, *args, **kwargs):
-        self._nrows = int(kwargs['nrows']) if 'nrows' in kwargs else 1
-        self._ncols = int(kwargs['ncols']) if 'ncols' in kwargs else 1
-        self._xsize = int(kwargs['xsize']) if 'xsize' in kwargs else 7
-        self._ysize = int(kwargs['ysize']) if 'ysize' in kwargs else 7
-        self._title = kwargs['title'] if 'title' in kwargs else None
-        self._yspace = kwargs['yspace'] if 'yspace' in kwargs else 0
-        self._xspace = kwargs['xspace'] if 'xspace' in kwargs else 0
-        self._graphs = list()
-        self._axes = list()
 
-        self._sub_x_size = [1]
-        self._sub_y_size = [1]
-        for obj in args:
-            if isinstance(obj, Graph):
-                self._graphs.append(obj)
-                self._sub_x_size.insert(0, obj.xsub)
-                self._sub_y_size.insert(0, obj.ysub)
-            else:
-                self._graphs.append(None)
-
-        f = figure(figsize=(self._xsize, self._ysize))
-        gs = GridSpec(self._nrows,
-                      self._ncols,
-                      height_ratios=self._sub_y_size,
-                      width_ratios=self._sub_x_size,
-                      hspace=self._yspace,
-                      wspace=self._xspace)
-        f.suptitle(self._title, fontsize=14)
-        for i, graph in enumerate(self._graphs):
-            if self._graphs[i]:
-                self._axes.append(f.add_subplot(gs[i]))
-            else:
-                continue
+class NoDataError(Exception):
+    pass
 
 
 class Graph(object):
-
-    _xsub = 1
-    _ysub = 1
-    _min_size = 1
-
-    def __init__(self, *args, **kwargs):
-        self._xname = kwargs['xname'] if 'xname' in kwargs else 'x'
-        self._yname = kwargs['yname'] if 'yname' in kwargs else 'y'
-        self._display = kwargs['display'] if 'display' in kwargs else True
-        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
-
-        if self._display:
-            self.draw()
-            if self._save_to:
-                savefig(self._save_to)
-
-    def draw(self):
-        """Prepares and displays the graph based on the set class members."""
-        pass
-
-
-class GraphCdf(Graph):
-
-    _xsub = 1
-    _ysub = 3
-
-    def __init__(self, data, fit=False, distribution='norm', xname='data', yname='Probability', **kwargs):
-        self._fit = fit
-        self._distribution = distribution
-        self._output = list()
-
-        self._data = self.data_prep(data)
-        x_cdf, y_cdf = self.calc_cdf()
-        self._output.append((x_cdf, y_cdf, 'k-'))
-        if self._fit:
-            distro, distro_cdf = self.fit_distro(self._distribution)
-            self._output.append((distro, distro_cdf, 'r--'))
-        super(GraphCdf, self).__init__(data, xname, yname, **kwargs)
-
-    def calc_cdf(self):
-        x_sorted_vector = sort(self._data)
-        if len(x_sorted_vector) == 0:
-            return 0, 0
-        y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
-        x_cdf = array([x_sorted_vector, x_sorted_vector]).T.flatten()
-        y_cdf = array([y_sorted_vector[:(len(y_sorted_vector) - 1)], y_sorted_vector[1:]]).T.flatten()
-        return x_cdf, y_cdf
-
-    def fit_distro(self, distribution):
-        distro_class = getattr(__import__('scipy.stats',
-                                          globals(),
-                                          locals(),
-                                          [distribution], -1), distribution)
-        parms = distro_class.fit(self._data)
-        distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
-        distro_cdf = distro_class.cdf(distro, *parms)
-        return distro, distro_cdf
-
-    def draw(self):
-        for p in self._output:
-            grid(plot(*p))
-        xlabel(self._xname)
-        ylabel(self._yname)
-
-
-class GraphHistogram(Graph):
-
-    _xsub = 1
-    _ysub = 3
-
-    def __init__(self, data, xname='Probability', yname='Data', distribution='norm',
-                 fit=False, bins=20, color='green', **kwargs):
-        self._fit = fit
-        self._bins = bins
-        self._color = color
-        self._distribution = distribution
-        self._output = list()
-
-        self._data = self.data_prep(data)
-        self._output.append((self._data, bins))
-        if self._fit:
-            distro, distro_pdf = self.fit_distro(self._distribution)
-            self._output.append((distro, distro_pdf, 'r--'))
-        super(GraphHistogram, self).__init__(data, xname, yname, **kwargs)
-
-    def fit_distro(self, distribution):
-        distro_class = getattr(__import__('scipy.stats',
-                                          globals(),
-                                          locals(),
-                                          [distribution], -1), distribution)
-        parms = distro_class.fit(self._data)
-        distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
-        distro_pdf = distro_class.pdf(distro, *parms)
-        return distro, distro_pdf
-
-    def draw(self):
-        for p in self._output:
-            grid(plot(*p))
-        xlabel(self._xname)
-        ylabel(self._yname)
-
-
-class OldGraph(object):
     """The super class all other sci_analysis graphing classes descend from.
     Classes that descend from Graph should implement the draw method at bare minimum.
 
@@ -201,43 +67,72 @@ class OldGraph(object):
 
         self._xname = kwargs['xname'] if 'xname' in kwargs else 'x'
         self._yname = kwargs['yname'] if 'yname' in kwargs else 'y'
-        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else 'save_to'
 
-        data = self.data_prep(args)
-        if len(data) <= 1:
+        if 'intersect' in kwargs:
+            x, y = assign(args[0], args[1])
+            if x is None or y is None:
+                raise NoDataError("Cannot graph because there is no data")
             try:
+                x, y = x.data_prep(y)
+            except TypeError:
+                raise NoDataError("Cannot perform test because there is no data")
+            if len(x) <= self._min_size or len(y) <= self._min_size:
+                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+            self._data = [x, y]
+        else:
+            data = list()
+            for d in args:
+                clean = assign(d).data_prep()
+                if clean is None:
+                    continue
+                if len(clean) <= self._min_size:
+                    raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+                data.append(clean)
+            if len(data) < 1:
+                raise NoDataError("Cannot perform test because there is no data")
+            if len(data) == 1:
                 data = data[0]
-            except IndexError:
-                raise EmptyVectorError("Passed data is empty")
-        self._data = data
-        if self._save_to:
-            savefig(self._save_to)
+            self._data = data
         self.draw()
 
-    def data_prep(self, data):
-        clean_list = list()
-        for d in data:
-            if not is_iterable(d):
-                try:
-                    clean_list.append(float(d))
-                except (ValueError, TypeError):
-                    continue
-            else:
-                v = drop_nan(d) if is_vector(d) else drop_nan(Vector(d))
-                if not v:
-                    continue
-                if len(v) <= self._min_size:
-                    raise MinimumSizeError("length of data is less than the minimum size {}"
-                                           .format(self._min_size))
-                clean_list.append(v)
-        return clean_list
-    
+    @staticmethod
+    def get_color(num):
+        """Return a color based on the given num argument.
+
+        :param num: An integer not equal to zero that returns a corresponding color
+        :return: A color tuple calculated from the num argument
+        """
+        colors = [(0, 0.3, 0.7, 1),
+                  (0, 0.5, 0, 1),
+                  (1, 0, 0, 1),
+                  (0, 1, 1, 1),
+                  (1, 1, 0, 1),
+                  (1, 0, 1, 1),
+                  (1, 0.5, 0, 1),
+                  (0.5, 0, 1, 1),
+                  (0.5, 1, 0, 1),
+                  (0, 0, 0, 1),
+                  (0, 0, 1, 1)
+                  ]
+        desired_color = []
+        if num < 0:
+            num *= -1
+        floor = int(num) // len(colors)
+        remainder = int(num) % len(colors)
+        selected = colors[remainder]
+        if floor > 0:
+            for value in selected:
+                desired_color.append(value / (2.0 * floor) + 0.4)
+            return tuple(desired_color)
+        else:
+            return selected
+
     def draw(self):
         """Prepares and displays the graph based on the set class members."""
         pass
 
 
-class GraphHisto(OldGraph):
+class GraphHisto(Graph):
     """Draws a histogram.
 
     New class members are bins, color and box_plot. The bins member is the number
@@ -248,7 +143,8 @@ class GraphHisto(OldGraph):
 
     # nrows = 2
     # ncols = 1
-    _ysize = 4
+    _xsize = 7
+    _ysize = 6
 
     def __init__(self, data, **kwargs):
         """GraphHisto constructor.
@@ -258,7 +154,7 @@ class GraphHisto(OldGraph):
         :param name: The optional x-axis label.
         :param distribution: The theoretical distribution to fit.
         :param color: The optional color of the histogram as a formmated string.
-        :param box_plot: Toggle the display of the optional boxplot.
+        :param boxplot: Toggle the display of the optional boxplot.
         :param cdf: Toggle the display of the optional cumulative density function plot.
         :param violin_plot: Add a distribution density overlay to the boxplot.
         :param fit: Toggle the display of the best fit line for the specified distribution.
@@ -268,7 +164,7 @@ class GraphHisto(OldGraph):
         self._bins = kwargs['bins'] if 'bins' in kwargs else 20
         self._distribution = kwargs['distribution'] if 'distribution' in kwargs else 'norm'
         self._color = kwargs['color'] if 'color' in kwargs else 'green'
-        self._box_plot = kwargs['box_plot'] if 'box_plot' in kwargs else True
+        self._box_plot = kwargs['boxplot'] if 'boxplot' in kwargs else True
         self._cdf = kwargs['cdf'] if 'cdf' in kwargs else False
         self._violin_plot = kwargs['violin_plot'] if 'violin_plot' in kwargs else False
         self._histogram = kwargs['histogram'] if 'histogram' in kwargs else True
@@ -276,14 +172,15 @@ class GraphHisto(OldGraph):
         self._mean = kwargs['mean'] if 'mean' in kwargs else None
         self._std = kwargs['std_dev'] if 'std_dev' in kwargs else None
         self._sample = kwargs['sample'] if 'sample' in kwargs else True
-        self._yname = "Probability"
-        self._name = 'Data'
+        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        yname = "Probability"
+        name = 'Data'
         if 'name' in kwargs:
-            self._name = kwargs['name']
+            name = kwargs['name']
         elif 'xname' in kwargs:
-            self._name = kwargs['xname']
+            name = kwargs['xname']
 
-        super(GraphHisto, self).__init__(data)
+        super(GraphHisto, self).__init__(data, xname=name, yname=yname)
         # if GraphPreferences.Plot.boxplot != GraphPreferences.Plot.defaults[0]:
         #    _box_plot = GraphPreferences.Plot.boxplot
         # else:
@@ -301,10 +198,7 @@ class GraphHisto(OldGraph):
         parms = distro_class.fit(self._data)
         distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
         distro_pdf = distro_class.pdf(distro, *parms)
-        if self._fit:
-            distro_cdf = distro_class.cdf(distro, *parms)
-        else:
-            distro_cdf = None
+        distro_cdf = distro_class.cdf(distro, *parms)
         return distro, distro_pdf, distro_cdf
 
     def calc_cdf(self):
@@ -352,44 +246,60 @@ class GraphHisto(OldGraph):
         # Fit the distribution
         if self._fit:
             distro, distro_pdf, distro_cdf = self.fit_distro()
+        else:
+            distro, distro_pdf, distro_cdf = None, None, None
 
         # Draw the cdf
         if self._cdf:
             x_cdf, y_cdf = self.calc_cdf()
-            ax_cdf = f.add_subplot(gs[0])
-            grid(ax_cdf.plot(x_cdf, y_cdf, 'k-'))
+            # ax_cdf = f.add_subplot(gs[0])
+            ax_cdf = subplot(gs[0])
+            ax_cdf.plot(x_cdf, y_cdf, 'k-')
+            ax_cdf.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax_cdf.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             p.append(ax_cdf.get_xticklabels())
             if self._fit:
                 ax_cdf.plot(distro, distro_cdf, 'r--', linewidth=2)
             yticks(arange(11) * 0.1)
             ylabel("Cumulative Probability")
+        else:
+            ax_cdf = None
 
         # Draw the box plot
-        if self._box_plot or self._violin_plot:
+        if self._box_plot:
             if self._cdf:
-                ax_box = f.add_subplot(gs[len(h_ratios)-2], sharex=ax_cdf)
+                # ax_box = f.add_subplot(gs[len(h_ratios)-2], sharex=ax_cdf)
+                ax_box = subplot(gs[len(h_ratios) - 2], sharex=ax_cdf)
             else:
-                ax_box = f.add_subplot(gs[len(h_ratios)-2])
+                # ax_box = f.add_subplot(gs[len(h_ratios)-2])
+                ax_box = subplot(gs[len(h_ratios) - 2])
             # if GraphPreferences.distribution['violin']:
-            if self._violin_plot:
-                grid(ax_box.violinplot(self._data.data, vert=False, showextrema=False, showmedians=False, showmeans=False))
+            bp = ax_box.boxplot(self._data, vert=False, showmeans=True)
+            setp(bp['boxes'], color='k')
+            setp(bp['whiskers'], color='k')
+            vp = ax_box.violinplot(self._data, vert=False, showextrema=False, showmedians=False, showmeans=False)
+            setp(vp['bodies'], facecolors=self.get_color(0))
+            ax_box.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             # if GraphPreferences.distribution['boxplot']:
-            grid(ax_box.boxplot(self._data.data, vert=False, showmeans=True))
             yticks([])
             p.append(ax_box.get_xticklabels())
-            ax_hist = f.add_subplot(gs[len(h_ratios)-1], sharex=ax_box)
+            # ax_hist = f.add_subplot(gs[len(h_ratios)-1], sharex=ax_box)
+            ax_hist = subplot(gs[len(h_ratios) - 1], sharex=ax_box)
         else:
-            ax_hist = f.add_subplot(gs[len(h_ratios)-1])
+            # ax_hist = f.add_subplot(gs[len(h_ratios)-1])
+            ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
-        grid(ax_hist.hist(self._data.data, self._bins, normed=True, color=self._color))
+        ax_hist.hist(self._data, self._bins, normed=True, color=self.get_color(0))
+        ax_hist.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        ax_hist.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if self._fit:
             ax_hist.plot(distro, distro_pdf, 'r--', linewidth=2)
         if len(p) > 0:
             setp(p, visible=False)
 
         # set the labels and display the figure
-        ylabel("".format(self._yname))
+        ylabel(self._yname)
         xlabel(self._xname)
         show()
         if self._save_to:
@@ -397,7 +307,7 @@ class GraphHisto(OldGraph):
         pass
 
 
-class GraphScatter(OldGraph):
+class GraphScatter(Graph):
     """Draws an x-by-y scatter plot.
 
     Unique class members are fit and style. The fit member is a boolean flag for
@@ -409,26 +319,10 @@ class GraphScatter(OldGraph):
 
     _nrows = 1
     _ncols = 1
-    _xsize = 5
-    _ysize = 5
+    _xsize = 8
+    _ysize = 7
 
-    def __init__(self, xdata,
-                 ydata,
-                 xname='x Data',
-                 yname='y Data',
-                 fit=True,
-                 pointstyle='k.',
-                 linestyle='r-',
-                 points=True,
-                 contours=False,
-                 num_of_contours=31,
-                 contour_width=1.1,
-                 histogram_borders=False,
-                 bins=20,
-                 color='green',
-                 boxplot_borders=False,
-                 violin_plots=True,
-                 save_to=None):
+    def __init__(self, xdata, ydata, **kwargs):
         """GraphScatter constructor.
 
         :param xdata: The x-axis data.
@@ -436,51 +330,53 @@ class GraphScatter(OldGraph):
         :param xname: The optional x-axis label.
         :param yname: The optional y-axis label.
         :param fit: Display the optional line fit.
-        :param pointstyle: The optional matplotlib point style formatted string.
-        :param linestyle: The optional matplotlib line style formatted string.
         :return: pass
         """
-        super(GraphScatter, self).__init__(drop_nan_intersect(Vector(xdata), Vector(ydata)), xname, yname, save_to)
-        self.fit = fit
-        self.style = (pointstyle, linestyle)
-        self.points = points
-        self.contours = contours
-        self.contour_props = (num_of_contours, contour_width)
-        self.histogram_props = (bins, color)
-        self.histogram_borders = histogram_borders
-        self.boxplot_borders = boxplot_borders
-        self.violin_plots = violin_plots
-        self.draw()
+        self._fit = kwargs['fit'] if 'fit' in kwargs else True
+        self._points = kwargs['points'] if 'points' in kwargs else True
+        self._contours = kwargs['contours'] if 'contours' in kwargs else False
+        self._contour_props = (31, 1.1)
+        # self.contour_props = tuple({'num_of_contours': 31, 'contour_width': 1.1}.values())
+        self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
+        # self._histogram_borders = kwargs['histogram_borders'] if 'histogram_borders' in kwargs else False
+        self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
+        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        yname = "y Data"
+        xname = 'x Data'
+        if 'yname' in kwargs:
+            yname = kwargs['yname']
+        elif 'xname' in kwargs:
+            xname = kwargs['xname']
+        super(GraphScatter, self).__init__(xdata, ydata, xname=xname, yname=yname, intersect=True)
 
     def calc_contours(self):
-        xmin = self._data[0].data.min()
-        xmax = self._data[0].data.max()
-        ymin = self._data[1].data.min()
-        ymax = self._data[1].data.max()
+        xmin = self._data[0].min()
+        xmax = self._data[0].max()
+        ymin = self._data[1].min()
+        ymax = self._data[1].max()
 
-        values = vstack([self._data[0].data, self._data[1].data])
+        values = vstack([self._data[0], self._data[1]])
         kernel = gaussian_kde(values)
         _x, _y = mgrid[xmin:xmax:100j, ymin:ymax:100j]
         positions = vstack([_x.ravel(), _y.ravel()])
         _z = reshape(kernel(positions).T, _x.shape)
-        return _x, _y, _z, arange(_z.min(), _z.max(), (_z.max() - _z.min()) / self.contour_props[0])
+        return _x, _y, _z, arange(_z.min(), _z.max(), (_z.max() - _z.min()) / self._contour_props[0])
 
     def calc_fit(self):
-        x = self._data[0].data
-        y = self._data[1].data
+        x = self._data[0]
+        y = self._data[1]
         p = polyfit(x, y, 1, full=True)
         return polyval(p[0], x)
 
     def draw(self):
-        x = self._data[0].data
-        y = self._data[1].data
-        pointstyle = self.style[0]
-        linestyle = self.style[1]
+        x = self._data[0]
+        y = self._data[1]
         h_ratio = [1, 1]
         w_ratio = [1, 1]
-        borders = self.histogram_borders or self.boxplot_borders
+        # borders = self._histogram_borders or self._boxplot_borders
 
-        if borders:
+        # if borders:
+        if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
             self._xsize, self._ysize = 7, 6
             h_ratio, w_ratio = [2, 5], [5, 2]
@@ -488,38 +384,60 @@ class GraphScatter(OldGraph):
         else:
             main_plot = 0
         f = figure(figsize=(self._xsize, self._ysize))
-        if borders:
-            gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0.1, wspace=0.1)
+        f.suptitle('Bivariate', fontsize=14)
+        # if borders:
+        if self._boxplot_borders:
+            gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
         else:
             gs = GridSpec(self._nrows, self._ncols)
-        ax2 = f.add_subplot(gs[main_plot])
-        if self.points:
-            grid(ax2.plot(x, y, pointstyle, zorder=1))
+        # ax2 = f.add_subplot(gs[main_plot])
+        ax2 = subplot(gs[main_plot])
+        if self._points:
+            # grid(ax2.plot(x, y, pointstyle, zorder=1))
+            ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.5, zorder=1)
+            ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         xlabel(self._xname)
         ylabel(self._yname)
-        if self.contours:
+        if self._contours:
             x_prime, y_prime, z, levels = self.calc_contours()
-            ax2.contour(x_prime, y_prime, z, levels, linewidths=self.contour_props[1], nchunk=16, extend='both', zorder=2)
-        if self.fit:
-            ax2.plot(x, self.calc_fit(), linestyle, zorder=3)
-        if borders:
-            ax1 = f.add_subplot(gs[0], sharex=ax2)
-            ax3 = f.add_subplot(gs[3], sharey=ax2)
-            if self.histogram_borders:
-                grid(ax1.hist(x, bins=self.histogram_props[0], color=self.histogram_props[1], normed=True))
-                grid(ax3.hist(y, bins=self.histogram_props[0], color=self.histogram_props[1], normed=True, orientation='horizontal'))
-            elif self.boxplot_borders:
-                grid(ax1.boxplot(x, vert=False, showmeans=True))
-                grid(ax3.boxplot(y, vert=True, showmeans=True))
-                if self.violin_plots:
-                    ax1.violinplot(x, vert=False, showmedians=False, showmeans=False, showextrema=False)
-                    ax3.violinplot(y, vert=True, showmedians=False, showmeans=False, showextrema=False)
-            setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()], visible=False)
+            ax2.contour(x_prime, y_prime, z, levels, linewidths=self._contour_props[1], nchunk=16,
+                        extend='both', zorder=2)
+        if self._fit:
+            fit_line = self.calc_fit()
+            ax2.plot([min(x), max(x)], [min(fit_line), max(fit_line)], 'r--', linewidth=2, zorder=3)
+        # if borders:
+        if self._boxplot_borders:
+            # ax1 = f.add_subplot(gs[0], sharex=ax2)
+            # ax3 = f.add_subplot(gs[3], sharey=ax2)
+            ax1 = subplot(gs[0], sharex=ax2)
+            ax3 = subplot(gs[3], sharey=ax2)
+            # if self._histogram_borders:
+            #     ax1.hist(x, bins=self._histogram_props[0], color=self._histogram_props[1], normed=True)
+            #     ax3.hist(y, bins=self._histogram_props[0], color=self._histogram_props[1],
+            #              normed=True, orientation='horizontal')
+            # elif self._boxplot_borders:
+            bpx = ax1.boxplot(x, vert=False, showmeans=True)
+            bpy = ax3.boxplot(y, vert=True, showmeans=True)
+            setp(bpx['boxes'], color='k')
+            setp(bpx['whiskers'], color='k')
+            setp(bpy['boxes'], color='k')
+            setp(bpy['whiskers'], color='k')
+            vpx = ax1.violinplot(x, vert=False, showmedians=False, showmeans=False, showextrema=False)
+            vpy = ax3.violinplot(y, vert=True, showmedians=False, showmeans=False, showextrema=False)
+            setp(vpx['bodies'], facecolors=self.get_color(0))
+            setp(vpy['bodies'], facecolors=self.get_color(0))
+            ax1.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()],
+                 visible=False)
         show()
+        if self._save_to:
+            savefig(self._save_to)
         pass
 
 
-class GraphBoxplot(OldGraph):
+class GraphBoxplot(Graph):
     """Draws box plots of the provided data as well as an optional probability plot.
 
     Unique class members are groups, nqp and prob. The groups member is a list of
@@ -536,9 +454,7 @@ class GraphBoxplot(OldGraph):
     _xsize = 7.5
     _ysize = 5
 
-    # TODO: Make sure the grid on the histogram borders is working properly
-
-    def __init__(self, vectors, groups=list(), xname='Categories', yname='Values', nqp=True):
+    def __init__(self, *args, **kwargs):
         """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are
         graphed in random order instead of the provided order.
 
@@ -549,77 +465,63 @@ class GraphBoxplot(OldGraph):
         :param nqp: Display the optional probability plot.
         :return: pass
         """
-        if not any(is_iterable(v) for v in vectors):
-            if is_dict(vectors):
-                groups = list(vectors.keys())
-                vectors = list(vectors.values())
-            else:
-                print("Provided data is not a sequence")
-                pass
-        self.prob = []
-        self.groups = []
-        if not is_iterable(groups):
-            groups = []
-        super(GraphBoxplot, self).__init__(vectors, xname, yname)
-        if not groups:
-            groups = list(range(1, len(self._data) + 1))
-        for i, v in enumerate(self._data):
-            self._data[i] = v = drop_nan(v)
-            if len(v) == 0:
-                groups = groups[:i] + groups[i + 1:]
-                continue
-            if nqp:
-                q, fit = probplot(v)
-                self.prob.append((q, fit))
-        self.groups = groups
-        self.draw()
-
-    @staticmethod
-    def get_color(num):
-        """Return a color based on the given num argument.
-
-        :param num: An integer not equal to zero that returns a corresponding color
-        :return: A color tuple calculated from the num argument
-        """
-        colors = [(0,   0,   1, 1),
-                  (0,   0.5, 0, 1),
-                  (1,   0,   0, 1),
-                  (0,   1,   1, 1),
-                  (1,   1,   0, 1),
-                  (1,   0,   1, 1),
-                  (1,   0.5, 0, 1),
-                  (0.5, 0,   1, 1),
-                  (0.5, 1,   0, 1),
-                  (1,   1,   1, 1)
-                  ]
-        desired_color = []
-        if num < 0:
-            num *= -1
-        floor = int(num) // len(colors)
-        remainder = int(num) % len(colors)
-        selected = colors[remainder]
-        if floor > 0:
-            for value in selected:
-                desired_color.append(value / (2.0 * floor) + 0.4)
-            return tuple(desired_color)
+        xname = kwargs['xname'] if 'xname' in kwargs else 'Categories'
+        yname = kwargs['yname'] if 'yname' in kwargs else 'Values'
+        save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        self._nqp = kwargs['nqp'] if 'nqp' in kwargs else True
+        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        data = list()
+        groups = list()
+        if is_dict(args[0]):
+            for g, d in args[0].items():
+                data.append(d)
+                groups.append(g)
+            self._groups = groups
         else:
-            return selected
+            self._groups = kwargs['groups'] if 'groups' in kwargs else list(range(1, len(args) + 1))
+            if 'groups' in kwargs:
+                if kwargs['groups']:
+                    self._groups = kwargs['groups']
+                else:
+                    self._groups = list(range(1, len(args) + 1))
+            else:
+                self._groups = list(range(1, len(args) + 1))
+            data = args
+        self._prob = [probplot(d) for d in data] if self._nqp else list()
+        super(GraphBoxplot, self).__init__(*data, xname=xname, yname=yname, save_to=save_to)
 
     def draw(self):
-        if len(self.prob) > 0:
-            figure(figsize=(self._xsize * 2, self._ysize))
-            ax2 = subplot(self._nrows, self._ncols, 2)
-            grid(which='major')
-            for i, g in enumerate(self.prob):
-                plot(g[0][0], g[0][1], marker='^', color=self.get_color(i), label=self.groups[i])
-                plot(g[0][0], g[1][0] * g[0][0] + g[1][1], linestyle='-', color=self.get_color(i))
-            legend(loc='best')
-            xlabel("Quantiles")
-            subplot(self._nrows, self._ncols, 1, sharey=ax2)
+        if len(self._prob) > 0:
+            self._xsize *= 2
+            title = 'Oneway and Normal Quantile Plot'
         else:
-            figure(figsize=(self._xsize, self._ysize))
-        grid(boxplot(self._data, showmeans=True, labels=self.groups))
+            self._ncols = 1
+            title = 'Oneway'
+        f = figure(figsize=(self._xsize, self._ysize))
+        f.suptitle(title, fontsize=14)
+        gs = GridSpec(self._nrows, self._ncols, wspace=0)
+        ax1 = subplot(gs[0])
+        bp = ax1.boxplot(self._data, showmeans=True, labels=self._groups)
+        setp(bp['boxes'], color='k')
+        setp(bp['whiskers'], color='k')
+        vp = ax1.violinplot(self._data, showextrema=False, showmedians=False, showmeans=False)
+        for i in range(len(self._data)):
+            setp(vp['bodies'][i], facecolors=self.get_color(i))
+        ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         ylabel(self._yname)
         xlabel(self._xname)
+        if len(self._prob) > 0:
+            ax2 = subplot(gs[1], sharey=ax1)
+            # grid(which='major')
+            for i, g in enumerate(self._prob):
+                ax2.plot(g[0][0], g[0][1], marker='^', color=self.get_color(i), label=self._groups[i])
+                ax2.plot(g[0][0], g[1][0] * g[0][0] + g[1][1], linestyle='--', linewidth=2, color=self.get_color(i))
+            ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax2.legend(loc='best')
+            xlabel("Quantiles")
+            setp(ax2.get_yticklabels(), visible=False)
         show()
+        if self._save_to:
+            savefig(self._save_to)
         pass

@@ -32,10 +32,6 @@ from numpy import mean, std, median, amin, amax, percentile
 from operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
 from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 from data.data import assign
-# from ..data.vector import Vector, EmptyVectorError, UnequalVectorLengthError
-# from ..operations.data_operations import is_dict, is_iterable, is_vector, is_group,\
-#    is_dict_group, drop_nan, drop_nan_intersect
-# from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
 
 
 class MinimumSizeError(Exception):
@@ -112,7 +108,7 @@ class Analysis(object):
 
         def format_output(n, v):
             """Format the results with a consistent look"""
-            return '{:{}s}'.format(n, label_max_length) + " = " + " " + '{:< .{}f}'.format(v, precision)
+            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
 
         def no_precision_output(n, v):
             return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
@@ -147,9 +143,6 @@ class Analysis(object):
 
     def __str__(self):
         return self.output(self._name)
-
-    # def __repr__(self):
-    #    return self.output(self._name)
 
 
 class GroupAnalysis(Analysis):
@@ -245,24 +238,6 @@ class Test(Analysis):
         """The p-value returned by the function called in the run method"""
         return self._results['p value']
 
-    # def data_prep(self, data):
-    #     clean_list = list()
-    #     for d in data:
-    #         if not is_iterable(d):
-    #             try:
-    #                 clean_list.append(float(d))
-    #             except (ValueError, TypeError):
-    #                 continue
-    #         else:
-    #             v = drop_nan(d) if is_vector(d) else drop_nan(Vector(d))
-    #             if not v:
-    #                 continue
-    #             if len(v) <= self._min_size:
-    #                 raise MinimumSizeError("length of data is less than the minimum size {}"
-    #                                        .format(self._min_size))
-    #             clean_list.append(v)
-    #     return clean_list
-
     def output(self, name, order=list(), no_format=list(), precision=4):
         """Print the results of the test in a user-friendly format"""
         label_max_length = 0
@@ -326,20 +301,6 @@ class Comparison(Analysis):
             raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
         super(Comparison, self).__init__([x, y], display=display)
         self.logic()
-
-    # def data_prep(self, data):
-    #     """Prepare the data for analysis"""
-    #     xdata = data[0] if is_vector(data[0]) else Vector(data[0])
-    #     ydata = data[1] if is_vector(data[1]) else Vector(data[1])
-    #     if len(xdata) != len(ydata):
-    #         raise UnequalVectorLengthError("x and y data lengths are not equal")
-    #     elif len(xdata) <= self._min_size or len(ydata) <= self._min_size:
-    #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-    #     else:
-    #         xdata, ydata = drop_nan_intersect(xdata, ydata)
-    #         if len(xdata) <= self._min_size or len(ydata) <= self._min_size:
-    #             raise EmptyVectorError("x or y data is empty")
-    #     return [xdata, ydata]
 
     @property
     def xdata(self):
@@ -774,14 +735,6 @@ class VectorStatistics(Analysis):
         super(VectorStatistics, self).__init__(d, display=display)
         self.logic()
 
-    # def data_prep(self, data):
-    #     v = drop_nan(data) if is_vector(data) else drop_nan(Vector(data))
-    #     if not v:
-    #         raise EmptyVectorError("data is empty")
-    #     if len(v) <= self._min_size:
-    #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-    #     return v
-
     def run(self):
         dof = 0
         if self._sample:
@@ -911,20 +864,6 @@ class GroupStatistics(GroupAnalysis):
         super(GroupStatistics, self).__init__(data, display=display)
         self.logic()
 
-    # def data_prep(self, data):
-    #     clean_data = dict()
-    #     for i, d in data.items():
-    #         if len(d) == 0:
-    #             continue
-    #         else:
-    #             v = drop_nan(d) if is_vector(d) else drop_nan(Vector(d))
-    #             if not v:
-    #                 continue
-    #             if len(v) <= self._min_size:
-    #                 raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-    #             clean_data.update({i: v})
-    #     return clean_data
-
     def logic(self):
         if not self._data:
             pass
@@ -955,7 +894,7 @@ class GroupStatistics(GroupAnalysis):
                            no_format=['Count', 'Group'])
 
 
-def analyze(xdata, *data, **kwargs):
+def analyze(*data, **kwargs):
     """Magic method for performing quick data analysis.
 
     :param xdata: A Vector, numPy Array or sequence like object
@@ -968,14 +907,18 @@ def analyze(xdata, *data, **kwargs):
     :param categories: The x-axis label when performing a group analysis
     :return: A tuple of xdata and ydata
     """
-
-    ydata = data[0] if data else None
     groups = kwargs['groups'] if 'groups' in kwargs else None
     name = kwargs['name'] if 'name' in kwargs else None
     xname = kwargs['xname'] if 'xname' in kwargs else None
     yname = kwargs['yname'] if 'yname' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
     categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
+    if not data:
+        raise NoDataError("No data was passed to analyze")
+    xdata = data[0]
+    ydata = data[1] if len(data) > 1 else None
+    if len(data) > 2:
+        raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
 
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
@@ -998,21 +941,26 @@ def analyze(xdata, *data, **kwargs):
             label = categories
 
         # Show the box plot and stats
-        #GraphBoxplot(xdata, groups, label, yname=yname)
-        GroupStatistics(xdata, groups)
+        GraphBoxplot(*xdata, groups=groups, xname=label, yname=yname, **kwargs)
+        GroupStatistics(*xdata, groups=groups)
 
         if len(xdata) == 2:
-            TTest(xdata[0], xdata[1])
-            pass
-
-        e = EqualVariance(*xdata, alpha=alpha)
-
-        # If normally distributed and variances are equal, perform one-way ANOVA
-        # Otherwise, perform a non-parametric Kruskal-Wallis test
-        if e.test_type == 'Bartlett' and e.p_value > alpha:
-                Anova(*xdata, alpha=alpha)
+            norm = NormTest(*xdata, alpha=alpha, display=False)
+            if norm.p_value > alpha:
+                TTest(xdata[0], xdata[1])
+            elif len(xdata[0]) > 25 and len(xdata[1]) > 25:
+                MannWhitney(xdata[0], xdata[1])
+            else:
+                TwoSampleKSTest(xdata[0], xdata[1])
         else:
-                Kruskal(*xdata, alpha=alpha)
+            e = EqualVariance(*xdata, alpha=alpha)
+
+            # If normally distributed and variances are equal, perform one-way ANOVA
+            # Otherwise, perform a non-parametric Kruskal-Wallis test
+            if e.test_type == 'Bartlett' and e.p_value > alpha:
+                    Anova(*xdata, alpha=alpha)
+            else:
+                    Kruskal(*xdata, alpha=alpha)
         pass
 
     # Correlation and Linear Regression
@@ -1032,7 +980,7 @@ def analyze(xdata, *data, **kwargs):
             yname = 'Response'
 
         # Show the scatter plot, correlation and regression stats
-        #GraphScatter(xdata, ydata, label, yname)
+        GraphScatter(xdata, ydata, xname=label, yname=yname, **kwargs)
         LinearRegression(xdata, ydata, alpha=alpha)
         Correlation(xdata, ydata, alpha=alpha)
         pass
@@ -1042,10 +990,19 @@ def analyze(xdata, *data, **kwargs):
 
         # Show the histogram and stats
         stats = VectorStatistics(xdata, display=False)
-        norm = NormTest(xdata, alpha=alpha, display=False)
-        #GraphHisto(xdata, mean="{: .4f}".format(stats.mean), std_dev="{: .4f}".format(stats.std_dev), **kwargs)
+        if 'distribution' in kwargs:
+            distro = kwargs['distribution']
+            distro_class = getattr(__import__('scipy.stats',
+                                              globals(),
+                                              locals(),
+                                              [distro], -1), distro)
+            parms = distro_class.fit(xdata)
+            fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
+        else:
+            fit = NormTest(xdata, alpha=alpha, display=False)
+        GraphHisto(xdata, mean="{: .4f}".format(stats.mean), std_dev="{: .4f}".format(stats.std_dev), **kwargs)
         print(stats)
-        print(norm)
+        print(fit)
         pass
     else:
         return xdata, ydata
