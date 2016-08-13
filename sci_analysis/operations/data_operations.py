@@ -31,8 +31,10 @@ def to_float(seq):
     for i in range(len(seq)):
         try:
             float_list.append(float(seq[i]))
-        except (ValueError, TypeError):
+        except ValueError:
             float_list.append(float("nan"))
+        except TypeError:
+            float_list.append(to_float(seq[i]))
     return float_list
 
 

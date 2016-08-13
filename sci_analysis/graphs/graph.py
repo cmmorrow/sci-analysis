@@ -9,18 +9,19 @@ Classes:
 from __future__ import absolute_import
 from __future__ import print_function
 # matplotlib imports
-from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig
+from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \
+    subplots_adjust
 from matplotlib.gridspec import GridSpec
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, argsort
 
 # Scipy imports
 from scipy.stats import probplot, gaussian_kde
 
 # local imports
 from data.data import assign
-from operations.data_operations import is_dict
+from operations.data_operations import is_dict, is_group
 # TODO: Add preferences back in a future version
 # from ..preferences.preferences import GraphPreferences
 # from six.moves import range
@@ -84,11 +85,13 @@ class Graph(object):
             for d in args:
                 clean = assign(d).data_prep()
                 if clean is None:
+                    data.append(None)
                     continue
                 if len(clean) <= self._min_size:
                     raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
                 data.append(clean)
-            if len(data) < 1:
+            # if len(data) < 1:
+            if not is_group(data):
                 raise NoDataError("Cannot perform test because there is no data")
             if len(data) == 1:
                 data = data[0]
@@ -103,16 +106,15 @@ class Graph(object):
         :return: A color tuple calculated from the num argument
         """
         colors = [(0, 0.3, 0.7, 1),
-                  (0, 0.5, 0, 1),
-                  (1, 0, 0, 1),
-                  (0, 1, 1, 1),
+                  (1, 0.1, 0.1, 1),
+                  (0, 0.7, 0.3, 1),
+                  (1, 0.5, 0, 1),
+                  (0.1, 1, 1, 1),
                   (1, 1, 0, 1),
                   (1, 0, 1, 1),
-                  (1, 0.5, 0, 1),
                   (0.5, 0, 1, 1),
                   (0.5, 1, 0, 1),
-                  (0, 0, 0, 1),
-                  (0, 0, 1, 1)
+                  (0, 0, 0, 1)
                   ]
         desired_color = []
         if num < 0:
@@ -153,7 +155,6 @@ class GraphHisto(Graph):
         :param bins: The number of histogram bins to draw. This arg sets the bins member.
         :param name: The optional x-axis label.
         :param distribution: The theoretical distribution to fit.
-        :param color: The optional color of the histogram as a formmated string.
         :param boxplot: Toggle the display of the optional boxplot.
         :param cdf: Toggle the display of the optional cumulative density function plot.
         :param violin_plot: Add a distribution density overlay to the boxplot.
@@ -163,15 +164,13 @@ class GraphHisto(Graph):
         """
         self._bins = kwargs['bins'] if 'bins' in kwargs else 20
         self._distribution = kwargs['distribution'] if 'distribution' in kwargs else 'norm'
-        self._color = kwargs['color'] if 'color' in kwargs else 'green'
         self._box_plot = kwargs['boxplot'] if 'boxplot' in kwargs else True
         self._cdf = kwargs['cdf'] if 'cdf' in kwargs else False
-        self._violin_plot = kwargs['violin_plot'] if 'violin_plot' in kwargs else False
-        self._histogram = kwargs['histogram'] if 'histogram' in kwargs else True
         self._fit = kwargs['fit'] if 'fit' in kwargs else False
         self._mean = kwargs['mean'] if 'mean' in kwargs else None
         self._std = kwargs['std_dev'] if 'std_dev' in kwargs else None
         self._sample = kwargs['sample'] if 'sample' in kwargs else True
+        self._title = kwargs['title'] if 'title' in kwargs else 'Distribution'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = "Probability"
         name = 'Data'
@@ -231,7 +230,7 @@ class GraphHisto(Graph):
         gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratios, hspace=0)
 
         # Set the title
-        title = "Distribution"
+        title = self._title
         if self._mean is not None and self._std is not None:
             if self._sample:
                 title = r"{}{}$\bar x = {},  s = {}$".format(title, "\n", self._mean, self._std)
@@ -301,9 +300,12 @@ class GraphHisto(Graph):
         # set the labels and display the figure
         ylabel(self._yname)
         xlabel(self._xname)
-        show()
+        # show()
         if self._save_to:
             savefig(self._save_to)
+            close(f)
+        else:
+            show()
         pass
 
 
@@ -340,13 +342,10 @@ class GraphScatter(Graph):
         self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
         # self._histogram_borders = kwargs['histogram_borders'] if 'histogram_borders' in kwargs else False
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
+        self._title = kwargs['title'] if 'title' in kwargs else 'Bivariate'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
-        yname = "y Data"
-        xname = 'x Data'
-        if 'yname' in kwargs:
-            yname = kwargs['yname']
-        elif 'xname' in kwargs:
-            xname = kwargs['xname']
+        yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
+        xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
         super(GraphScatter, self).__init__(xdata, ydata, xname=xname, yname=yname, intersect=True)
 
     def calc_contours(self):
@@ -366,7 +365,10 @@ class GraphScatter(Graph):
         x = self._data[0]
         y = self._data[1]
         p = polyfit(x, y, 1, full=True)
-        return polyval(p[0], x)
+        fit = polyval(p[0], x)
+        index = argsort(x)
+        return [x[index[0]], x[index[-1]]], [fit[index[0]], fit[index[-1]]]
+        # return polyval(p[0], x)
 
     def draw(self):
         x = self._data[0]
@@ -378,13 +380,13 @@ class GraphScatter(Graph):
         # if borders:
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
-            self._xsize, self._ysize = 7, 6
+            self._xsize, self._ysize = 8.5, 7.5
             h_ratio, w_ratio = [2, 5], [5, 2]
             main_plot = 2
         else:
             main_plot = 0
         f = figure(figsize=(self._xsize, self._ysize))
-        f.suptitle('Bivariate', fontsize=14)
+        f.suptitle(self._title, fontsize=14)
         # if borders:
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
@@ -394,18 +396,25 @@ class GraphScatter(Graph):
         ax2 = subplot(gs[main_plot])
         if self._points:
             # grid(ax2.plot(x, y, pointstyle, zorder=1))
-            ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.5, zorder=1)
-            ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-            ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-        xlabel(self._xname)
-        ylabel(self._yname)
+            if len(x) == 4:
+                ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.5, zorder=1)
+            else:
+                ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.5, zorder=1)
+            # ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.5, zorder=1)
         if self._contours:
             x_prime, y_prime, z, levels = self.calc_contours()
             ax2.contour(x_prime, y_prime, z, levels, linewidths=self._contour_props[1], nchunk=16,
                         extend='both', zorder=2)
         if self._fit:
-            fit_line = self.calc_fit()
-            ax2.plot([min(x), max(x)], [min(fit_line), max(fit_line)], 'r--', linewidth=2, zorder=3)
+            fit_x, fit_y = self.calc_fit()
+            ax2.plot(fit_x, fit_y, 'r--', linewidth=2, zorder=3)
+            # fit_line = self.calc_fit()
+            # ax2.plot([x[0], x[-1]], [fit_line[0], fit_line[-1]], 'r--', linewidth=2, zorder=3)
+            # ax2.plot(x, fit_line, color='red', linestyle='dashed', linewidth=2, zorder=3)
+        ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        xlabel(self._xname)
+        ylabel(self._yname)
         # if borders:
         if self._boxplot_borders:
             # ax1 = f.add_subplot(gs[0], sharex=ax2)
@@ -431,9 +440,11 @@ class GraphScatter(Graph):
             ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()],
                  visible=False)
-        show()
         if self._save_to:
             savefig(self._save_to)
+            close(f)
+        else:
+            show()
         pass
 
 
@@ -452,7 +463,7 @@ class GraphBoxplot(Graph):
     _nrows = 1
     _ncols = 2
     _xsize = 7.5
-    _ysize = 5
+    _ysize = 6
 
     def __init__(self, *args, **kwargs):
         """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are
@@ -467,9 +478,15 @@ class GraphBoxplot(Graph):
         """
         xname = kwargs['xname'] if 'xname' in kwargs else 'Categories'
         yname = kwargs['yname'] if 'yname' in kwargs else 'Values'
-        save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        self._title = kwargs['title'] if 'title' in kwargs else 'Oneway'
         self._nqp = kwargs['nqp'] if 'nqp' in kwargs else True
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        if 'title' in kwargs:
+            self._title = kwargs['title']
+        elif self._nqp:
+            self._title = 'Oneway and Normal Quantile Plot'
+        else:
+            self._title = 'Oneway'
         data = list()
         groups = list()
         if is_dict(args[0]):
@@ -478,7 +495,7 @@ class GraphBoxplot(Graph):
                 groups.append(g)
             self._groups = groups
         else:
-            self._groups = kwargs['groups'] if 'groups' in kwargs else list(range(1, len(args) + 1))
+            # self._groups = kwargs['groups'] if 'groups' in kwargs else list(range(1, len(args) + 1))
             if 'groups' in kwargs:
                 if kwargs['groups']:
                     self._groups = kwargs['groups']
@@ -487,41 +504,68 @@ class GraphBoxplot(Graph):
             else:
                 self._groups = list(range(1, len(args) + 1))
             data = args
-        self._prob = [probplot(d) for d in data] if self._nqp else list()
-        super(GraphBoxplot, self).__init__(*data, xname=xname, yname=yname, save_to=save_to)
+        super(GraphBoxplot, self).__init__(*data, xname=xname, yname=yname, save_to=self._save_to)
 
     def draw(self):
-        if len(self._prob) > 0:
+        prob = list()
+        if self._nqp:
+            new_groups = list()
+            if not is_group(self._data):
+                prob.append(probplot(self._data))
+            else:
+                for i, d in enumerate(self._data):
+                    # if len(d) > 0:
+                    if d is not None:
+                        prob.append(probplot(d))
+                        new_groups.append(self._groups[i])
+                self._groups = new_groups
+        # self._data = [d for d in self._data if len(d) > 0]
+        if is_group(self._data):
+            self._data = [d for d in self._data if d is not None]
+        # prob = [probplot(d) for d in self._data] if self._nqp else list()
+        if len(prob) > 0:
             self._xsize *= 2
-            title = 'Oneway and Normal Quantile Plot'
+            # title = 'Oneway and Normal Quantile Plot'
         else:
             self._ncols = 1
-            title = 'Oneway'
+            # title = 'Oneway'
         f = figure(figsize=(self._xsize, self._ysize))
-        f.suptitle(title, fontsize=14)
+        f.suptitle(self._title, fontsize=14)
         gs = GridSpec(self._nrows, self._ncols, wspace=0)
         ax1 = subplot(gs[0])
         bp = ax1.boxplot(self._data, showmeans=True, labels=self._groups)
         setp(bp['boxes'], color='k')
         setp(bp['whiskers'], color='k')
         vp = ax1.violinplot(self._data, showextrema=False, showmedians=False, showmeans=False)
-        for i in range(len(self._data)):
-            setp(vp['bodies'][i], facecolors=self.get_color(i))
+        if is_group(self._data):
+            for i in range(len(self._data)):
+                setp(vp['bodies'][i], facecolors=self.get_color(i))
+        else:
+            setp(vp['bodies'][0], facecolors=self.get_color(0))
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        if any([True if len(str(g)) > 10 else False for g in self._groups]) or len(self._groups) > 5:
+            xticks(rotation=60)
+        subplots_adjust(bottom=0.2)
         ylabel(self._yname)
         xlabel(self._xname)
-        if len(self._prob) > 0:
+        if len(prob) > 0:
             ax2 = subplot(gs[1], sharey=ax1)
             # grid(which='major')
-            for i, g in enumerate(self._prob):
-                ax2.plot(g[0][0], g[0][1], marker='^', color=self.get_color(i), label=self._groups[i])
-                ax2.plot(g[0][0], g[1][0] * g[0][0] + g[1][1], linestyle='--', linewidth=2, color=self.get_color(i))
+            for i, g in enumerate(prob):
+                osm = g[0][0]
+                osr = g[0][1]
+                slope = g[1][0]
+                intercept = g[1][1]
+                ax2.plot(osm, osr, marker='^', color=self.get_color(i), label=self._groups[i])
+                ax2.plot(osm, slope * osm + intercept, linestyle='--', linewidth=2, color=self.get_color(i))
             ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             ax2.legend(loc='best')
             xlabel("Quantiles")
             setp(ax2.get_yticklabels(), visible=False)
-        show()
         if self._save_to:
             savefig(self._save_to)
+            close(f)
+        else:
+            show()
         pass
