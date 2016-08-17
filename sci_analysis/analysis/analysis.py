@@ -908,50 +908,51 @@ def analyze(*data, **kwargs):
     :return: A tuple of xdata and ydata
     """
     groups = kwargs['groups'] if 'groups' in kwargs else None
-    name = kwargs['name'] if 'name' in kwargs else None
-    xname = kwargs['xname'] if 'xname' in kwargs else None
-    yname = kwargs['yname'] if 'yname' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
-    categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
-    if not data:
-        raise NoDataError("No data was passed to analyze")
+    debug = True if 'debug' in kwargs else False
     xdata = data[0]
     ydata = data[1] if len(data) > 1 else None
+    parms = kwargs
+    tested = list()
+
     if len(data) > 2:
         raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
+    if xdata is None:
+        raise ValueError("xdata was not provided.")
+    if not is_iterable(xdata):
+        raise TypeError("xdata is not an array.")
+    if len(xdata) == 0:
+        raise NoDataError("No data was passed to analyze")
 
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
+        tested.append('Oneway')
+        name = kwargs['name'] if 'name' in kwargs else 'Values'
+        categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
+        xname = kwargs['xname'] if 'xname' in kwargs else categories
+        yname = kwargs['yname'] if 'yname' in kwargs else name
+        parms['xname'] = xname
+        parms['yname'] = yname
         if is_dict(xdata):
             groups = list(xdata.keys())
             xdata = list(xdata.values())
-
-        # Apply the y data label
-        if yname:
-            yname = yname
-        elif name:
-            yname = name
-        else:
-            yname = 'Values'
-
-        # Apply the x data label
-        if xname:
-            label = xname
-        else:
-            label = categories
+        parms['groups'] = groups
 
         # Show the box plot and stats
-        GraphBoxplot(*xdata, groups=groups, xname=label, yname=yname, **kwargs)
+        GraphBoxplot(*xdata, **parms)
         GroupStatistics(*xdata, groups=groups)
 
         if len(xdata) == 2:
             norm = NormTest(*xdata, alpha=alpha, display=False)
             if norm.p_value > alpha:
                 TTest(xdata[0], xdata[1])
+                tested.append('TTest')
             elif len(xdata[0]) > 25 and len(xdata[1]) > 25:
                 MannWhitney(xdata[0], xdata[1])
+                tested.append('MannWhitney')
             else:
                 TwoSampleKSTest(xdata[0], xdata[1])
+                tested.append('TwoSampleKSTest')
         else:
             e = EqualVariance(*xdata, alpha=alpha)
 
@@ -959,34 +960,29 @@ def analyze(*data, **kwargs):
             # Otherwise, perform a non-parametric Kruskal-Wallis test
             if e.test_type == 'Bartlett' and e.p_value > alpha:
                     Anova(*xdata, alpha=alpha)
+                    tested.append('Anova')
             else:
                     Kruskal(*xdata, alpha=alpha)
-        pass
+                    tested.append('Kruskal')
+        return tested if debug else None
 
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
-
-        # Apply the x data label
-        label = 'Predictor'
-        if xname:
-            label = xname
-
-        # Apply the y data label
-        if yname:
-            yname = yname
-        elif name:
-            yname = name
-        else:
-            yname = 'Response'
+        tested.append('Bivariate')
+        xname = kwargs['xname'] if 'xname' in kwargs else 'Predictor'
+        yname = kwargs['yname'] if 'yname' in kwargs else 'Response'
+        parms['xname'] = xname
+        parms['yname'] = yname
 
         # Show the scatter plot, correlation and regression stats
-        GraphScatter(xdata, ydata, xname=label, yname=yname, **kwargs)
+        GraphScatter(xdata, ydata, **parms)
         LinearRegression(xdata, ydata, alpha=alpha)
         Correlation(xdata, ydata, alpha=alpha)
-        pass
+        return tested if debug else None
 
     # Histogram and Basic Stats
     elif is_iterable(xdata):
+        tested.append('Distribution')
 
         # Show the histogram and stats
         stats = VectorStatistics(xdata, display=False)
@@ -998,11 +994,13 @@ def analyze(*data, **kwargs):
                                               [distro], -1), distro)
             parms = distro_class.fit(xdata)
             fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
+            tested.append('KSTest')
         else:
             fit = NormTest(xdata, alpha=alpha, display=False)
+            tested.append('NormTest')
         GraphHisto(xdata, mean="{: .4f}".format(stats.mean), std_dev="{: .4f}".format(stats.std_dev), **kwargs)
         print(stats)
         print(fit)
-        pass
+        return tested if debug else None
     else:
         return xdata, ydata
