@@ -22,7 +22,7 @@ class Preferences(object):
     __metaclass__ = DefaultPreferences
 
     def list(self):
-        print self.__dict__
+        print(self.__dict__)
         return self.__dict__
 
     def defaults(self):

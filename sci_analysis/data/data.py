@@ -137,7 +137,8 @@ class Vector(Data):
                 self._type = self._values.dtype
         else:
             if is_dict(sequence):
-                sequence = flatten(list(sequence.values()))
+                values = list(sequence.values())
+                sequence = flatten(values)
             if is_iterable(sequence):
                 self._values = np.array(to_float(sequence))
                 self._type = self._values.dtype

@@ -193,7 +193,7 @@ class GraphHisto(Graph):
         distro_class = getattr(__import__('scipy.stats',
                                           globals(),
                                           locals(),
-                                          [self._distribution], -1), self._distribution)
+                                          [self._distribution], 0), self._distribution)
         parms = distro_class.fit(self._data)
         distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
         distro_pdf = distro_class.pdf(distro, *parms)

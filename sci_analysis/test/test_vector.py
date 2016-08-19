@@ -107,9 +107,13 @@ class MyTestCase(unittest.TestCase):
         """Test the drop_nan_intersect method"""
         input_array_1 = [1., float("nan"), 3., float("nan"), 5.]
         input_array_2 = [11., float("nan"), 13., 14., 15.]
-        output_array = [(1., 11.), (3., 13.), (5., 15.)]
+        # output_array = [(1., 11.), (3., 13.), (5., 15.)]
+        output_array = (np.array([1., 3., 5.]), np.array([11., 13., 15.]))
         inter = Vector(input_array_1).drop_nan_intersect(Vector(input_array_2))
-        self.assertEqual(zip(inter[0], inter[1]), output_array, "FAIL: Error in drop_nan_intersect")
+        test1 = inter[0] == output_array[0]
+        test2 = inter[1] == output_array[1]
+        # self.assertEqual(zip(inter[0], inter[1]), output_array, "FAIL: Error in drop_nan_intersect")
+        self.assertTrue(test1.all and test2.all, "FAIL: Error in drop_nan_intersect")
 
     def test_127_drop_nan_intersect_empty(self):
         """Test the drop_nan_intersect method with one empty array"""

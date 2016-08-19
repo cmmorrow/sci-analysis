@@ -991,7 +991,7 @@ def analyze(*data, **kwargs):
             distro_class = getattr(__import__('scipy.stats',
                                               globals(),
                                               locals(),
-                                              [distro], -1), distro)
+                                              [distro], 0), distro)
             parms = distro_class.fit(xdata)
             fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
             tested.append('KSTest')

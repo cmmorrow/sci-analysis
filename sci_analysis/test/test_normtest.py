@@ -3,7 +3,6 @@ import numpy as np
 import scipy.stats as st
 
 from analysis.analysis import NormTest, MinimumSizeError, NoDataError
-from data.data import EmptyVectorError
 
 
 class MyTestCase(unittest.TestCase):
@@ -92,8 +91,8 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         self.assertRaises(NoDataError, lambda: NormTest(["one", "two", "three", "four"],
-                                                             alpha=alpha,
-                                                             display=False).p_value)
+                                                        alpha=alpha,
+                                                        display=False).p_value)
 
     def test_311_Norm_test_multi_all_empty_vectors(self):
         """Test if multiple vectors are from the normal distribution with all missing vectors"""

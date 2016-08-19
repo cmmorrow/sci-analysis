@@ -16,6 +16,7 @@ Functions:
     is_group_dict - checks if a variable is a dict of iterables.
 """
 from __future__ import absolute_import
+import six
 
 # from ..graphs.graph import Graph
 
@@ -81,6 +82,8 @@ def is_iterable(seq):
     :param seq: A variable of unknown type
     :return: True or False
     """
+    if isinstance(seq, six.string_types):
+        return False
     try:
         seq.__iter__()
         return True
@@ -104,9 +107,9 @@ def is_dict(seq):
     :return: True or False
     """
     try:
-        seq.items()
+        seq.values()
         return True
-    except AttributeError:
+    except (AttributeError, TypeError):
         return False
 
 
