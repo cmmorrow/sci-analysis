@@ -73,3 +73,15 @@ dist/sci_analysis-1.3.3.tar.gz
 *.whl
 
 dist/sci_analysis-1.3.4.tar.gz
+
+*.pyc
+
+*.pyc
+
+*.png
+
+*.xml
+
+sci_analysis/test/.coverage
+
+*.pyc

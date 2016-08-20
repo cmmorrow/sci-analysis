@@ -23,25 +23,32 @@ from __future__ import print_function
 
 # Scipy imports
 from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
-    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis
+    ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem, ks_2samp, mannwhitneyu
 
 # Numpy imports
-from numpy import concatenate, mean, std, median, amin, amax, percentile
+from numpy import mean, std, median, amin, amax, percentile
 
 # Local imports
-from ..data.vector import Vector
-from ..operations.data_operations import is_dict, is_iterable, is_vector, is_group,\
-    is_dict_group, drop_nan, drop_nan_intersect
-from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+from operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
+from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+from data.data import assign
+
+
+class MinimumSizeError(Exception):
+    pass
+
+
+class NoDataError(Exception):
+    pass
 
 
 class Analysis(object):
     """Generic analysis root class.
 
     Members:
-        data - the data used for analysis.
-        display - flag for whether to display the analysis output.
-        results - a tuple representing the results of the analysis.
+        _data - the data used for analysis.
+        _display - flag for whether to display the analysis output.
+        _results - A dict of the results of the test.
 
     Methods:
         logic - This method needs to run the analysis, set the results member, and display the output at bare minimum.
@@ -49,15 +56,32 @@ class Analysis(object):
         output - This method shouldn't return a value and only produce a side-effect.
     """
 
+    _name = "Analysis"
+
     def __init__(self, data, display=True):
         """Initialize the data and results members.
 
         Override this method to initialize additional members or perform
         checks on data.
         """
-        self.data = data
-        self.display = display
-        self.results = 0.0
+        self._data = data
+        self._display = display
+        self._results = {}
+
+    @property
+    def name(self):
+        """The name of the test class"""
+        return self._name
+
+    @property
+    def data(self):
+        """The data used for analysis"""
+        return self._data
+
+    @property
+    def results(self):
+        """A dict of the results returned by the run method"""
+        return self._results
 
     def logic(self):
         """This method needs to run the analysis, set the results member, and
@@ -65,591 +89,812 @@ class Analysis(object):
 
         Override this method to modify the execution sequence of the analysis.
         """
-        self.results = self.run()
-        if self.display:
-            self.output()
+        if self._data is None:
+            pass
+        self.run()
+        if self._display:
+            print(self)
 
     def run(self):
-        """This method should return the results of the specific analysis.
+        """This method should perform the specific analysis and set the results dict.
 
         Override this method to perform a specific analysis or calculation.
         """
-        return 0.0
-
-    def output(self):
-        """This method shouldn't return a value and only produce a side-effect.
-
-        Override this method to write the formatted output to std out.
-        """
-        print(self.results)
         pass
 
-    def __str__(self):
-        return str(self.results)
+    def output(self, name, order=list(), no_format=list(), precision=4):
+        """Print the results of the test in a user-friendly format"""
+        label_max_length = 0
 
-    def __repr__(self):
-        return str(self.results)
+        def format_output(n, v):
+            """Format the results with a consistent look"""
+            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+
+        def no_precision_output(n, v):
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+
+        for label in self._results.keys():
+            if len(label) > label_max_length:
+                label_max_length = len(label)
+
+        report = [
+            ' ',
+            name,
+            '-' * len(name),
+            ' ',
+        ]
+
+        if order:
+            for key in order:
+                for label, value in self._results.items():
+                    if label == key:
+                        if label in no_format:
+                            report.append(no_precision_output(label, value))
+                        else:
+                            report.append(format_output(label, value))
+                        continue
+        else:
+            for label, value in self._results.items():
+                report.append(format_output(label, value))
+
+        report.append(" ")
+
+        return "\n".join(report)
+
+    def __str__(self):
+        return self.output(self._name)
+
+
+class GroupAnalysis(Analysis):
+
+    def output(self, name, order=list(), no_format=list(), precision=4, spacing=14):
+        grid = list()
+
+        def format_header(names):
+            line = ""
+            for n in names:
+                line += '{:{}s}'.format(n, spacing)
+            return line
+
+        def format_row(_row, _order):
+            line = ""
+            for _label in _order:
+                for k, v in _row.items():
+                    if k == _label:
+                        if k in no_format:
+                            line += '{:<{}s}'.format(str(v), spacing)
+                        else:
+                            line += '{:< {}.{}f}'.format(v, spacing, precision)
+                        continue
+            return line
+
+        header = format_header(order)
+        for row in self._results:
+            grid.append(format_row(row, order))
+
+        return '\n'.join((
+            name,
+            " ",
+            header,
+            "-" * len(header),
+            '\n'.join(grid),
+            " "
+        ))
 
 
 class Test(Analysis):
     """Generic statistical test class.
     Members:
-        data - the data used for analysis.
-        display - flag for whether to display the analysis output.
-        results - a tuple representing the results of the analysis.
-        alpha - the statistical significance of the test.
+        _name - The name of the test.
+        _h0 - Prints the null hypothesis.
+        _ha - Prints the alternate hypothesis.
+        _data - the data used for analysis.
+        _display - flag for whether to display the analysis output.
+        _alpha - the statistical significance of the test.
+        _results - A dict of the results of the test.
     Methods:
         logic - If the result is greater than the significance, print the null hypothesis, otherwise,
             the alternate hypothesis.
         run - This method should return the results of the specific analysis.
         output - This method shouldn't return a value and only produce a side-effect.
-        h0 - Prints the null hypothesis.
-        ha - Prints the alternate hypothesis.
     """
 
-    def __init__(self, data, alpha=0.05, display=True):
+    _name = "Test"
+    _statistic_name = "test"
+    _h0 = "H0: "
+    _ha = "HA: "
+    _min_size = 2
 
-        super(Test, self).__init__(data, display=display)
+    def __init__(self, *args, **kwargs):
+        """Initialize the object"""
 
-        # Set members
-        self.alpha = alpha
-        self.results = 1, 0
-
-        # If data is not a vector, wrap it in a Vector object
-        if not is_vector(data):
-            self.data = Vector(data)
-
-        # Stop the test if the vector is empty
-        if self.data.is_empty():
-            print("vector is empty")
-            pass
-        else:
-
-            # Remove NaN values from the vector
-            self.data = drop_nan(self.data)
-
-            # Run the test and display the results
-            self.logic()
-
-    def logic(self):
-        self.results = self.run()
-        if self.display:
-            self.output()
-
-            # If the result is greater than the significance, print the null
-            # hypothesis, otherwise, the alternate hypothesis
-            if self.results[0] > self.alpha:
-                self.h0()
-            else:
-                self.ha()
-            print("")
-
-    def run(self):
-        """ The default p-value is 1
-        """
-        return 1, 0
-
-    def output(self):
-        print(str(self.results[1]) + ", " + str(self.results[0]))
-
-    def h0(self):
-        print("H0: ")
-
-    def ha(self):
-        print("HA: ")
-
-
-class GroupTest(Test):
-    """ Perform a test on multiple vectors that are passed as a tuple of arbitrary length.
-    """
-
-    def __init__(self, *groups, **parms):
-        self.alpha = 0.05
-        self.data = []
-        self.display = True
-        self.results = 1, 0
-
-        self.__dict__.update(parms)
-
-        if is_dict(groups[0]):
-            groups = list(groups[0].values())
-        for group in groups:
-            if not is_vector(group):
-                group = drop_nan(Vector(group))
-            if group.is_empty():
+        self._alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
+        data = list()
+        for d in args:
+            clean = assign(d).data_prep()
+            if clean is None:
                 continue
-            if len(group) == 1:
-                continue
-            self.data.append(group.data)
-        super(GroupTest, self).logic()
+            if len(clean) <= self._min_size:
+                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+            data.append(clean)
+        if len(data) < 1:
+            raise NoDataError("Cannot perform test because there is no data")
+        if len(data) == 1:
+            data = data[0]
 
+        # set the _data and _display members
+        super(Test, self).__init__(data, display=(kwargs['display'] if 'display' in kwargs else True))
 
-class Comparison(Test):
-    """Perform a test on two independent vectors of equal length."""
-
-    __min_size = 2
-
-    def __init__(self, xdata, ydata, alpha=0.05, display=True):
-
-        self.xdata = xdata
-        self.ydata = ydata
-        self.alpha = alpha
-        self.display = display
-        self.results = 1, 0
-
-        if not is_vector(xdata):
-            self.xdata = Vector(xdata)
-        if not is_vector(ydata):
-            self.ydata = Vector(ydata)
-        if len(xdata) != len(ydata):
-            print("Vector lengths are not equal")
-            pass
-        elif self.xdata.is_empty() or self.ydata.is_empty():
-            print("At least one vector is empty")
-            pass
-        else:
-            self.xdata, self.ydata = drop_nan_intersect(self.xdata, self.ydata)
+        # Run the test and display the results
         self.logic()
 
-    def logic(self):
-        if len(self.xdata) <= self.__min_size or len(self.ydata) <= self.__min_size:
-            return self.results
-        super(Comparison, self).logic()
+    @property
+    def statistic(self):
+        """The test statistic returned by the function called in the run method"""
+        return self._results['statistic']
+
+    @property
+    def p_value(self):
+        """The p-value returned by the function called in the run method"""
+        return self._results['p value']
+
+    def output(self, name, order=list(), no_format=list(), precision=4):
+        """Print the results of the test in a user-friendly format"""
+        label_max_length = 0
+
+        def format_output(n, v):
+            """Format the results with a consistent look"""
+            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+
+        def no_precision_output(n, v):
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+
+        for label in self._results.keys():
+            if len(label) > label_max_length:
+                label_max_length = len(label)
+
+        report = [
+            ' ',
+            name,
+            '-' * len(name),
+            ' ',
+        ]
+
+        if order:
+            for key in order:
+                for label, value in self._results.items():
+                    if label == key:
+                        if label in no_format:
+                            report.append(no_precision_output(label, value))
+                        else:
+                            report.append(format_output(label, value))
+                        continue
+        else:
+            for label, value in self._results.items():
+                report.append(format_output(label, value))
+
+        report.append(" ")
+        report.append(self._h0 if self.p_value > self._alpha else self._ha)
+        report.append(" ")
+
+        return "\n".join(report)
+
+
+class Comparison(Analysis):
+    """Perform a test on two independent vectors of equal length."""
+
+    _min_size = 3
+    _name = "Comparison"
+    _h0 = "H0: "
+    _ha = "HA: "
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        self._alpha = alpha
+        x, y = assign(xdata, ydata)
+        if x is None or y is None:
+            raise NoDataError("Cannot perform test because there is no data")
+        try:
+            x, y = x.data_prep(y)
+        except TypeError:
+            raise NoDataError("Cannot perform test because there is no data")
+        if len(x) <= self._min_size or len(y) <= self._min_size:
+            raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+        super(Comparison, self).__init__([x, y], display=display)
+        self.logic()
+
+    @property
+    def xdata(self):
+        """The predictor vector for comparison tests"""
+        return self.data[0]
+
+    @property
+    def ydata(self):
+        """The response vector for comparison tests"""
+        return self.data[1]
+
+    @property
+    def predictor(self):
+        """The predictor vector for comparison tests"""
+        return self.data[0]
+
+    @property
+    def response(self):
+        """The response vector for comparison tests"""
+        return self.data[1]
+
+    @property
+    def statistic(self):
+        """The test statistic returned by the function called in the run method"""
+        return self._results['statistic']
+
+    @property
+    def p_value(self):
+        """The p-value returned by the function called in the run method"""
+        return self._results['p value']
+
+    def output(self, name, order=list(), no_format=list(), precision=4):
+        """Print the results of the test in a user-friendly format"""
+        label_max_length = 0
+
+        def format_output(n, v):
+            """Format the results with a consistent look"""
+            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+
+        def no_precision_output(n, v):
+            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+
+        for label in self._results.keys():
+            if len(label) > label_max_length:
+                label_max_length = len(label)
+
+        report = [
+            ' ',
+            name,
+            '-' * len(name),
+            ' ',
+        ]
+
+        if order:
+            for key in order:
+                for label, value in self._results.items():
+                    if label == key:
+                        if label in no_format:
+                            report.append(no_precision_output(label, value))
+                        else:
+                            report.append(format_output(label, value))
+                        continue
+        else:
+            for label, value in self._results.items():
+                report.append(format_output(label, value))
+
+        if self.p_value:
+            report.append(" ")
+            report.append(self._h0 if self.p_value > self._alpha else self._ha)
+            report.append(" ")
+
+        return "\n".join(report)
 
 
 class NormTest(Test):
     """Tests for whether data is normally distributed or not."""
 
-    def run(self):
-        w_value, p_value = shapiro(self.data)
-        return p_value, w_value
-
-    def output(self):
-        name = "Shapiro-Wilk test for normality"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("W value = " + "{:.4f}".format(self.results[1]))
-        print("p value = " + "{:.4f}".format(self.results[0]))
-        print("")
-
-    def h0(self):
-        print("H0: Data is normally distributed")
-
-    def ha(self):
-        print("HA: Data is not normally distributed")
-
-
-class GroupNormTest(GroupTest):
-    """Tests a group of data to see if they are normally distributed or not."""
+    _name = "Shapiro-Wilk test for normality"
+    _h0 = "H0: Data is normally distributed"
+    _ha = "HA: Data is not normally distributed"
 
     def run(self):
-        w_value, p_value = shapiro(concatenate(self.data))
-        return p_value, w_value
+        if not is_group(self._data):
+            w_value, p_value = shapiro(self.data)
+        else:
+            w_value = list()
+            p_value = list()
+            for d in self._data:
+                _w, _p = shapiro(d)
+                w_value.append(_w)
+                p_value.append(_p)
+            min_p = min(p_value)
+            w_value = w_value[p_value.index(min_p)]
+            p_value = min_p
+        self._results.update({'W value': w_value, 'p value': p_value})
 
-    def output(self):
-        name = "Shapiro-Wilk test for normality"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("W value = " + "{:.4f}".format(self.results[1]))
-        print("p value = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def statistic(self):
+        return self._results['W value']
 
-    def h0(self):
-        print("H0: Data is normally distributed")
+    @property
+    def w_value(self):
+        return self._results['W value']
 
-    def ha(self):
-        print("HA: Data is not normally distributed")
+
+class KSTest(Test):
+    """Tests whether data comes from a specified distribution or not."""
+
+    _name = "Kolmogorov-Smirnov Test"
+
+    def __init__(self, data, distribution='norm', parms=(), alpha=0.05, display=True):
+        self._distribution = distribution
+        self._parms = parms
+        self._h0 = "H0: Data is matched to the " + self.distribution + " distribution"
+        self._ha = "HA: Data is not from the " + self.distribution + " distribution"
+        super(KSTest, self).__init__(data, alpha=alpha, display=display)
+
+    def run(self):
+        args = [self._data, self._distribution]
+        if self._parms:
+            args.append(self._parms)
+        d_value, p_value = kstest(*args)
+        self._results.update({'D value': d_value, 'p value': p_value})
+
+    @property
+    def distribution(self):
+        """Return the distribution that data is being compared against"""
+        return self._distribution
+
+    @property
+    def statistic(self):
+        return self._results['D value']
+
+    @property
+    def d_value(self):
+        return self._results['D value']
+
+
+class TwoSampleKSTest(Test):
+    """Tests whether two independent vectors come from the same distribution"""
+
+    _name = "Two Sample Kolmogorov-Smirnov Test"
+    _h0 = "H0: Both samples come from the same distribution"
+    _ha = "HA: Samples do not come from the same distribution"
+
+    def __init__(self, a, b, alpha=0.05, display=True):
+        super(TwoSampleKSTest, self).__init__(a, b, alpha=alpha, display=display)
+
+    def run(self):
+        d_value, p_value = ks_2samp(*self._data)
+        self._results.update({'D value': d_value, 'p value': p_value})
+
+    @property
+    def statistic(self):
+        return self._results['D value']
+
+    @property
+    def d_value(self):
+        return self._results['D value']
+
+
+class MannWhitney(Test):
+    """Performs a Mann Whitney U Test on two vectors"""
+
+    _name = "Mann Whitney U Test"
+    _h0 = "H0: Locations are matched"
+    _ha = "HA: Locations are not matched"
+    _min_size = 30
+
+    def run(self):
+        u_value, p_value = mannwhitneyu(*self._data)
+        self._results.update({'u value': u_value, 'p value': p_value * 2})
+
+    @property
+    def statistic(self):
+        return self._results['u value']
+
+    @property
+    def u_value(self):
+        return self._results['u value']
 
 
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
+    _name = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
+    _h0 = "H0: Means are matched"
+    _ha = "HA: Means are significantly different"
+    _min_size = 3
+
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
-
-        self.alpha = alpha
-        self.display = display
-
-        if is_iterable(ydata):
-            # If data is not a vector, wrap it in a Vector object
-            if not is_vector(ydata):
-                self.ydata = Vector(ydata)
-
-            # Stop the test if the vector is empty
-            if self.ydata.is_empty():
-                print("vector is empty")
-                pass
-            else:
-                # Remove NaN values from the vector
-                self.ydata = drop_nan(self.ydata)
+        self._mu = None
+        self._test = None
+        if not is_iterable(ydata):
+            self._mu = float(ydata)
+            super(TTest, self).__init__(xdata, alpha=alpha, display=display)
         else:
-            try:
-                self.ydata = float(ydata)
-            except (ValueError, TypeError):
-                print("ydata is not a vector or a number")
-                pass
-
-        super(TTest, self).__init__(xdata, alpha=alpha, display=display)
+            super(TTest, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
-
-        if is_iterable(self.ydata):
-            if EqualVariance(self.data, self.ydata, display=False).results[0] > self.alpha:
-                t, p = ttest_ind(self.data, self.ydata, equal_var=True)
-                test = "T Test"
-            else:
-                t, p = ttest_ind(self.data, self.ydata, equal_var=False)
-                test = "Welch's T Test"
+        if self._mu:
+            t, p = ttest_1samp(self._data, self._mu, axis=0)
+            test = "1_sample"
         else:
-            t, p = ttest_1samp(self.data, float(self.ydata))
-            test = "1 Sample T Test"
-        return float(p), float(t), test
+            if not is_group(self._data):
+                raise NoDataError("Cannot perform the test because there is no data")
+            if EqualVariance(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
+                t, p = ttest_ind(*self._data, equal_var=True, axis=0)
+                test = 't_test'
+            else:
+                t, p = ttest_ind(*self._data, equal_var=False, axis=0)
+                test = 'welch_t'
+        self._test = test
+        self._results.update({'p value': p, 't value': float(t)})
 
-    def output(self):
-        print("")
-        print(self.results[2])
-        print("-" * len(self.results[2]))
-        print("")
-        print("t = " + "{:.4f}".format(self.results[1]))
-        print("p = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def test_type(self):
+        return self._test
 
-    def h0(self):
-        print("H0: Means are matched")
+    @property
+    def mu(self):
+        return self._mu
 
-    def ha(self):
-        print("HA: Means are significantly different")
+    @property
+    def t_value(self):
+        return self._results['t value']
+
+    @property
+    def statistic(self):
+        return self._results['t value']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
 class LinearRegression(Comparison):
     """Performs a linear regression between two vectors."""
 
-    __min_size = 3
+    _name = "Linear Regression"
+    _h0 = "H0: There is no significant relationship between predictor and response"
+    _ha = "HA: There is a significant relationship between predictor and response"
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        super(LinearRegression, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
         slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.ydata)
         count = len(self.xdata)
-        return p_value, slope, intercept, r2, std_err, count
+        self._results.update({'Count': count,
+                              'Slope': slope,
+                              'Intercept': intercept,
+                              'R^2': r2,
+                              'Std Err': std_err,
+                              'p value': p_value})
 
-    def output(self):
-        name = "Linear Regression"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("count     = " + str(self.results[5]))
-        print("slope     = " + "{:.4f}".format(self.results[1]))
-        print("intercept = " + "{:.4f}".format(self.results[2]))
-        print("R^2       = " + "{:.4f}".format(self.results[3]))
-        print("std err   = " + "{:.4f}".format(self.results[4]))
-        print("p value   = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def slope(self):
+        return self._results['Slope']
 
-    def h0(self):
-        print("H0: There is no significant relationship between predictor and response")
+    @property
+    def intercept(self):
+        return self._results['Intercept']
 
-    def ha(self):
-        print("HA: There is a significant relationship between predictor and response")
+    @property
+    def r_squared(self):
+        return self._results['R^2']
+
+    @property
+    def statistic(self):
+        return self._results['R^2']
+
+    @property
+    def std_err(self):
+        return self._results['Std Err']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'R^2', 'Std Err', 'p value'],
+                           no_format=['Count'])
 
 
 class Correlation(Comparison):
     """Performs a pearson or spearman correlation between two vectors."""
 
-    __min_size = 3
+    _name = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
+    _h0 = "H0: There is no significant relationship between predictor and response"
+    _ha = "HA: There is a significant relationship between predictor and response"
+
+    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+        self._test = None
+        super(Correlation, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
-        if NormTest(concatenate([self.xdata, self.ydata]), display=False, alpha=self.alpha).results[0] > self.alpha:
+        if NormTest(self.xdata, self.ydata, display=False, alpha=self._alpha).p_value > self._alpha:
             r_value, p_value = pearsonr(self.xdata, self.ydata)
             r = "pearson"
         else:
             r_value, p_value = spearmanr(self.xdata, self.ydata)
             r = "spearman"
-        return p_value, r_value, r
+        self._test = r
+        self._results.update({'r value': r_value, 'p value': p_value})
 
-    def output(self):
-        name = "Correlation"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        if self.results[2] == "pearson":
-            print("Pearson Coeff:")
-        else:
-            print("Spearman Coeff:")
-        print("r = " + "{:.4f}".format(self.results[1]))
-        print("p = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def r_value(self):
+        """The correlation coefficient returned by the the determined test type"""
+        return self._results['r value']
 
-    def h0(self):
-        print("H0: There is no significant relationship between predictor and response")
+    @property
+    def statistic(self):
+        return self._results['r value']
 
-    def ha(self):
-        print("HA: There is a significant relationship between predictor and response")
+    @property
+    def test_type(self):
+        """The test that was used to determine the correlation coefficient"""
+        return self._test
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
-class Anova(GroupTest):
+class Anova(Test):
     """Performs a one-way ANOVA on a group of vectors."""
 
-    __min_size = 2
+    _name = "Oneway ANOVA"
+    _h0 = "H0: Group means are matched"
+    _ha = "HA: Group means are not matched"
 
     def run(self):
-        if len(self.data) <= self.__min_size:
-            return self.results
-        f_value, p_value = f_oneway(*tuple(self.data))
-        return p_value, f_value
+        f_value, p_value = f_oneway(*self.data)
+        self._results.update({'p value': p_value, 'f value': f_value})
 
-    def output(self):
-        name = "Oneway ANOVA"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("f value = " + "{:.4f}".format(self.results[1]))
-        print("p value = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def f_value(self):
+        """The f value returned by the ANOVA f test"""
+        return self._results['f value']
 
-    def h0(self):
-        print("H0: Group means are matched")
-
-    def ha(self):
-        print("HA: Group means are not matched")
+    @property
+    def statistic(self):
+        return self._results['f value']
 
 
-class Kruskal(GroupTest):
+class Kruskal(Test):
     """Performs a non-parametric Kruskal-Wallis test on a group of vectors."""
 
-    __min_size = 2
+    _name = "Kruskal-Wallis"
+    _h0 = "H0: Group means are matched"
+    _ha = "HA: Group means are not matched"
 
     def run(self):
-        if len(self.data) <= self.__min_size:
-            return self.results
-        h_value, p_value = kruskal(*tuple(self.data))
-        return p_value, h_value
+        h_value, p_value = kruskal(*self.data)
+        self._results.update({'p value': p_value, 'h value': h_value})
 
-    def output(self):
-        name = "Kruskal-Wallis"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("H value = " + "{:.4f}".format(self.results[1]))
-        print("p value = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def h_value(self):
+        """The h value returned by the Kruskal test"""
+        return self._results['h value']
 
-    def h0(self):
-        print("H0: Group means are matched")
-
-    def ha(self):
-        print("HA: Group means are not matched")
+    @property
+    def statistic(self):
+        return self._results['h value']
 
 
-class EqualVariance(GroupTest):
+class EqualVariance(Test):
     """Checks a group of vectors for equal variance."""
 
-    __min_size = 2
+    _name = {'Bartlett': 'Bartlett Test', 'Levene': 'Levene Test'}
+    _h0 = "H0: Variances are equal"
+    _ha = "HA: Variances are not equal"
+
+    def __init__(self, *data, **kwargs):
+        self._test = None
+        super(EqualVariance, self).__init__(*data, **kwargs)
 
     def run(self):
-        if len(self.data) < self.__min_size:
-            return self.results
-        if NormTest(concatenate(self.data), display=False, alpha=self.alpha).results[0] > self.alpha:
-            statistic, p_value = bartlett(*tuple(self.data))
-            t = "Bartlett Test"
+        if len(self._data) < self._min_size:
+            pass
+        if NormTest(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
+            statistic, p_value = bartlett(*self._data)
+            self._test = 'Bartlett'
+            self._results.update({'p value': p_value, 'T value': statistic})
         else:
-            statistic, p_value = levene(*tuple(self.data))
-            t = "Levene Test"
-        return p_value, statistic, t
+            statistic, p_value = levene(*self._data)
+            self._test = 'Levene'
+            self._results.update({'p value': p_value, 'W value': statistic})
 
-    def output(self):
-        print("")
-        print(self.results[2])
-        print("-" * len(self.results[2]))
-        print("")
-        if self.results[2] == "Bartlett Test":
-            print("T value = " + "{:.4f}".format(self.results[1]))
-        else:
-            print("W value = " + "{:.4f}".format(self.results[1]))
-        print("p value = " + "{:.4f}".format(self.results[0]))
-        print("")
+    @property
+    def t_value(self):
+        return self._results['T value']
 
-    def h0(self):
-        print("H0: Variances are equal")
+    @property
+    def w_value(self):
+        return self._results['W value']
 
-    def ha(self):
-        print("HA: Variances are not equal")
+    @property
+    def statistic(self):
+        try:
+            s = self._results['W value']
+        except KeyError:
+            s = self._results['T value']
+        return s
+
+    @property
+    def test_type(self):
+        """The test that was used to check for equal variance"""
+        return self._test
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name[self._test])
 
 
 class VectorStatistics(Analysis):
     """Reports basic summary stats for a provided vector."""
 
-    __min_size = 2
+    _min_size = 1
+    _name = 'Statistics'
 
-    def __init__(self, data, sample=False, display=True):
-        super(VectorStatistics, self).__init__(data, display=display)
+    def __init__(self, data, sample=True, display=True):
+        self._sample = sample
+        d = assign(data).data_prep()
+        if d is None:
+            raise NoDataError("Cannot perform the test because there is no data")
+        if len(d) <= self._min_size:
+            raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
 
-        self.results = None
-        self.sample = sample
-
-        self.data = drop_nan(Vector(data))
-
-        if self.data.is_empty():
-            print("vector is empty")
-            pass
-        elif len(self.data) < self.__min_size:
-            pass
-        else:
-            if len(self.data) < self.__min_size:
-                pass
-            else:
-                self.logic()
+        super(VectorStatistics, self).__init__(d, display=display)
+        self.logic()
 
     def run(self):
         dof = 0
-        if self.sample:
+        if self._sample:
             dof = 1
-        count = len(self.data)
-        avg = mean(self.data)
-        sd = std(self.data, ddof=dof)
-        med = median(self.data)
-        vmin = amin(self.data)
-        vmax = amax(self.data)
+        count = len(self._data)
+        avg = mean(self._data)
+        sd = std(self._data, ddof=dof)
+        error = sem(self._data, 0, dof)
+        med = median(self._data)
+        vmin = amin(self._data)
+        vmax = amax(self._data)
         vrange = vmax - vmin
-        sk = skew(self.data)
-        kurt = kurtosis(self.data)
-        q1 = percentile(self.data, 25)
-        q3 = percentile(self.data, 75)
+        sk = skew(self._data)
+        kurt = kurtosis(self._data)
+        q1 = percentile(self._data, 25)
+        q3 = percentile(self._data, 75)
         iqr = q3 - q1
-        return {"count": count,
-                "mean": avg,
-                "std": sd,
-                "median": med,
-                "min": vmin,
-                "max": vmax,
-                "range": vrange,
-                "skew": sk,
-                "kurtosis": kurt,
-                "q1": q1,
-                "q3": q3,
-                "iqr": iqr}
+        self._results = {"Count": count,
+                         "Mean": avg,
+                         "Std Dev": sd,
+                         "Std Error": error,
+                         "50%": med,
+                         "Minimum": vmin,
+                         "Maximum": vmax,
+                         "Range": vrange,
+                         "Skewness": sk,
+                         "Kurtosis": kurt,
+                         "25%": q1,
+                         "75%": q3,
+                         "IQR": iqr}
 
-    def output(self):
-        name = "Statistics"
-        print("")
-        print(name)
-        print("-" * len(name))
-        print("")
-        print("Count    = " + str(self.results["count"]))
-        print("Mean     = " + "{:.3f}".format(self.results['mean']))
-        print("Std Dev  = " + "{:.3f}".format(self.results['std']))
-        print("Skewness = " + "{:.3f}".format(self.results['skew']))
-        print("Kurtosis = " + "{:.3f}".format(self.results['kurtosis']))
-        print("Max      = " + "{:.3f}".format(self.results['max']))
-        print("75%      = " + "{:.3f}".format(self.results['q3']))
-        print("50%      = " + "{:.3f}".format(self.results['median']))
-        print("25%      = " + "{:.3f}".format(self.results['q1']))
-        print("Min      = " + "{:.3f}".format(self.results['min']))
-        print("IQR      = " + "{:.3f}".format(self.results['iqr']))
-        print("Range    = " + "{:.3f}".format(self.results['range']))
-        print("")
+    @property
+    def count(self):
+        return self._results['Count']
+
+    @property
+    def mean(self):
+        return self._results['Mean']
+
+    @property
+    def std_dev(self):
+        return self._results['Std Dev']
+
+    @property
+    def std_err(self):
+        return self._results['Std Error']
+
+    @property
+    def median(self):
+        return self._results['50%']
+
+    @property
+    def minimum(self):
+        return self._results['Minimum']
+
+    @property
+    def maximum(self):
+        return self._results['Maximum']
+
+    @property
+    def range(self):
+        return self._results['Range']
+
+    @property
+    def skewness(self):
+        return self._results['Skewness']
+
+    @property
+    def kurtosis(self):
+        return self._results['Kurtosis']
+
+    @property
+    def q1(self):
+        return self._results['25%']
+
+    @property
+    def q3(self):
+        return self._results['75%']
+
+    @property
+    def iqr(self):
+        return self._results['IQR']
+
+    def __str__(self):
+        """If the result is greater than the significance, print the null hypothesis, otherwise,
+        the alternate hypothesis"""
+        return self.output(self._name, order=['Count',
+                                              'Mean',
+                                              'Std Dev',
+                                              'Std Error',
+                                              'Skewness',
+                                              'Kurtosis',
+                                              'Maximum',
+                                              '75%',
+                                              '50%',
+                                              '25%',
+                                              'Minimum',
+                                              'IQR',
+                                              'Range'], no_format=['Count'])
 
 
-class GroupStatistics(Analysis):
+class GroupStatistics(GroupAnalysis):
     """Reports basic summary stats for a group of vectors."""
 
-    __min_size = 1
+    _min_size = 1
+    _name = 'Group Statistics'
 
-    def __init__(self, data, groups=None, display=True):
-        super(GroupStatistics, self).__init__(data, display=display)
-        self.groups = groups
-        self.results = []
-        if not is_iterable(data):
-            pass
+    def __init__(self, *args, **kwargs):
+        groups = kwargs['groups'] if 'groups' in kwargs else None
+        display = kwargs['display'] if 'display' in kwargs else True
+        if not is_dict(args[0]):
+            _data = dict(zip(groups, args)) if groups else dict(zip(list(range(1, len(args) + 1)), args))
         else:
-            if is_dict(data):
-                self.groups = list(data.keys())
-                self.data = list(data.values())
-            elif groups is None:
-                self.groups = list(range(1, len(data) + 1))
-            self.logic()
+            _data = args[0]
+        data = dict()
+        for g, d in _data.items():
+            clean = assign(d).data_prep()
+            if clean is None:
+                continue
+            if len(clean) <= self._min_size:
+                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+            data.update({g: clean})
+        if len(data) < 1:
+            raise NoDataError("Cannot perform test because there is no data")
+        if len(data) == 1:
+            data = data[0]
+        super(GroupStatistics, self).__init__(data, display=display)
+        self.logic()
 
     def logic(self):
-        for i, d in enumerate(self.data):
-            if len(d) == 0:
-                self.groups = self.groups[:i] + self.groups[i + 1:]
-                continue
-            else:
-                if not is_vector(d):
-                    d = Vector(d)
-                if len(d) < self.__min_size:
-                    self.groups = self.groups[:i] + self.groups[i + 1:]
-                    continue
-                self.results.append(self.run(d, self.groups[i]))
-        if len(self.results) > 0:
-            self.output()
+        if not self._data:
+            pass
+        self._results = list()
+        self.run()
+        if self._display:
+            print(self)
 
-    def run(self, vector, group):
-        vector = drop_nan(vector)
-        count = len(vector)
-        avg = mean(vector)
-        sd = std(vector, ddof=1)
-        vmax = amax(vector)
-        vmin = amin(vector)
-        q2 = median(vector)
-        return {"group": group, "count": count, "mean": avg, "std": sd, "max": vmax, "median": q2, "min": vmin}
+    def run(self):
+        for group, vector in self._data.items():
+            count = len(vector)
+            avg = mean(vector)
+            sd = std(vector, ddof=1)
+            vmax = amax(vector)
+            vmin = amin(vector)
+            q2 = median(vector)
+            row_result = {"Group": group,
+                          "Count": count,
+                          "Mean": avg,
+                          "Std Dev": sd,
+                          "Max": vmax,
+                          "Median": q2,
+                          "Min": vmin}
+            self._results.append(row_result)
 
-    def output(self):
-        size = 12
-        header = ""
-        line = ""
-        offset = 0
-        shift = False
-        spacing = "{:.5f}"
-        labels = ["Count", "Mean", "Std.", "Min", "Q2", "Max", "Group"]
-
-        for s in labels:
-            header = header + s + " " * (size - len(s))
-        print(header)
-        print("-" * len(header))
-        for v in self.results:
-            stats = [str(v["count"]),
-                     spacing.format(v["mean"]),
-                     spacing.format(v["std"]),
-                     spacing.format(v["min"]),
-                     spacing.format(v["median"]),
-                     spacing.format(v["max"]),
-                     str(v["group"])
-                     ]
-            for i, s in enumerate(stats):
-                if offset == 1 or shift:
-                    offset = -1
-                    shift = False
-                else:
-                    offset = 0
-                try:
-                    if stats[i + 1][0] == "-":
-                        if offset == -1:
-                            offset = 0
-                            shift = True
-                        else:
-                            offset = 1
-                    line = line + s + " " * (size - offset - len(s))
-                except IndexError:
-                    line = line + s + " " * (size - offset - len(s))
-            print(line)
-            line = ""
+    def __str__(self):
+        return self.output(self._name, ['Count', 'Mean', 'Std Dev', 'Min', 'Median', 'Max', 'Group'],
+                           no_format=['Count', 'Group'])
 
 
-def analyze(
-        xdata,
-        ydata=None,
-        groups=None,
-        name=None,
-        xname=None,
-        yname=None,
-        alpha=0.05,
-        categories='Categories'):
+def analyze(*data, **kwargs):
     """Magic method for performing quick data analysis.
 
     :param xdata: A Vector, numPy Array or sequence like object
@@ -662,92 +907,100 @@ def analyze(
     :param categories: The x-axis label when performing a group analysis
     :return: A tuple of xdata and ydata
     """
+    groups = kwargs['groups'] if 'groups' in kwargs else None
+    alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
+    debug = True if 'debug' in kwargs else False
+    xdata = data[0]
+    ydata = data[1] if len(data) > 1 else None
+    parms = kwargs
+    tested = list()
+
+    if len(data) > 2:
+        raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
+    if xdata is None:
+        raise ValueError("xdata was not provided.")
+    if not is_iterable(xdata):
+        raise TypeError("xdata is not an array.")
+    if len(xdata) == 0:
+        raise NoDataError("No data was passed to analyze")
 
     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
+        tested.append('Oneway')
+        name = kwargs['name'] if 'name' in kwargs else 'Values'
+        categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
+        xname = kwargs['xname'] if 'xname' in kwargs else categories
+        yname = kwargs['yname'] if 'yname' in kwargs else name
+        parms['xname'] = xname
+        parms['yname'] = yname
         if is_dict(xdata):
             groups = list(xdata.keys())
             xdata = list(xdata.values())
-
-        # Apply the y data label
-        if yname:
-            yname = yname
-        elif name:
-            yname = name
-        else:
-            yname = 'Values'
-
-        # Apply the x data label
-        if xname:
-            label = xname
-        else:
-            label = categories
+        parms['groups'] = groups
 
         # Show the box plot and stats
-        GraphBoxplot(xdata, groups, label, yname=yname)
-        GroupStatistics(xdata, groups)
-        p = EqualVariance(*xdata).results[0]
+        GraphBoxplot(*xdata, **parms)
+        GroupStatistics(*xdata, groups=groups)
 
-        # If normally distributed and variances are equal, perform one-way ANOVA
-        # Otherwise, perform a non-parametric Kruskal-Wallis test
-        if GroupNormTest(*xdata, display=False, alpha=alpha).results[0] > alpha and p > alpha:
-            if len(xdata) == 2:
+        if len(xdata) == 2:
+            norm = NormTest(*xdata, alpha=alpha, display=False)
+            if norm.p_value > alpha:
                 TTest(xdata[0], xdata[1])
+                tested.append('TTest')
+            elif len(xdata[0]) > 25 and len(xdata[1]) > 25:
+                MannWhitney(xdata[0], xdata[1])
+                tested.append('MannWhitney')
             else:
-                Anova(*xdata)
+                TwoSampleKSTest(xdata[0], xdata[1])
+                tested.append('TwoSampleKSTest')
         else:
-            if len(xdata) == 2:
-                TTest(xdata[0], xdata[1])
+            e = EqualVariance(*xdata, alpha=alpha)
+
+            # If normally distributed and variances are equal, perform one-way ANOVA
+            # Otherwise, perform a non-parametric Kruskal-Wallis test
+            if e.test_type == 'Bartlett' and e.p_value > alpha:
+                    Anova(*xdata, alpha=alpha)
+                    tested.append('Anova')
             else:
-                Kruskal(*xdata)
-        pass
+                    Kruskal(*xdata, alpha=alpha)
+                    tested.append('Kruskal')
+        return tested if debug else None
 
     # Correlation and Linear Regression
     elif is_iterable(xdata) and is_iterable(ydata):
-
-        # Apply the x data label
-        label = 'Predictor'
-        if xname:
-            label = xname
-
-        # Apply the y data label
-        if yname:
-            yname = yname
-        elif name:
-            yname = name
-        else:
-            yname = 'Response'
-
-        # Convert xdata and ydata to Vectors
-        if not is_vector(xdata):
-            xdata = Vector(xdata)
-        if not is_vector(ydata):
-            ydata = Vector(ydata)
+        tested.append('Bivariate')
+        xname = kwargs['xname'] if 'xname' in kwargs else 'Predictor'
+        yname = kwargs['yname'] if 'yname' in kwargs else 'Response'
+        parms['xname'] = xname
+        parms['yname'] = yname
 
         # Show the scatter plot, correlation and regression stats
-        GraphScatter(xdata, ydata, label, yname)
-        LinearRegression(xdata, ydata)
-        Correlation(xdata, ydata)
-        pass
+        GraphScatter(xdata, ydata, **parms)
+        LinearRegression(xdata, ydata, alpha=alpha)
+        Correlation(xdata, ydata, alpha=alpha)
+        return tested if debug else None
 
     # Histogram and Basic Stats
     elif is_iterable(xdata):
-
-        # Apply the data label
-        label = 'Data'
-        if name:
-            label = name
-        elif xname:
-            label = xname
-
-        # Convert xdata to a Vector
-        if not is_vector(xdata):
-            xdata = Vector(xdata)
+        tested.append('Distribution')
 
         # Show the histogram and stats
-        GraphHisto(xdata, name=label)
-        VectorStatistics(xdata)
-        NormTest(xdata, alpha=alpha)
-        pass
+        stats = VectorStatistics(xdata, display=False)
+        if 'distribution' in kwargs:
+            distro = kwargs['distribution']
+            distro_class = getattr(__import__('scipy.stats',
+                                              globals(),
+                                              locals(),
+                                              [distro], 0), distro)
+            parms = distro_class.fit(xdata)
+            fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
+            tested.append('KSTest')
+        else:
+            fit = NormTest(xdata, alpha=alpha, display=False)
+            tested.append('NormTest')
+        GraphHisto(xdata, mean="{: .4f}".format(stats.mean), std_dev="{: .4f}".format(stats.std_dev), **kwargs)
+        print(stats)
+        print(fit)
+        return tested if debug else None
     else:
         return xdata, ydata

@@ -4,4 +4,5 @@ Modules:
     operations - sci_analysis Data functions
     vector - the sci_analysis Vector class
 """
-from vector import Vector
+# from vector import Vector
+from data import *

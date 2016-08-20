@@ -7,23 +7,27 @@
 What is sci_analysis?
 =====================
 
-sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. It is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.
+sci_analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci_analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as how the data is distributed.
 
 Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.
 
-What's new in sci_analysis version 1.3?
+What's new in sci_analysis version 1.4?
 =======================================
 
-In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci_analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.
+In version 1.4, sci_analysis was re-written to be more pythonic and to support python 3. A ton of new graphing options have been added histograms, scatter plots and oneway plots. Histograms can now display an accompanying cumulative distribution plot and fit lines to a specified distribution can be displayed on both the histogram and cumulative distribution plot. Scatter plots can now overlay density contour lines and display boxplot borders. Boxplots have been revamped and are now overlayed on top of a kernel density estimation, which provides a much better representation of distribution density. New tests have been added for comparing two distributions -- Student's T Test for normally distributed data, the Mann Whitney U Test for non-parametric data and the two-sample Kolmogorov-Smirnov Test for small non-parametric samples. The Kolmogorov-Smirnov Test has been added for determining goodness-of-fit to a specified distribution as well. 
 
 Getting started with sci_analysis
 =================================
 
-sci_analysis require python 2.7. It has not been tested with python 3.0 or above. 
+sci_analysis requires python 2.7 or 3.5.
 
-If you use OS X or Linux, python should already be installed. You can check by opening a terminal window and typing ``which python`` on the command line. To verify what version of python you have installed, type ``python --version`` at the command line. If the version is 2.7.x, where x is any number, sci_analysis should work properly.
+If you use OS X or Linux, python should already be installed. You can check by opening a terminal window and typing ``which python`` on the command line. To verify what version of python you have installed, type ``python --version`` at the command line. If the version is 2.7.x or 3.5.x, where x is any number, sci_analysis should work properly.
 
-If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing ``cmd`` in the run text box, then type ``python.exe`` on the command line. If you receive an error message, you need to install python. You can download python from the following page:
+If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing ``cmd`` in the run text box, then type ``python.exe`` on the command line. If you receive an error message, you need to install python. The easiest way to install python is by installing Anaconda or Mini-conda from this page:
+
+`<https://www.continuum.io/downloads>`_
+
+Alternatively, you can download the python binary from the following page, but be warned that installing the required packages can be difficult using this method:
 
 `<https://www.python.org/downloads/windows/>`_
 
@@ -36,16 +40,21 @@ sci_analysis can be installed with pip by typing the following:
 	
 	pip install sci_analysis
 	
-On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:
+On Linux, you can install pip from your OS package manager. If you have Anaconda or Mini-conda, pip should already be installed. Otherwise, you can download pip from the following page:
 
 `<https://pypi.python.org/pypi/pip>`_
 
-.. note:: sci_analysis is also compatible with pandas and works best in the iPython Notebook.
+sci_analysis works best in conjunction with the excellent pandas and jupyter notebook python packages. If you don't have either of these packages installed, you can install them by typing the following:
+
+::
+
+	pip install pandas
+	pip install jupyter
 
 Using sci_analysis
 ==================
 
-From the python interpreter, type:
+From the python interpreter or in the first cell of a Jupyter notebook, type:
 
 ::
 	
@@ -56,7 +65,7 @@ From the python interpreter, type:
 
 This will tell python to import sci_analysis to your project as the object ``a``.
 
-If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:
+If you are using the Jupyter notebook, you may also need to use the following code instead to enable inline plots:
 
 ::
 	

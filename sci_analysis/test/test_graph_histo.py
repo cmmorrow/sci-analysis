@@ -1,0 +1,345 @@
+import unittest
+import numpy as np
+import scipy.stats as st
+
+from graphs.graph import GraphHisto, NoDataError, MinimumSizeError
+
+
+class MyTestCase(unittest.TestCase):
+
+    def test_100_default_graph(self):
+        """Generate a histogram graph with default arguments"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   save_to='./images/test_histo_100'))
+
+    def test_101_bins(self):
+        """Generate a histogram graph with 100 bins"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   bins=100,
+                                   save_to='./images/test_histo_101'))
+
+    def test_102_bins_no_box_plot(self):
+        """Generate a histogram graph without the accompanying boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   bins=100,
+                                   boxplot=False,
+                                   save_to='./images/test_histo_102'))
+
+    def test_103_bins_no_box_plot_cdf(self):
+        """Generate a histogram graph with cdf and no boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   bins=100,
+                                   boxplot=False,
+                                   cdf=True,
+                                   save_to='./images/test_histo_103'))
+
+    def test_104_bins_no_box_plot_cdf_fit(self):
+        """Generate a histogram graph with fit, cdf and no boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   bins=100,
+                                   boxplot=False,
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_104'))
+
+    def test_105_no_box_plot(self):
+        """Generate a histogram graph without the accompanying boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   boxplot=False,
+                                   save_to='./images/test_histo_105'))
+
+    def test_106_no_box_plot_cdf(self):
+        """Generate a histogram graph with cdf and no boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   boxplot=False,
+                                   cdf=True,
+                                   save_to='./images/test_histo_106'))
+
+    def test_107_no_box_plot_cdf_fit(self):
+        """Generate a histogram graph with fit, cdf and no boxplot"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   boxplot=False,
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_107'))
+
+    def test_108_cdf(self):
+        """Generate a histogram graph with cdf"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   cdf=True,
+                                   save_to='./images/test_histo_108'))
+
+    def test_109_no_box_plot_cdf_fit(self):
+        """Generate a histogram graph with fit and cdf"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_109'))
+
+    def test_110_no_box_plot_cdf_fit(self):
+        """Generate a histogram graph with fit"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   fit=True,
+                                   save_to='./images/test_histo_110'))
+
+    def test_111_only_mean(self):
+        """Generate a histogram graph with only the mean set"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        mean = np.mean(input_array)
+        self.assertTrue(GraphHisto(input_array,
+                                   mean=mean,
+                                   save_to='./images/test_histo_111'))
+
+    def test_112_only_std(self):
+        """Generate a histogram graph with only the std dev set"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        std = np.std(input_array)
+        self.assertTrue(GraphHisto(input_array,
+                                   std_dev=std,
+                                   save_to='./images/test_histo_112'))
+
+    def test_113_mean_and_std(self):
+        """Generate a histogram graph with the mean and std dev set"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        mean = np.mean(input_array)
+        std = np.std(input_array)
+        self.assertTrue(GraphHisto(input_array,
+                                   mean=mean,
+                                   std_dev=std,
+                                   save_to='./images/test_histo_113'))
+
+    def test_114_mean_std_and_sample(self):
+        """Generate a histogram graph with the mean and std dev set"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        mean = np.mean(input_array)
+        std = np.std(input_array)
+        self.assertTrue(GraphHisto(input_array,
+                                   mean=mean,
+                                   std_dev=std,
+                                   sample=False,
+                                   save_to='./images/test_histo_114'))
+
+    def test_115_distribution(self):
+        """Generate a histogram graph with distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   save_to='./images/test_histo_115'))
+
+    def test_116_distribution_bins(self):
+        """Generate a histogram graph with distribution and bins set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   bins=100,
+                                   save_to='./images/test_histo_116'))
+
+    def test_117_distribution_bins_boxplot(self):
+        """Generate a histogram graph with no boxplot, cdf, distribution and bins set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   bins=100,
+                                   boxplot=False,
+                                   save_to='./images/test_histo_117'))
+
+    def test_118_distribution_bins_boxplot_cdf(self):
+        """Generate a histogram graph with no boxplot, distribution and bins set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   bins=100,
+                                   boxplot=False,
+                                   cdf=True,
+                                   save_to='./images/test_histo_118'))
+
+    def test_119_distribution_bins_boxplot_cdf_fit(self):
+        """Generate a histogram graph with no boxplot, fit, cdf, distribution and bins set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   bins=100,
+                                   boxplot=False,
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_119'))
+
+    def test_120_distribution_boxplot(self):
+        """Generate a histogram graph with no boxplot and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   boxplot=False,
+                                   save_to='./images/test_histo_120'))
+
+    def test_121_distribution_boxplot_cdf(self):
+        """Generate a histogram graph with no boxplot, cdf and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   boxplot=False,
+                                   cdf=True,
+                                   save_to='./images/test_histo_121'))
+
+    def test_122_distribution_boxplot_cdf_fit(self):
+        """Generate a histogram graph with no boxplot, fit, cdf and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   boxplot=False,
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_122'))
+
+    def test_123_distribution_cdf(self):
+        """Generate a histogram graph with cdf and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   cdf=True,
+                                   save_to='./images/test_histo_123'))
+
+    def test_124_distribution_cdf_fit(self):
+        """Generate a histogram graph with fit, cdf and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   cdf=True,
+                                   fit=True,
+                                   save_to='./images/test_histo_124'))
+
+    def test_125_distribution_fit(self):
+        """Generate a histogram graph with fit and distribution set"""
+        np.random.seed(987654321)
+        input_array = st.weibull_min.rvs(1.7, size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   distribution='weibull_min',
+                                   fit=True,
+                                   save_to='./images/test_histo_125'))
+
+    def test_126_empty_list(self):
+        """Catch the graphing case where the input is an empty list"""
+        np.random.seed(987654321)
+        input_array = []
+        self.assertRaises(NoDataError, lambda: GraphHisto(input_array))
+
+    def test_127_empty_array(self):
+        """Catch the graphing case where the input is an empty array"""
+        np.random.seed(987654321)
+        input_array = np.array([])
+        self.assertRaises(NoDataError, lambda: GraphHisto(input_array))
+
+    def test_128_xname(self):
+        """Set the xname of a histogram graph"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   xname='Test',
+                                   save_to='./images/test_histo_128'))
+
+    def test_129_name(self):
+        """Set the name of a histogram graph"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   name='Test',
+                                   save_to='./images/test_histo_129'))
+
+    def test_130_yname(self):
+        """Set the yname of a histogram graph"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        self.assertTrue(GraphHisto(input_array,
+                                   yname='Test',
+                                   save_to='./images/test_histo_130'))
+
+    def test_131_missing_data(self):
+        """Generate a histogram graph with 500 random missing values"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=5000)
+        indicies = [x for x in np.random.randint(0, 4999, 500)]
+        for x in indicies:
+            input_array = np.insert(input_array, x, np.nan, axis=0)
+        self.assertTrue(GraphHisto(input_array, name='Missing Test', save_to='./images/test_histo_131'))
+
+    def test_132_at_min_size(self):
+        """Generate a histogram graph at the minimum size"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=2)
+        self.assertTrue(GraphHisto(input_array, name='At Min Size', save_to='./images/test_histo_132'))
+
+    def test_133_min_size(self):
+        """Generate a histogram graph below the minimum size"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=1)
+        self.assertRaises(MinimumSizeError, lambda: GraphHisto(input_array))
+
+    def test_134_graph_string(self):
+        """Generate a histogram graph with string data"""
+        np.random.seed(987654321)
+        input_array = ["1", "2", "this", "is", "a", '3', "string", "4", "5"]
+        self.assertTrue(GraphHisto(input_array, name='String Array', save_to='./images/test_histo_134'))
+
+    def test_135_graph_2dim_array(self):
+        """Generate a histogram graph with a 2dim array"""
+        np.random.seed(987654321)
+        input_array = np.array([[1, 2, 3], [4, 5, 6]])
+        self.assertTrue(GraphHisto(input_array, name='2dim Array', save_to='./images/test_histo_135'))
+
+    def test_136_graph_3dim_array(self):
+        """Generate a histogram graph with a 3dim array"""
+        np.random.seed(987654321)
+        input_array = np.array([[[1, 2, 3], [4, 5, 6]], [[10, 11, 12], [13, 14, 15]]])
+        self.assertTrue(GraphHisto(input_array, name='3dim Array', save_to='./images/test_histo_136'))
+
+    def test_137_graph_3dim_missing_data(self):
+        """Generate a histogram graph from a 3dim list with missing data"""
+        np.random.seed(987654321)
+        input_array = [[['1', '2', 'three'], ['4.0', 'five', '6']], [['10', '11', '12.00'], ['t', 'h', '15']]]
+        self.assertTrue(GraphHisto(input_array, name='3dim Missing', save_to='./images/test_histo_137'))
+
+    def test_138_graph_title(self):
+        """Generate a histogram graph with a specified title"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=2000)
+        self.assertTrue(GraphHisto(input_array, title='Title Test', save_to='./images/test_histo_138'))
+
+
+if __name__ == '__main__':
+    unittest.main()
