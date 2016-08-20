@@ -1,10 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='sci_analysis',
-    version='1.4.2',
-    packages=[
-	'sci_analysis'],
+    version='1.4.4',
+    packages=find_packages(),
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
     author='chris morrow',

@@ -20,8 +20,8 @@ from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack
 from scipy.stats import probplot, gaussian_kde
 
 # local imports
-from data.data import assign
-from operations.data_operations import is_dict, is_group
+from ..data.data import assign
+from ..operations.data_operations import is_dict, is_group
 # TODO: Add preferences back in a future version
 # from ..preferences.preferences import GraphPreferences
 # from six.moves import range

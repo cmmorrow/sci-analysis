@@ -5,4 +5,4 @@ Modules:
     vector - the sci_analysis Vector class
 """
 # from vector import Vector
-from data import *
+from .data import *

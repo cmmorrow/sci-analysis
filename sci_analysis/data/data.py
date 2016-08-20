@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import numpy as np
 
 # Import from local
-from operations.data_operations import is_array, is_dict, is_iterable, to_float, flatten
+from ..operations.data_operations import is_array, is_dict, is_iterable, to_float, flatten
 
 
 def assign(obj, other=None):

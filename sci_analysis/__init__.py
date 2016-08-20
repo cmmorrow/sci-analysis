@@ -12,11 +12,12 @@ VectorStatistics, GroupStatistics, GraphHisto, GraphScatter and GraphBoxplot. Th
 following methods are imported so that they are exposed at a high level: analyze,
 clean and strip.
 """
+from __future__ import absolute_import
 
-from sci_analysis import analysis
-# from sci_analysis import graph
-from sci_analysis import data
-__all__ = ["data", "analysis", "graph"]
-from analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
+from .analysis import analysis
+from .graphs import graph
+from .data import data
+__all__ = ["data", "analysis", "graph", "operations"]
+from .analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
     analyze

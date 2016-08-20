@@ -29,9 +29,9 @@ from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
 from numpy import mean, std, median, amin, amax, percentile
 
 # Local imports
-from operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
-from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
-from data.data import assign
+from ..operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
+from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+from ..data.data import assign
 
 
 class MinimumSizeError(Exception):
