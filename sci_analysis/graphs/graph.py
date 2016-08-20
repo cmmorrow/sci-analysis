@@ -397,9 +397,9 @@ class GraphScatter(Graph):
         if self._points:
             # grid(ax2.plot(x, y, pointstyle, zorder=1))
             if len(x) == 4:
-                ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.5, zorder=1)
+                ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.6, zorder=1)
             else:
-                ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.5, zorder=1)
+                ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.6, zorder=1)
             # ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.5, zorder=1)
         if self._contours:
             x_prime, y_prime, z, levels = self.calc_contours()
