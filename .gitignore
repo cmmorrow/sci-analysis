@@ -81,3 +81,7 @@ dist/sci_analysis-1.3.4.tar.gz
 *.png
 
 *.xml
+
+sci_analysis/test/.coverage
+
+*.pyc
