@@ -43,232 +43,235 @@
             
   <div class="section" id="what-is-sci-analysis">
 <h1>What is sci_analysis?<a class="headerlink" href="#what-is-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis is a python module for performing rapid statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. It is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as whether the data is normally distributed.</p>
+<p>sci_analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci_analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as how the data is distributed.</p>
 <p>Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.</p>
 </div>
-<div class="section" id="what-s-new-in-sci-analysis-version-1-3">
-<h1>What&#8217;s new in sci_analysis version 1.3?<a class="headerlink" href="#what-s-new-in-sci-analysis-version-1-3" title="Permalink to this headline">¶</a></h1>
-<p>In version 1.3, sci_analysis has been re-written from scratch and is now object oriented. sci_analysis is now a python package of modules with classes instead of a single module with functions. The reason for this change is to make the code easier to follow and to establish a code base that can be easily updated and modified in the future. The change should be mostly transparent. However, the names of individual tests have changed, and some of them now need to be called with the module name.</p>
+<div class="section" id="what-s-new-in-sci-analysis-version-1-4">
+<h1>What&#8217;s new in sci_analysis version 1.4?<a class="headerlink" href="#what-s-new-in-sci-analysis-version-1-4" title="Permalink to this headline">¶</a></h1>
+<p>In version 1.4, sci_analysis was re-written to be more pythonic and to support python 3. A ton of new graphing options have been added histograms, scatter plots and oneway plots. Histograms can now display an accompanying cumulative distribution plot and fit lines to a specified distribution can be displayed on both the histogram and cumulative distribution plot. Scatter plots can now overlay density contour lines and display boxplot borders. Boxplots have been revamped and are now overlayed on top of a kernel density estimation, which provides a much better representation of distribution density. New tests have been added for comparing two distributions &#8211; Student&#8217;s T Test for normally distributed data, the Mann Whitney U Test for non-parametric data and the two-sample Kolmogorov-Smirnov Test for small non-parametric samples. The Kolmogorov-Smirnov Test has been added for determining goodness-of-fit to a specified distribution as well.</p>
 </div>
 <div class="section" id="getting-started-with-sci-analysis">
 <h1>Getting started with sci_analysis<a class="headerlink" href="#getting-started-with-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis require python 2.7. It has not been tested with python 3.0 or above.</p>
-<p>If you use OS X or Linux, python should already be installed. You can check by opening a terminal window and typing <code class="docutils literal"><span class="pre">which</span> <span class="pre">python</span></code> on the command line. To verify what version of python you have installed, type <code class="docutils literal"><span class="pre">python</span> <span class="pre">--version</span></code> at the command line. If the version is 2.7.x, where x is any number, sci_analysis should work properly.</p>
-<p>If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing <code class="docutils literal"><span class="pre">cmd</span></code> in the run text box, then type <code class="docutils literal"><span class="pre">python.exe</span></code> on the command line. If you receive an error message, you need to install python. You can download python from the following page:</p>
+<p>sci_analysis requires python 2.7 or 3.5.</p>
+<p>If you use OS X or Linux, python should already be installed. You can check by opening a terminal window and typing <code class="docutils literal"><span class="pre">which</span> <span class="pre">python</span></code> on the command line. To verify what version of python you have installed, type <code class="docutils literal"><span class="pre">python</span> <span class="pre">--version</span></code> at the command line. If the version is 2.7.x or 3.5.x, where x is any number, sci_analysis should work properly.</p>
+<p>If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing <code class="docutils literal"><span class="pre">cmd</span></code> in the run text box, then type <code class="docutils literal"><span class="pre">python.exe</span></code> on the command line. If you receive an error message, you need to install python. The easiest way to install python is by installing Anaconda or Mini-conda from this page:</p>
+<p><a class="reference external" href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a></p>
+<p>Alternatively, you can download the python binary from the following page, but be warned that installing the required packages can be difficult using this method:</p>
 <p><a class="reference external" href="https://www.python.org/downloads/windows/">https://www.python.org/downloads/windows/</a></p>
 </div>
 <div class="section" id="installing-sci-analysis">
 <h1>Installing sci_analysis<a class="headerlink" href="#installing-sci-analysis" title="Permalink to this headline">¶</a></h1>
 <p>sci_analysis can be installed with pip by typing the following:</p>
-<div class="highlight-python"><div class="highlight"><pre>pip install sci_analysis
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">sci_analysis</span>
 </pre></div>
 </div>
-<p>On Linux, you can install pip from your OS package manager. Otherwise, you can download pip from the following page:</p>
+<p>On Linux, you can install pip from your OS package manager. If you have Anaconda or Mini-conda, pip should already be installed. Otherwise, you can download pip from the following page:</p>
 <p><a class="reference external" href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a></p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">sci_analysis is also compatible with pandas and works best in the iPython Notebook.</p>
+<p>sci_analysis works best in conjunction with the excellent pandas and jupyter notebook python packages. If you don&#8217;t have either of these packages installed, you can install them by typing the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">jupyter</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="using-sci-analysis">
 <h1>Using sci_analysis<a class="headerlink" href="#using-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>From the python interpreter, type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sci_analysis</span> <span class="kn">as</span> <span class="nn">a</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<p>From the python interpreter or in the first cell of a Jupyter notebook, type:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sci_analysis</span> <span class="k">as</span> <span class="nn">a</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
 <p><strong>Note:</strong> The package name is <code class="docutils literal"><span class="pre">sci_analysis</span></code> with an underscore.</p>
 <p>This will tell python to import sci_analysis to your project as the object <code class="docutils literal"><span class="pre">a</span></code>.</p>
-<p>If you are using the iPython Notebook, you will also want to use the following code instead to enable inline plots:</p>
-<div class="highlight-python"><div class="highlight"><pre>%matplotlib inline
-import sci_analysis as a
-import numpy as np
+<p>If you are using the Jupyter notebook, you may also need to use the following code instead to enable inline plots:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">sci_analysis</span> <span class="k">as</span> <span class="nn">a</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
 <p>Now, sci_analysis should be ready to use. Try the following code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A histogram and box plot of the data should appear, as well as printed output similar to that below:</p>
 <img alt="_images/histo.png" src="_images/histo.png" />
-<div class="highlight-python"><div class="highlight"><pre>Statistics
-----------
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Statistics</span>
+<span class="o">----------</span>
 
-Count    = 1000
-Mean     = -0.015
-Std Dev  = 1.043
-Skewness = 0.014
-Kurtosis = 0.002
-Max      = 3.511
-75%      = 0.721
-50%      = -0.021
-25%      = -0.700
-Min      = -3.277
-IQR      = 1.421
-Range    = 6.788
+<span class="n">Count</span>    <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">Mean</span>     <span class="o">=</span> <span class="o">-</span><span class="mf">0.015</span>
+<span class="n">Std</span> <span class="n">Dev</span>  <span class="o">=</span> <span class="mf">1.043</span>
+<span class="n">Skewness</span> <span class="o">=</span> <span class="mf">0.014</span>
+<span class="n">Kurtosis</span> <span class="o">=</span> <span class="mf">0.002</span>
+<span class="n">Max</span>      <span class="o">=</span> <span class="mf">3.511</span>
+<span class="mi">75</span><span class="o">%</span>      <span class="o">=</span> <span class="mf">0.721</span>
+<span class="mi">50</span><span class="o">%</span>      <span class="o">=</span> <span class="o">-</span><span class="mf">0.021</span>
+<span class="mi">25</span><span class="o">%</span>      <span class="o">=</span> <span class="o">-</span><span class="mf">0.700</span>
+<span class="n">Min</span>      <span class="o">=</span> <span class="o">-</span><span class="mf">3.277</span>
+<span class="n">IQR</span>      <span class="o">=</span> <span class="mf">1.421</span>
+<span class="n">Range</span>    <span class="o">=</span> <span class="mf">6.788</span>
 
 
-Shapiro-Wilk test for normality
--------------------------------
+<span class="n">Shapiro</span><span class="o">-</span><span class="n">Wilk</span> <span class="n">test</span> <span class="k">for</span> <span class="n">normality</span>
+<span class="o">-------------------------------</span>
 
-W value = 0.9995
-p value = 0.9965
+<span class="n">W</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.9995</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.9965</span>
 
-H0: Data is normally distributed
+<span class="n">H0</span><span class="p">:</span> <span class="n">Data</span> <span class="ow">is</span> <span class="n">normally</span> <span class="n">distributed</span>
 </pre></div>
 </div>
 <p>If <code class="docutils literal"><span class="pre">data</span></code> contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.</p>
 <p>You should probably note that numpy was only imported for the purpose of the above example. sci_analysis uses numpy internally, so it isn&#8217;t necessary to import it unless you want to explicitly use it.</p>
 <p>Let&#8217;s examine the <code class="docutils literal"><span class="pre">analyze</span></code> function in more detail. Here&#8217;s the signature for the <code class="docutils literal"><span class="pre">analyze</span></code> function:</p>
-<div class="highlight-python"><div class="highlight"><pre>def analyze(
-        xdata,
-        ydata=None,
-        groups=None,
-        name=None,
-        xname=None,
-        yname=None,
-        alpha=0.05,
-        categories=&#39;Categories&#39;):
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span>
+        <span class="n">xdata</span><span class="p">,</span>
+        <span class="n">ydata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">yname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Categories&#39;</span><span class="p">):</span>
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">analyze</span></code> will detect the desired type of data analysis to perform based on whether the <code class="docutils literal"><span class="pre">ydata</span></code> argument is supplied, and whether the <code class="docutils literal"><span class="pre">xdata</span></code> argument is a two-dimensional array-like object.</p>
 <p>The <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> arguments can accept most python iterable objects, with the exception of strings. For example, <code class="docutils literal"><span class="pre">xdata</span></code> will accept a python list or tuple, a numpy array, or a pandas Series object. Internally, iterable objects are converted to a Vector object, which is a numpy array of type <code class="docutils literal"><span class="pre">float64</span></code>.</p>
 <p>If only the <code class="docutils literal"><span class="pre">xdata</span></code> argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.</p>
 <p>If <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">example1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.52</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]</span>
-<span class="n">example2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span> <span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.49</span><span class="p">,</span> <span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">example1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.52</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]</span>
+<span class="n">example2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.49</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">]</span>
 <span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">example1</span><span class="p">,</span> <span class="n">example2</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="_images/corr.png" src="_images/corr.png" />
-<div class="highlight-python"><div class="highlight"><pre>Linear Regression
------------------
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Linear</span> <span class="n">Regression</span>
+<span class="o">-----------------</span>
 
-count     = 11
-slope     = 0.8467
-intercept = 0.0601
-R^2       = 0.9836
-std err   = 0.0518
-p value   = 0.0000
+<span class="n">count</span>     <span class="o">=</span> <span class="mi">11</span>
+<span class="n">slope</span>     <span class="o">=</span> <span class="mf">0.8467</span>
+<span class="n">intercept</span> <span class="o">=</span> <span class="mf">0.0601</span>
+<span class="n">R</span><span class="o">^</span><span class="mi">2</span>       <span class="o">=</span> <span class="mf">0.9836</span>
+<span class="n">std</span> <span class="n">err</span>   <span class="o">=</span> <span class="mf">0.0518</span>
+<span class="n">p</span> <span class="n">value</span>   <span class="o">=</span> <span class="mf">0.0000</span>
 
-HA: There is a significant relationship between predictor and response
+<span class="n">HA</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
 
 
-Correlation
------------
+<span class="n">Correlation</span>
+<span class="o">-----------</span>
 
-Pearson Coeff:
-r = 0.9836
-p = 0.0000
+<span class="n">Pearson</span> <span class="n">Coeff</span><span class="p">:</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mf">0.9836</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.0000</span>
 
-HA: There is a significant relationship between predictor and response
+<span class="n">HA</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
 </pre></div>
 </div>
 <p>If <code class="docutils literal"><span class="pre">xdata</span></code> is a sequence or dictionary of vectors, summary statistics will be reported for each vector. If the concatenation of each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.</p>
 <p>It is important to note that the vectors should be independent from one another &#8212; that is to say, there should not be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results.</p>
 <p>For example, a proper use case would be if you had a table with measurement data for multiple groups, such as test scores per class, accidents per site or measurements per trial, where the classes, sites and trials are the groups. In this case, each group should be represented by it&#8217;s own vector, which are then all wrapped in a dictionary or sequence.</p>
 <p>If <code class="docutils literal"><span class="pre">xdata</span></code> is supplied as a dictionary, the keys are the names of the groups and the values are the iterable objects that represent the vectors. Alternatively, <code class="docutils literal"><span class="pre">xdata</span></code> can be a python sequence of the vectors and the <code class="docutils literal"><span class="pre">groups</span></code> argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to <code class="docutils literal"><span class="pre">xdata</span></code>. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 <span class="n">group_d</span> <span class="o">=</span> <span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s2">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s2">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s2">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s2">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
 <img alt="_images/comp1.png" src="_images/comp1.png" />
-<div class="highlight-python"><div class="highlight"><pre>Count       Mean        Std.        Min         Q2          Max         Group
-------------------------------------------------------------------------------------
-50         -0.09281     0.97702    -2.06823    -0.21706     2.20736     A
-25         -0.01699     0.70658    -1.81908     0.11035     1.52168     B
-30          0.36266     0.97275    -1.42187     0.33914     2.77769     C
-40          0.18866     0.94583    -1.50868     0.20423     2.14427     D
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Count</span>       <span class="n">Mean</span>        <span class="n">Std</span><span class="o">.</span>        <span class="n">Min</span>         <span class="n">Q2</span>          <span class="n">Max</span>         <span class="n">Group</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="mi">50</span>         <span class="o">-</span><span class="mf">0.09281</span>     <span class="mf">0.97702</span>    <span class="o">-</span><span class="mf">2.06823</span>    <span class="o">-</span><span class="mf">0.21706</span>     <span class="mf">2.20736</span>     <span class="n">A</span>
+<span class="mi">25</span>         <span class="o">-</span><span class="mf">0.01699</span>     <span class="mf">0.70658</span>    <span class="o">-</span><span class="mf">1.81908</span>     <span class="mf">0.11035</span>     <span class="mf">1.52168</span>     <span class="n">B</span>
+<span class="mi">30</span>          <span class="mf">0.36266</span>     <span class="mf">0.97275</span>    <span class="o">-</span><span class="mf">1.42187</span>     <span class="mf">0.33914</span>     <span class="mf">2.77769</span>     <span class="n">C</span>
+<span class="mi">40</span>          <span class="mf">0.18866</span>     <span class="mf">0.94583</span>    <span class="o">-</span><span class="mf">1.50868</span>     <span class="mf">0.20423</span>     <span class="mf">2.14427</span>     <span class="n">D</span>
 
-Bartlett Test
--------------
+<span class="n">Bartlett</span> <span class="n">Test</span>
+<span class="o">-------------</span>
 
-T value = 3.3845
-p value = 0.3361
+<span class="n">T</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">3.3845</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.3361</span>
 
-H0: Variances are equal
+<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
 
 
-Oneway ANOVA
-------------
+<span class="n">Oneway</span> <span class="n">ANOVA</span>
+<span class="o">------------</span>
 
-f value = 1.7762
-p value = 0.1545
+<span class="n">f</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">1.7762</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.1545</span>
 
-H0: Group means are matched
+<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
 </pre></div>
 </div>
 <p>In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let&#8217;s try another example, but this time change the variance of group B:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
 <span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
-<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">([</span><span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span><span class="p">,</span> <span class="n">group_c</span><span class="p">,</span> <span class="n">group_d</span><span class="p">],</span> <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">])</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">([</span><span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span><span class="p">,</span> <span class="n">group_c</span><span class="p">,</span> <span class="n">group_d</span><span class="p">],</span> <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 <img alt="_images/comp2.png" src="_images/comp2.png" />
-<div class="highlight-python"><div class="highlight"><pre>Count       Mean        Std.        Min         Q2          Max         Group
-------------------------------------------------------------------------------------
-50         -0.19082     1.01291    -2.48687    -0.22015     2.15578     A
-25         -0.03630     2.89428    -6.02110     0.07263     4.47457     B
-30         -0.09452     1.14620    -2.00273    -0.14987     2.68979     C
-40         -0.31092     0.86448    -2.51564    -0.13437     1.09661     D
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Count</span>       <span class="n">Mean</span>        <span class="n">Std</span><span class="o">.</span>        <span class="n">Min</span>         <span class="n">Q2</span>          <span class="n">Max</span>         <span class="n">Group</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="mi">50</span>         <span class="o">-</span><span class="mf">0.19082</span>     <span class="mf">1.01291</span>    <span class="o">-</span><span class="mf">2.48687</span>    <span class="o">-</span><span class="mf">0.22015</span>     <span class="mf">2.15578</span>     <span class="n">A</span>
+<span class="mi">25</span>         <span class="o">-</span><span class="mf">0.03630</span>     <span class="mf">2.89428</span>    <span class="o">-</span><span class="mf">6.02110</span>     <span class="mf">0.07263</span>     <span class="mf">4.47457</span>     <span class="n">B</span>
+<span class="mi">30</span>         <span class="o">-</span><span class="mf">0.09452</span>     <span class="mf">1.14620</span>    <span class="o">-</span><span class="mf">2.00273</span>    <span class="o">-</span><span class="mf">0.14987</span>     <span class="mf">2.68979</span>     <span class="n">C</span>
+<span class="mi">40</span>         <span class="o">-</span><span class="mf">0.31092</span>     <span class="mf">0.86448</span>    <span class="o">-</span><span class="mf">2.51564</span>    <span class="o">-</span><span class="mf">0.13437</span>     <span class="mf">1.09661</span>     <span class="n">D</span>
 
-Levene Test
------------
+<span class="n">Levene</span> <span class="n">Test</span>
+<span class="o">-----------</span>
 
-W value = 22.9783
-p value = 0.0000
+<span class="n">W</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">22.9783</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0000</span>
 
-HA: Variances are not equal
+<span class="n">HA</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">equal</span>
 
 
-Kruskal-Wallis
---------------
+<span class="n">Kruskal</span><span class="o">-</span><span class="n">Wallis</span>
+<span class="o">--------------</span>
 
-H value = 0.5562
-p value = 0.9064
+<span class="n">H</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.5562</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.9064</span>
 
-H0: Group means are matched
+<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
 </pre></div>
 </div>
 <p>In the example above, group B has a standard deviation of 2.89 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance.</p>
 <p>In another example, let&#8217;s compare groups that have different distibutions and different means:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">group_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">weibull</span><span class="p">(</span><span class="mf">0.82</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
 <span class="n">group_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
-<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s">&quot;A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
+<span class="n">a</span><span class="o">.</span><span class="n">analyze</span><span class="p">({</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
 <img alt="_images/comp3.png" src="_images/comp3.png" />
-<div class="highlight-python"><div class="highlight"><pre>Count       Mean        Std.        Min         Q2          Max         Group
-------------------------------------------------------------------------------------
-50         -0.07091     1.06720    -2.59419    -0.05428     2.31340     A
-30          2.41758     0.86823     0.90913     2.54628     4.21419     C
-50          1.26172     1.54953     0.00308     0.67848     7.18120     B
-40         -0.41410     0.95377    -3.40598    -0.27992     1.64474     D
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Count</span>       <span class="n">Mean</span>        <span class="n">Std</span><span class="o">.</span>        <span class="n">Min</span>         <span class="n">Q2</span>          <span class="n">Max</span>         <span class="n">Group</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="mi">50</span>         <span class="o">-</span><span class="mf">0.07091</span>     <span class="mf">1.06720</span>    <span class="o">-</span><span class="mf">2.59419</span>    <span class="o">-</span><span class="mf">0.05428</span>     <span class="mf">2.31340</span>     <span class="n">A</span>
+<span class="mi">30</span>          <span class="mf">2.41758</span>     <span class="mf">0.86823</span>     <span class="mf">0.90913</span>     <span class="mf">2.54628</span>     <span class="mf">4.21419</span>     <span class="n">C</span>
+<span class="mi">50</span>          <span class="mf">1.26172</span>     <span class="mf">1.54953</span>     <span class="mf">0.00308</span>     <span class="mf">0.67848</span>     <span class="mf">7.18120</span>     <span class="n">B</span>
+<span class="mi">40</span>         <span class="o">-</span><span class="mf">0.41410</span>     <span class="mf">0.95377</span>    <span class="o">-</span><span class="mf">3.40598</span>    <span class="o">-</span><span class="mf">0.27992</span>     <span class="mf">1.64474</span>     <span class="n">D</span>
 
-Levene Test
------------
+<span class="n">Levene</span> <span class="n">Test</span>
+<span class="o">-----------</span>
 
-W value = 1.0429
-p value = 0.3751
+<span class="n">W</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">1.0429</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.3751</span>
 
-H0: Variances are equal
+<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
 
 
-Kruskal-Wallis
---------------
+<span class="n">Kruskal</span><span class="o">-</span><span class="n">Wallis</span>
+<span class="o">--------------</span>
 
-H value = 86.0827
-p value = 0.0000
+<span class="n">H</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">86.0827</span>
+<span class="n">p</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0000</span>
 
-HA: Group means are not matched
+<span class="n">HA</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">matched</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -287,7 +290,7 @@ HA: Group means are not matched
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">What is sci_analysis?</a></li>
-<li><a class="reference internal" href="#what-s-new-in-sci-analysis-version-1-3">What&#8217;s new in sci_analysis version 1.3?</a></li>
+<li><a class="reference internal" href="#what-s-new-in-sci-analysis-version-1-4">What&#8217;s new in sci_analysis version 1.4?</a></li>
 <li><a class="reference internal" href="#getting-started-with-sci-analysis">Getting started with sci_analysis</a></li>
 <li><a class="reference internal" href="#installing-sci-analysis">Installing sci_analysis</a></li>
 <li><a class="reference internal" href="#using-sci-analysis">Using sci_analysis</a></li>
@@ -308,9 +311,6 @@ HA: Group means are not matched
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -328,7 +328,7 @@ HA: Group means are not matched
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2015-2016, Chris Morrow.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>
