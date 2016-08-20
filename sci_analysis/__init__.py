@@ -13,10 +13,10 @@ following methods are imported so that they are exposed at a high level: analyze
 clean and strip.
 """
 
-from analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
-    Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
-    analyze
 from analysis import analysis
 from graphs import graph
 from data import data
 __all__ = ["data", "analysis", "graph"]
+from analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
+    Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
+    analyze
