@@ -35,10 +35,12 @@ from ..data.data import assign
 
 
 class MinimumSizeError(Exception):
+    """Thrown when the length of the Data object is less than the Graph object's _min_size property."""
     pass
 
 
 class NoDataError(Exception):
+    """Thrown when the Data object passed to a Graph object is empty or has no graph-able data."""
     pass
 
 
@@ -897,14 +899,16 @@ class GroupStatistics(GroupAnalysis):
 def analyze(*data, **kwargs):
     """Magic method for performing quick data analysis.
 
-    :param xdata: A Vector, numPy Array or sequence like object
-    :param ydata: An optional secondary Vector, numPy Array or sequence object
-    :param groups: A list of group names. The box plots will be graphed in order of groups
-    :param name: The response variable label
-    :param xname: The predictor variable (x-axis) label
-    :param yname: The response variable (y-axis) label
-    :param alpha: The significance level of the test
-    :param categories: The x-axis label when performing a group analysis
+    Parameters
+    ----------
+    xdata: A Vector, numPy Array or sequence like object
+    ydata: An optional secondary Vector, numPy Array or sequence object
+    groups: A list of group names. The box plots will be graphed in order of groups
+    name: The response variable label
+    xname: The predictor variable (x-axis) label
+    yname: The response variable (y-axis) label
+    alpha: The significance level of the test
+    categories: The x-axis label when performing a group analysis
     :return: A tuple of xdata and ydata
     """
     groups = kwargs['groups'] if 'groups' in kwargs else None

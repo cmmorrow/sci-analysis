@@ -2,8 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from graphs.graph import GraphScatter, NoDataError, MinimumSizeError
-from data.data import UnequalVectorLengthError
+from ..graphs.graph import GraphScatter, NoDataError, MinimumSizeError
+from ..data.data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):

@@ -8,6 +8,7 @@ Classes:
 """
 from __future__ import absolute_import
 from __future__ import print_function
+
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \
     subplots_adjust
@@ -28,10 +29,12 @@ from ..operations.data_operations import is_dict, is_group
 
 
 class MinimumSizeError(Exception):
+    """Thrown when the length of the Data object is less than the Graph object's _min_size property."""
     pass
 
 
 class NoDataError(Exception):
+    """Thrown when the Data object passed to a Graph object is empty or has no graph-able data."""
     pass
 
 
@@ -39,13 +42,35 @@ class Graph(object):
     """The super class all other sci_analysis graphing classes descend from.
     Classes that descend from Graph should implement the draw method at bare minimum.
 
-    Graph members are nrows, ncols, xsize, ysize, vector, xname and yname. The nrows
-    member is the number of graphs that will span vertically. The ncols member is
-    the number of graphs that will span horizontally. The xsize member is the horizontal
-    size of the graph area. The ysize member is the vertical size of the graph area.
-    The vector member the data to be plotted. The xname member is the x-axis label.
-    The yname member is the y-axis label.
+    Graph members are _nrows, _ncols, _xsize, _ysize, _data, _xname and _yname. The _nrows
+    member is the number of graphs that will span vertically. The _ncols member is
+    the number of graphs that will span horizontally. The _xsize member is the horizontal
+    size of the graph area. The _ysize member is the vertical size of the graph area.
+    The _data member the data to be plotted. The _xname member is the x-axis label.
+    The _yname member is the y-axis label.
 
+    Parameters
+    ----------
+    _nrows : int, static
+        The number of graphs that will span vertically.
+    _ncols : int, static
+        The number of graphs that will span horizontally.
+    _xsize : int, static
+        The horizontal size of the graph area.
+    _ysize : int, static
+        The vertical size of the graph area.
+    _min_size : int, static
+        The minimum required length of the data to be graphed.
+    _xname : str
+        The x-axis label.
+    _yname : str
+        The y-axis label.
+    _data : Data or list(d1, d2, ..., dn)
+        The data to graph.
+
+    Returns
+    -------
+    pass
     """
 
     _nrows = 1
@@ -59,11 +84,12 @@ class Graph(object):
         object's vector member. Sets the xname and yname arguments as the axis
         labels. The default values are "x" and "y".
 
-        :param data: The data to plot
-        :param xname: The x-axis label
-        :param yname: The y-axis label
-        :param save_to: Save the graph to the specified path
-        :return: pass
+        Parameters
+        ----------
+        args : tuple
+            The data to be graphed.
+        kwargs : dict
+            The input parameters that control graphing behavior.
         """
 
         self._xname = kwargs['xname'] if 'xname' in kwargs else 'x'
@@ -90,7 +116,6 @@ class Graph(object):
                 if len(clean) <= self._min_size:
                     raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
                 data.append(clean)
-            # if len(data) < 1:
             if not is_group(data):
                 raise NoDataError("Cannot perform test because there is no data")
             if len(data) == 1:
@@ -102,19 +127,26 @@ class Graph(object):
     def get_color(num):
         """Return a color based on the given num argument.
 
-        :param num: An integer not equal to zero that returns a corresponding color
-        :return: A color tuple calculated from the num argument
+        Parameters
+        ----------
+        num : int
+            A numeric value greater than zero that returns a corresponding color.
+
+        Returns
+        -------
+        color : tuple
+            A color tuple calculated from the num argument.
         """
-        colors = [(0, 0.3, 0.7, 1),
-                  (1, 0.1, 0.1, 1),
-                  (0, 0.7, 0.3, 1),
-                  (1, 0.5, 0, 1),
-                  (0.1, 1, 1, 1),
-                  (1, 1, 0, 1),
-                  (1, 0, 1, 1),
-                  (0.5, 0, 1, 1),
-                  (0.5, 1, 0, 1),
-                  (0, 0, 0, 1)
+        colors = [(0, 0.3, 0.7, 1),     # blue
+                  (1, 0.1, 0.1, 1),     # red
+                  (0, 0.7, 0.3, 1),     # green
+                  (1, 0.5, 0, 1),       # orange
+                  (0.1, 1, 1, 1),       # cyan
+                  (1, 1, 0, 1),         # yellow
+                  (1, 0, 1, 1),         # magenta
+                  (0.5, 0, 1, 1),       # purple
+                  (0.5, 1, 0, 1),       # light green
+                  (0, 0, 0, 1)          # black
                   ]
         desired_color = []
         if num < 0:
@@ -130,7 +162,9 @@ class Graph(object):
             return selected
 
     def draw(self):
-        """Prepares and displays the graph based on the set class members."""
+        """
+        Prepares and displays the graph based on the set class members.
+        """
         pass
 
 
@@ -143,23 +177,24 @@ class GraphHisto(Graph):
     box plot.
     """
 
-    # nrows = 2
-    # ncols = 1
     _xsize = 7
     _ysize = 6
 
     def __init__(self, data, **kwargs):
         """GraphHisto constructor.
 
-        :param data: The data to be graphed. This arg sets the vector member.
-        :param bins: The number of histogram bins to draw. This arg sets the bins member.
-        :param name: The optional x-axis label.
-        :param distribution: The theoretical distribution to fit.
-        :param boxplot: Toggle the display of the optional boxplot.
-        :param cdf: Toggle the display of the optional cumulative density function plot.
-        :param violin_plot: Add a distribution density overlay to the boxplot.
-        :param fit: Toggle the display of the best fit line for the specified distribution.
-        :param save_to: Save the graph to the specified path
+        :param data: The data to be graphed.
+        :param _bins: The number of histogram bins to draw. This arg sets the bins member.
+        :param _name: The optional x-axis label.
+        :param _distribution: The theoretical distribution to fit.
+        :param _box_plot: Toggle the display of the optional boxplot.
+        :param _cdf: Toggle the display of the optional cumulative density function plot.
+        :param _fit: Toggle the display of the best fit line for the specified distribution.
+        :param _mean: The mean to be displayed on the graph title.
+        :param _std: The standard deviation to be displayed on the graph title.
+        :param _sample: Sets x-bar and s if true, else mu and sigma for displaying on the graph title.
+        :param _title: The title of the graph.
+        :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._bins = kwargs['bins'] if 'bins' in kwargs else 20
@@ -190,6 +225,17 @@ class GraphHisto(Graph):
         #    _cdf = cdf
 
     def fit_distro(self):
+        """
+        Calculate the fit points for a specified distribution.
+
+        Returns
+        -------
+        fit_parms : tuple
+            First value - The x-axis points
+            Second value - The pdf y-axis points
+            Third value - The cdf y-axis points
+
+        """
         distro_class = getattr(__import__('scipy.stats',
                                           globals(),
                                           locals(),
@@ -201,6 +247,15 @@ class GraphHisto(Graph):
         return distro, distro_pdf, distro_cdf
 
     def calc_cdf(self):
+        """
+        Calcuate the cdf points.
+
+        Returns
+        -------
+        coordinates : tuple
+            First value - The cdf x-axis points
+            Second value - The cdf y-axis points
+        """
         x_sorted_vector = sort(self._data)
         if len(x_sorted_vector) == 0:
             return 0, 0
@@ -210,6 +265,13 @@ class GraphHisto(Graph):
         return x_cdf, y_cdf
 
     def draw(self):
+        """
+        Draws the histogram based on the set parameters.
+
+        Returns
+        -------
+        pass
+        """
         # Setup the grid variables
         histo_span = 3
         box_plot_span = 1
@@ -251,7 +313,6 @@ class GraphHisto(Graph):
         # Draw the cdf
         if self._cdf:
             x_cdf, y_cdf = self.calc_cdf()
-            # ax_cdf = f.add_subplot(gs[0])
             ax_cdf = subplot(gs[0])
             ax_cdf.plot(x_cdf, y_cdf, 'k-')
             ax_cdf.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
@@ -267,10 +328,8 @@ class GraphHisto(Graph):
         # Draw the box plot
         if self._box_plot:
             if self._cdf:
-                # ax_box = f.add_subplot(gs[len(h_ratios)-2], sharex=ax_cdf)
                 ax_box = subplot(gs[len(h_ratios) - 2], sharex=ax_cdf)
             else:
-                # ax_box = f.add_subplot(gs[len(h_ratios)-2])
                 ax_box = subplot(gs[len(h_ratios) - 2])
             # if GraphPreferences.distribution['violin']:
             bp = ax_box.boxplot(self._data, vert=False, showmeans=True)
@@ -282,10 +341,8 @@ class GraphHisto(Graph):
             # if GraphPreferences.distribution['boxplot']:
             yticks([])
             p.append(ax_box.get_xticklabels())
-            # ax_hist = f.add_subplot(gs[len(h_ratios)-1], sharex=ax_box)
             ax_hist = subplot(gs[len(h_ratios) - 1], sharex=ax_box)
         else:
-            # ax_hist = f.add_subplot(gs[len(h_ratios)-1])
             ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
@@ -300,7 +357,6 @@ class GraphHisto(Graph):
         # set the labels and display the figure
         ylabel(self._yname)
         xlabel(self._xname)
-        # show()
         if self._save_to:
             savefig(self._save_to)
             close(f)
@@ -329,9 +385,12 @@ class GraphScatter(Graph):
 
         :param xdata: The x-axis data.
         :param ydata: The y-axis data.
-        :param xname: The optional x-axis label.
-        :param yname: The optional y-axis label.
-        :param fit: Display the optional line fit.
+        :param _fit: Display the optional line fit.
+        :param _points: Display the scatter points.
+        :param _contours: Display the density contours
+        :param _boxplot_borders: Display the boxplot borders
+        :param _title: The title of the graph.
+        :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._fit = kwargs['fit'] if 'fit' in kwargs else True
@@ -349,6 +408,17 @@ class GraphScatter(Graph):
         super(GraphScatter, self).__init__(xdata, ydata, xname=xname, yname=yname, intersect=True)
 
     def calc_contours(self):
+        """
+        Calculates the density contours.
+
+        Returns
+        -------
+        contour_parms : tuple
+            First value - x-axis points
+            Second value - y-axis points
+            Third value - z-axis points
+            Fourth value - The contour levels
+        """
         xmin = self._data[0].min()
         xmax = self._data[0].max()
         ymin = self._data[1].min()
@@ -362,22 +432,37 @@ class GraphScatter(Graph):
         return _x, _y, _z, arange(_z.min(), _z.max(), (_z.max() - _z.min()) / self._contour_props[0])
 
     def calc_fit(self):
+        """
+        Calculates the best fit line using sum of squares.
+
+        Returns
+        -------
+        fit_coordinates : list
+            A list of the min and max fit points.
+        """
         x = self._data[0]
         y = self._data[1]
         p = polyfit(x, y, 1, full=True)
         fit = polyval(p[0], x)
         index = argsort(x)
         return [x[index[0]], x[index[-1]]], [fit[index[0]], fit[index[-1]]]
-        # return polyval(p[0], x)
 
     def draw(self):
+        """
+        Draws the scatter plot based on the set parameters.
+
+        Returns
+        -------
+        pass
+        """
+
+        # Setup the grid variables
         x = self._data[0]
         y = self._data[1]
         h_ratio = [1, 1]
         w_ratio = [1, 1]
-        # borders = self._histogram_borders or self._boxplot_borders
 
-        # if borders:
+        # Setup the figure and gridspec
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
             self._xsize, self._ysize = 8.5, 7.5
@@ -387,45 +472,42 @@ class GraphScatter(Graph):
             main_plot = 0
         f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
-        # if borders:
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
         else:
             gs = GridSpec(self._nrows, self._ncols)
-        # ax2 = f.add_subplot(gs[main_plot])
+
+        # Draw the main graph
         ax2 = subplot(gs[main_plot])
+
+        # Draw the points
         if self._points:
-            # grid(ax2.plot(x, y, pointstyle, zorder=1))
             if len(x) == 4:
                 ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.6, zorder=1)
             else:
                 ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.6, zorder=1)
-            # ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.5, zorder=1)
+
+        # Draw the contours
         if self._contours:
             x_prime, y_prime, z, levels = self.calc_contours()
             ax2.contour(x_prime, y_prime, z, levels, linewidths=self._contour_props[1], nchunk=16,
                         extend='both', zorder=2)
+
+        # Draw the fit line
         if self._fit:
             fit_x, fit_y = self.calc_fit()
             ax2.plot(fit_x, fit_y, 'r--', linewidth=2, zorder=3)
-            # fit_line = self.calc_fit()
-            # ax2.plot([x[0], x[-1]], [fit_line[0], fit_line[-1]], 'r--', linewidth=2, zorder=3)
-            # ax2.plot(x, fit_line, color='red', linestyle='dashed', linewidth=2, zorder=3)
+
+        # Draw the grid lines and labels
         ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         xlabel(self._xname)
         ylabel(self._yname)
-        # if borders:
+
+        # Draw the boxplot borders
         if self._boxplot_borders:
-            # ax1 = f.add_subplot(gs[0], sharex=ax2)
-            # ax3 = f.add_subplot(gs[3], sharey=ax2)
             ax1 = subplot(gs[0], sharex=ax2)
             ax3 = subplot(gs[3], sharey=ax2)
-            # if self._histogram_borders:
-            #     ax1.hist(x, bins=self._histogram_props[0], color=self._histogram_props[1], normed=True)
-            #     ax3.hist(y, bins=self._histogram_props[0], color=self._histogram_props[1],
-            #              normed=True, orientation='horizontal')
-            # elif self._boxplot_borders:
             bpx = ax1.boxplot(x, vert=False, showmeans=True)
             bpy = ax3.boxplot(y, vert=True, showmeans=True)
             setp(bpx['boxes'], color='k')
@@ -440,6 +522,8 @@ class GraphScatter(Graph):
             ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()],
                  visible=False)
+
+        # Save the figure to disk or display
         if self._save_to:
             savefig(self._save_to)
             close(f)
@@ -469,11 +553,10 @@ class GraphBoxplot(Graph):
         """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are
         graphed in random order instead of the provided order.
 
-        :param vectors: A list of lists or dict of lists of the data to graph.
         :param groups: An optional list of boxplot labels. The order should match the order in vectors.
-        :param xname: The optional x-axis label for the boxplots.
-        :param yname: The optional y-axis label.
         :param nqp: Display the optional probability plot.
+        :param _title: The title of the graph.
+        :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         xname = kwargs['xname'] if 'xname' in kwargs else 'Categories'
@@ -495,7 +578,6 @@ class GraphBoxplot(Graph):
                 groups.append(g)
             self._groups = groups
         else:
-            # self._groups = kwargs['groups'] if 'groups' in kwargs else list(range(1, len(args) + 1))
             if 'groups' in kwargs:
                 if kwargs['groups']:
                     self._groups = kwargs['groups']
@@ -507,6 +589,15 @@ class GraphBoxplot(Graph):
         super(GraphBoxplot, self).__init__(*data, xname=xname, yname=yname, save_to=self._save_to)
 
     def draw(self):
+        """
+        Draws the boxplots based on the set parameters.
+
+        Returns
+        -------
+        pass
+        """
+
+        # Create the quantile plot arrays
         prob = list()
         if self._nqp:
             new_groups = list()
@@ -514,24 +605,23 @@ class GraphBoxplot(Graph):
                 prob.append(probplot(self._data))
             else:
                 for i, d in enumerate(self._data):
-                    # if len(d) > 0:
                     if d is not None:
                         prob.append(probplot(d))
                         new_groups.append(self._groups[i])
                 self._groups = new_groups
-        # self._data = [d for d in self._data if len(d) > 0]
         if is_group(self._data):
             self._data = [d for d in self._data if d is not None]
-        # prob = [probplot(d) for d in self._data] if self._nqp else list()
+
+        # Create the figure and gridspec
         if len(prob) > 0:
             self._xsize *= 2
-            # title = 'Oneway and Normal Quantile Plot'
         else:
             self._ncols = 1
-            # title = 'Oneway'
         f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
         gs = GridSpec(self._nrows, self._ncols, wspace=0)
+
+        # Draw the boxplots
         ax1 = subplot(gs[0])
         bp = ax1.boxplot(self._data, showmeans=True, labels=self._groups)
         setp(bp['boxes'], color='k')
@@ -548,9 +638,10 @@ class GraphBoxplot(Graph):
         subplots_adjust(bottom=0.2)
         ylabel(self._yname)
         xlabel(self._xname)
+
+        # Draw the normal quantile plot
         if len(prob) > 0:
             ax2 = subplot(gs[1], sharey=ax1)
-            # grid(which='major')
             for i, g in enumerate(prob):
                 osm = g[0][0]
                 osr = g[0][1]
@@ -563,6 +654,8 @@ class GraphBoxplot(Graph):
             ax2.legend(loc='best')
             xlabel("Quantiles")
             setp(ax2.get_yticklabels(), visible=False)
+
+        # Save the figure to disk or display
         if self._save_to:
             savefig(self._save_to)
             close(f)

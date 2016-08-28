@@ -2,7 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
-from analysis.analysis import KSTest, MinimumSizeError, NoDataError
+from ..analysis.analysis import KSTest, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):

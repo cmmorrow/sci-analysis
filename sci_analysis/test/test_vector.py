@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import scipy.stats as st
-from data.data import Vector, UnequalVectorLengthError
+from ..data.data import Vector, UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):
