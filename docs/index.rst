@@ -85,7 +85,7 @@ Now, sci_analysis should be ready to use. Try the following code:
 
 A histogram and box plot of the data should appear, as well as printed output similar to that below:
 
-.. image:: ../img/histo1.png
+.. image:: _images/histo1.png
 
 ::
 
@@ -154,7 +154,7 @@ If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an
     example2 = [0.23, 0.27, 0.29, "nan", 0.33, 0.35, 0.39, 0.42, "nan", 0.46, 0.48, 0.49, "nan", 0.5, 0.58]
     analyze(example1, example2)
 
-.. image:: ../img/corr1.png
+.. image:: _images/corr1.png
 
 ::
     
@@ -197,7 +197,7 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
     group_d = st.norm.rvs(size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
     
-.. image:: ../img/comp4.png
+.. image:: _images/comp4.png
 
 ::
     
@@ -239,7 +239,7 @@ In the example above, sci_analysis is telling us the four groups are normally di
     group_d = st.norm.rvs(0.0, 1, size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
 
-.. image:: ../img/comp5.png
+.. image:: _images/comp5.png
 
 ::
     
@@ -283,7 +283,7 @@ In another example, let's compare groups that have different distibutions and di
     group_d = st.norm.rvs(0.0, 1, size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
 
-.. image:: ../img/comp6.png
+.. image:: _images/comp6.png
 
 ::
     
@@ -329,7 +329,7 @@ Alternatively, the above example can be repeated where the groups are in the spe
     group_d = st.norm.rvs(0.0, 1, size=40)
     analyze([group_a, group_b, group_c, group_d], groups=['Group A', 'Group B', 'Group C', 'Group D'])
 
-.. image:: ../img/comp7.png
+.. image:: _images/comp7.png
 
 ::
 
@@ -387,7 +387,7 @@ This will create a table (pandas DataFrame object) with 6 columns and an index w
             name='Column One', 
             title='Distribution from pandas')
 
-.. image:: ../img/histo2.png
+.. image:: _images/histo2.png
 
 ::
 
@@ -426,7 +426,7 @@ The following command can be used to analyze the correlation between columns 'On
             yname='Column Three', 
             title='Bivariate from pandas')
 
-.. image:: ../img/corr2.png
+.. image:: _images/corr2.png
 
 ::
 
@@ -467,7 +467,7 @@ Let's start with an example. The following code will perform a Oneway analysis u
              name='Column Two',
              title='Oneway from pandas')
 
-.. image:: ../img/comp8.png
+.. image:: _images/comp8.png
 
 ::
 
@@ -517,7 +517,7 @@ One thing to note is that the groups argument was used to explicitly define the 
              name='Column Two',
              title='Oneway from pandas')
 
-.. image:: ../img/corr9.png
+.. image:: _images/corr9.png
 
 ::
 
@@ -566,7 +566,7 @@ Let's consider an example where the data is grouped by the 'Month' column instea
             name='Column Two',
             title='Oneway from pandas')
 
-.. image:: ../img/corr10.png
+.. image:: _images/corr10.png
 
 ::
 
@@ -617,7 +617,7 @@ In this example, a for loop is used to build the data and month lists. This meth
             name='Column Two',
             title='Oneway from pandas')
 
-.. image:: ../img/comp11.png
+.. image:: _images/comp11.png
 
 ::
 
@@ -668,7 +668,7 @@ In the last example, the months list was used to specify the order the box plots
             name='Column Two',
             title='Oneway from pandas')
 
-.. image:: ../img/comp12.png
+.. image:: _images/comp12.png
 
 ::
 
@@ -736,7 +736,7 @@ Using the new function is simple. The same techniques from previous examples are
             name='Column Two',
             title='Oneway from pandas')
 
-.. image:: ../img/comp13.png
+.. image:: _images/comp13.png
 
 ::
 
