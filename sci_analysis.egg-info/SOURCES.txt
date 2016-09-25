@@ -1,4 +1,5 @@
 README
+setup.cfg
 setup.py
 sci_analysis/__init__.py
 sci_analysis.egg-info/PKG-INFO
@@ -12,8 +13,6 @@ sci_analysis/data/__init__.py
 sci_analysis/data/data.py
 sci_analysis/graphs/__init__.py
 sci_analysis/graphs/graph.py
-sci_analysis/old/__init__.py
-sci_analysis/old/scianalysis.py
 sci_analysis/operations/__init__.py
 sci_analysis/operations/data_operations.py
 sci_analysis/preferences/__init__.py

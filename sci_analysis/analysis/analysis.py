@@ -897,19 +897,24 @@ class GroupStatistics(GroupAnalysis):
 
 
 def analyze(*data, **kwargs):
-    """Magic method for performing quick data analysis.
+    """
+    Automatically performs a statistical analysis based on the input arguments.
 
     Parameters
     ----------
-    xdata: A Vector, numPy Array or sequence like object
-    ydata: An optional secondary Vector, numPy Array or sequence object
-    groups: A list of group names. The box plots will be graphed in order of groups
-    name: The response variable label
-    xname: The predictor variable (x-axis) label
-    yname: The response variable (y-axis) label
-    alpha: The significance level of the test
-    categories: The x-axis label when performing a group analysis
-    :return: A tuple of xdata and ydata
+    xdata : array-like or list(array-like) or dict(array-like)
+        The primary set of data.
+    ydata : array-like
+        The response data set.
+    groups : array-like
+        The group names used for a oneway analysis.
+
+    Notes
+    -----
+    xdata : array-like, ydata : None - Distribution
+    xdata : array-like, ydata : array-like -- Bivariate
+    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
+
     """
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
