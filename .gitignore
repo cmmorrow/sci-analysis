@@ -78,10 +78,24 @@ dist/sci_analysis-1.3.4.tar.gz
 
 *.pyc
 
-*.png
-
 *.xml
 
 sci_analysis/test/.coverage
 
 *.pyc
+
+.tox/*
+
+sci_analysis/test/images/*.png
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.2.tar.gz
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.2.tar.gz

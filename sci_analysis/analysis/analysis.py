@@ -29,16 +29,18 @@ from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
 from numpy import mean, std, median, amin, amax, percentile
 
 # Local imports
-from operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
-from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
-from data.data import assign
+from ..operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
+from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+from ..data.data import assign
 
 
 class MinimumSizeError(Exception):
+    """Thrown when the length of the Data object is less than the Graph object's _min_size property."""
     pass
 
 
 class NoDataError(Exception):
+    """Thrown when the Data object passed to a Graph object is empty or has no graph-able data."""
     pass
 
 
@@ -895,17 +897,24 @@ class GroupStatistics(GroupAnalysis):
 
 
 def analyze(*data, **kwargs):
-    """Magic method for performing quick data analysis.
+    """
+    Automatically performs a statistical analysis based on the input arguments.
 
-    :param xdata: A Vector, numPy Array or sequence like object
-    :param ydata: An optional secondary Vector, numPy Array or sequence object
-    :param groups: A list of group names. The box plots will be graphed in order of groups
-    :param name: The response variable label
-    :param xname: The predictor variable (x-axis) label
-    :param yname: The response variable (y-axis) label
-    :param alpha: The significance level of the test
-    :param categories: The x-axis label when performing a group analysis
-    :return: A tuple of xdata and ydata
+    Parameters
+    ----------
+    xdata : array-like or list(array-like) or dict(array-like)
+        The primary set of data.
+    ydata : array-like
+        The response data set.
+    groups : array-like
+        The group names used for a oneway analysis.
+
+    Notes
+    -----
+    xdata : array-like, ydata : None - Distribution
+    xdata : array-like, ydata : array-like -- Bivariate
+    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
+
     """
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05

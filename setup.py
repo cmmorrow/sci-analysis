@@ -1,10 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='sci_analysis',
-    version='1.4.1',
-    packages=[
-	'sci_analysis'],
+    version='1.4.4',
+    packages=find_packages(),
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
     author='chris morrow',
@@ -29,5 +28,5 @@ setup(
     keywords='statistics data EDA graphing visualization analysis scientific',
     description='A light weight python data exploration and analysis tool',
     install_requires=['numpy', 'scipy', 'matplotlib', 'six'],
-    test_suite='nosetests'
+    test_suite='nose.collector'
 )

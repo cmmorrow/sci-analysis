@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from graphs.graph import GraphBoxplot, MinimumSizeError, NoDataError
+from ..graphs.graph import GraphBoxplot, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
