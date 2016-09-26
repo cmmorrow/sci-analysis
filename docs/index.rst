@@ -124,7 +124,7 @@ Let's examine the ``analyze`` function in more detail. Here's the signature for 
 .. py:function:: analyze(*data, **kwargs)
 
     Automatically performs a statistical analysis based on the input arguments.
-
+    
     Parameters
     ----------
     xdata : array-like or list(array-like) or dict(array-like)
@@ -134,11 +134,6 @@ Let's examine the ``analyze`` function in more detail. Here's the signature for 
     groups : array-like
         The group names used for a oneway analysis.
 
-    Notes
-    -----
-    xdata : array-like, ydata : None - Distribution
-    xdata : array-like, ydata : array-like -- Bivariate
-    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
 
 ``analyze`` will detect the desired type of data analysis to perform based on whether the ``ydata`` argument is supplied, and whether the ``xdata`` argument is a two-dimensional array-like object. 
 
