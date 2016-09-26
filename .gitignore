@@ -87,3 +87,9 @@ sci_analysis/test/.coverage
 .tox/*
 
 sci_analysis/test/images/*.png
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.1.tar.gz
+
+dist/sci_analysis-1.4.2.tar.gz

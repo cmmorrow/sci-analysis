@@ -85,7 +85,7 @@ Now, sci_analysis should be ready to use. Try the following code:
 
 A histogram and box plot of the data should appear, as well as printed output similar to that below:
 
-.. image:: _images/histo1.png
+.. image:: ../img/histo1.png
 
 ::
 
