@@ -58,22 +58,22 @@ From the python interpreter or in the first cell of a Jupyter notebook, type:
 
 ::
     
-    import sci_analysis as a
     import numpy as np
     import scipy.stats as st
+    from sci_analysis import analyze
 
 .. note:: The package name is ``sci_analysis`` with an underscore.
 
-This will tell python to import sci_analysis to your project as the object ``a``.
+This will tell python to import the sci_analysis function ``analyze``.
 
 If you are using the Jupyter notebook, you may also need to use the following code instead to enable inline plots:
 
 ::
     
     %matplotlib inline
-    import sci_analysis as a
     import numpy as np
     import scipy.stats as st
+    from sci_analysis import analyze
 
 Now, sci_analysis should be ready to use. Try the following code:
 
