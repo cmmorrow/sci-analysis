@@ -6,6 +6,7 @@ python:
 install: 
 #  - "pip install numpy"
 #  - "pip install scipy"
+  - "pip install pandas"
   - "pip install matplotlib"
   - "pip install six"
   - "pip install pytest"
