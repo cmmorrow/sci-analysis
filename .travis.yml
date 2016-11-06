@@ -5,6 +5,7 @@ python:
   - "3.5"
 before_install:
   - "sudo apt-get install libatlas-base-dev gfortran"
+  - "mkdir $HOME/.matplotlib"
   - "echo 'backend: TkAgg' > $HOME/.matplotlib/matplotlibrc"
 # command to install dependencies
 install: 
