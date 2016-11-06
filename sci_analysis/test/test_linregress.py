@@ -47,18 +47,29 @@ class MyTestCase(unittest.TestCase):
                                                 display=False).intercept, -0.0397, delta=0.0001,
                                msg="FAIL: Linear Regression intercept")
 
-    def test_354_LinRegress_no_corr_r2(self):
-        """Test the Linear Regression R^2"""
+    def test_354_LinRegress_no_corr_r(self):
+        """Test the Linear Regression r"""
         np.random.seed(987654321)
         alpha = 0.05
         x_input_array = st.norm.rvs(size=200)
         y_input_array = st.norm.rvs(size=200)
         self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
                                                 alpha=alpha,
-                                                display=False).r_squared, -0.1029, delta=0.0001,
-                               msg="FAIL: Linear Regression R^2")
+                                                display=False).r_value, -0.1029, delta=0.0001,
+                               msg="FAIL: Linear Regression r")
 
-    def test_355_LinRegress_no_corr_std_err(self):
+    def test_355_LinRegress_no_corr_r2(self):
+        """Test the Linear Regression r^2"""
+        np.random.seed(987654321)
+        alpha = 0.05
+        x_input_array = st.norm.rvs(size=200)
+        y_input_array = st.norm.rvs(size=200)
+        self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
+                                                alpha=alpha,
+                                                display=False).r_squared, 0.0105, delta=0.0001,
+                               msg="FAIL: Linear Regression r^2")
+
+    def test_356_LinRegress_no_corr_std_err(self):
         """Test the Linear Regression std err"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -69,7 +80,7 @@ class MyTestCase(unittest.TestCase):
                                                 display=False).std_err, 0.0666, delta=0.0001,
                                msg="FAIL: Linear Regression std err")
 
-    def test_356_LinRegress_no_corr_just_above_min_size(self):
+    def test_357_LinRegress_no_corr_just_above_min_size(self):
         """Test the Linear Regression class for uncorrelated data just above minimum size"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -78,7 +89,7 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value,
                         "FAIL: Linear Regression just above minimum size")
 
-    def test_357_LinRegress_no_corr_at_min_size(self):
+    def test_358_LinRegress_no_corr_at_min_size(self):
         """Test the Linear Regression class for uncorrelated data at minimum size"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -88,7 +99,7 @@ class MyTestCase(unittest.TestCase):
                                                                      alpha=alpha,
                                                                      display=False).p_value)
 
-    def test_358_LinRegress_no_corr_unequal_vectors(self):
+    def test_359_LinRegress_no_corr_unequal_vectors(self):
         """Test the Linear Regression class for uncorrelated data with unequal vectors"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -98,7 +109,7 @@ class MyTestCase(unittest.TestCase):
                                                                              alpha=alpha,
                                                                              display=False).p_value)
 
-    def test_359_LinRegress_no_corr_empty_vector(self):
+    def test_360_LinRegress_no_corr_empty_vector(self):
         """Test the Linear Regression class for uncorrelated data with an empty vector"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -108,7 +119,7 @@ class MyTestCase(unittest.TestCase):
                                                                 alpha=alpha,
                                                                 display=False).p_value)
 
-    def test_360_LinRegress_no_corr_two_empty_vectors(self):
+    def test_361_LinRegress_no_corr_two_empty_vectors(self):
         """Test the Linear Regression class for uncorrelated data with two empty vectors"""
         alpha = 0.05
         x_input_array = [float("nan"), "two", "three", "four", float("nan")]
@@ -117,7 +128,7 @@ class MyTestCase(unittest.TestCase):
                                                                 alpha=alpha,
                                                                 display=False).p_value)
 
-    def test_361_LinRegress_no_corr_statistic(self):
+    def test_362_LinRegress_no_corr_statistic(self):
         """Test the Linear Regression R^2"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -125,7 +136,7 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(size=200)
         self.assertAlmostEqual(LinearRegression(x_input_array, y_input_array,
                                                 alpha=alpha,
-                                                display=False).statistic, -0.1029, delta=0.0001,
+                                                display=False).statistic, 0.0105, delta=0.0001,
                                msg="FAIL: Linear Regression statistic")
 
 

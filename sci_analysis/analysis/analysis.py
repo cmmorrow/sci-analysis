@@ -551,12 +551,13 @@ class LinearRegression(Comparison):
         super(LinearRegression, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
-        slope, intercept, r2, p_value, std_err = linregress(self.xdata, self.ydata)
+        slope, intercept, r, p_value, std_err = linregress(self.xdata, self.ydata)
         count = len(self.xdata)
         self._results.update({'Count': count,
                               'Slope': slope,
                               'Intercept': intercept,
-                              'R^2': r2,
+                              'r': r,
+                              'r^2': r ** 2,
                               'Std Err': std_err,
                               'p value': p_value})
 
@@ -570,11 +571,15 @@ class LinearRegression(Comparison):
 
     @property
     def r_squared(self):
-        return self._results['R^2']
+        return self._results['r^2']
+
+    @property
+    def r_value(self):
+        return self._results['r']
 
     @property
     def statistic(self):
-        return self._results['R^2']
+        return self._results['r^2']
 
     @property
     def std_err(self):
@@ -583,7 +588,7 @@ class LinearRegression(Comparison):
     def __str__(self):
         """If the result is greater than the significance, print the null hypothesis, otherwise,
         the alternate hypothesis"""
-        return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'R^2', 'Std Err', 'p value'],
+        return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'r', 'r^2', 'Std Err', 'p value'],
                            no_format=['Count'])
 
 
