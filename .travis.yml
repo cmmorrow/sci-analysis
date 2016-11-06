@@ -10,4 +10,4 @@ install:
   - "pip install six"
   - "pip install pytest"
 # command to run tests
-script: pytest
+script: py.test
