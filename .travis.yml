@@ -4,10 +4,10 @@ python:
   - "3.5"
 # command to install dependencies
 install: 
-  - "pip install numpy"
-  - "pip install scipy"
+#  - "pip install numpy"
+#  - "pip install scipy"
   - "pip install matplotlib"
   - "pip install six"
-  - "pip install nose"
+  - "pip install pytest"
 # command to run tests
 script: pytest
