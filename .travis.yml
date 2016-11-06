@@ -1,7 +1,11 @@
+sudo: required
 language: python
 python:
-  - "2.7_with_system_site_packages"
+  - "2.7"
   - "3.5"
+before_install:
+  - "sudo apt-get install libatlas-base-dev gfortran"
+  - "echo 'backend: TkAgg' > $HOME/.matplotlib/matplotlibrc"
 # command to install dependencies
 install: 
 #  - "pip install numpy"
