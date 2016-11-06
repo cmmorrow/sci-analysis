@@ -5,7 +5,7 @@ python:
 # command to install dependencies
 install: 
 #  - "pip install numpy"
-#  - "pip install scipy"
+  - "pip install scipy"
   - "pip install pandas"
   - "pip install matplotlib"
   - "pip install six"
