@@ -1,6 +1,6 @@
 language: python
 python:
-  - "2.7"
+  - "2.7_with_system_site_packages"
   - "3.5"
 # command to install dependencies
 install: 
@@ -9,4 +9,4 @@ install:
   - "pip install six"
   - "pip install nose"
 # command to run tests
-script: nose
+script: nosetests
