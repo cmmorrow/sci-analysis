@@ -4,7 +4,9 @@ python:
   - "2.7"
   - "3.5"
 before_install:
-  - "export DISPLAY=:0"
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - "sleep 3"
   - "sudo apt-get install libatlas-base-dev gfortran"
   - "mkdir $HOME/.matplotlib"
   - "echo 'backend: TkAgg' > $HOME/.matplotlib/matplotlibrc"
