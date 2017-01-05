@@ -7,6 +7,8 @@ Current Version
 ===============
 
 1.4 --- Released August 19, 2016
+.. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=master
+    :target: https://travis-ci.org/cmmorrow/sci-analysis
 
 What is sci-analysis?
 =====================
