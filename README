@@ -8,6 +8,12 @@ Current Version
 
 1.4 --- Released August 19, 2016
 
+.. image:: https://img.shields.io/pypi/v/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
+.. image:: https://img.shields.io/pypi/format/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
+.. image:: https://img.shields.io/pypi/pyversions/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
+.. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=master
+    :target: https://travis-ci.org/cmmorrow/sci-analysis
+
 What is sci-analysis?
 =====================
 

@@ -137,16 +137,16 @@ class Graph(object):
         color : tuple
             A color tuple calculated from the num argument.
         """
-        colors = [(0, 0.3, 0.7, 1),     # blue
-                  (1, 0.1, 0.1, 1),     # red
-                  (0, 0.7, 0.3, 1),     # green
-                  (1, 0.5, 0, 1),       # orange
-                  (0.1, 1, 1, 1),       # cyan
-                  (1, 1, 0, 1),         # yellow
-                  (1, 0, 1, 1),         # magenta
-                  (0.5, 0, 1, 1),       # purple
-                  (0.5, 1, 0, 1),       # light green
-                  (0, 0, 0, 1)          # black
+        colors = [(0.0, 0.3, 0.7, 1.0),     # blue
+                  (1.0, 0.1, 0.1, 1.0),     # red
+                  (0.0, 0.7, 0.3, 1.0),     # green
+                  (1.0, 0.5, 0.0, 1.0),     # orange
+                  (0.1, 1.0, 1.0, 1.0),     # cyan
+                  (1.0, 1.0, 0.0, 1.0),     # yellow
+                  (1.0, 0.0, 1.0, 1.0),     # magenta
+                  (0.5, 0.0, 1.0, 1.0),     # purple
+                  (0.5, 1.0, 0.0, 1.0),     # light green
+                  (0.0, 0.0, 0.0, 1.0)      # black
                   ]
         desired_color = []
         if num < 0:
@@ -165,7 +165,7 @@ class Graph(object):
         """
         Prepares and displays the graph based on the set class members.
         """
-        pass
+        raise NotImplementedError
 
 
 class GraphHisto(Graph):
@@ -398,7 +398,7 @@ class GraphScatter(Graph):
         self._contours = kwargs['contours'] if 'contours' in kwargs else False
         self._contour_props = (31, 1.1)
         # self.contour_props = tuple({'num_of_contours': 31, 'contour_width': 1.1}.values())
-        self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
+        # self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
         # self._histogram_borders = kwargs['histogram_borders'] if 'histogram_borders' in kwargs else False
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
         self._title = kwargs['title'] if 'title' in kwargs else 'Bivariate'
@@ -470,6 +470,8 @@ class GraphScatter(Graph):
             main_plot = 2
         else:
             main_plot = 0
+
+        # Setup the figure
         f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
         if self._boxplot_borders:
@@ -482,6 +484,7 @@ class GraphScatter(Graph):
 
         # Draw the points
         if self._points:
+            # This case was added to cover a matplotlib issue where 4 arguments get interpreted as color
             if len(x) == 4:
                 ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.6, zorder=1)
             else:

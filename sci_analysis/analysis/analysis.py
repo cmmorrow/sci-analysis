@@ -102,7 +102,7 @@ class Analysis(object):
 
         Override this method to perform a specific analysis or calculation.
         """
-        pass
+        raise NotImplementedError
 
     def output(self, name, order=list(), no_format=list(), precision=4):
         """Print the results of the test in a user-friendly format"""
@@ -182,6 +182,9 @@ class GroupAnalysis(Analysis):
             '\n'.join(grid),
             " "
         ))
+
+    def run(self):
+        raise NotImplementedError
 
 
 class Test(Analysis):
@@ -281,6 +284,9 @@ class Test(Analysis):
 
         return "\n".join(report)
 
+    def run(self):
+        raise NotImplementedError
+
 
 class Comparison(Analysis):
     """Perform a test on two independent vectors of equal length."""
@@ -375,6 +381,9 @@ class Comparison(Analysis):
             report.append(" ")
 
         return "\n".join(report)
+
+    def run(self):
+        raise NotImplementedError
 
 
 class NormTest(Test):
@@ -907,12 +916,17 @@ def analyze(*data, **kwargs):
 
     Parameters
     ----------
-    xdata : array-like or list(array-like) or dict(array-like)
+    xdata : array-like
         The primary set of data.
     ydata : array-like
         The response data set.
     groups : array-like
         The group names used for a oneway analysis.
+
+    Returns
+    -------
+    xdata, ydata : tuple(array-like, array-like)
+        The input xdata and ydata.
 
     Notes
     -----

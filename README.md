@@ -4,6 +4,11 @@ An easy to use python based data exploration and analysis tool by Chris Morrow
 ## Current Version:
 1.4 --- Released August 19, 2016
 
+[![PyPI](https://img.shields.io/pypi/v/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
+[![PyPI](https://img.shields.io/pypi/format/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
+[![PyPI](https://img.shields.io/pypi/pyversions/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
+[![Build Status](https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=master)](https://travis-ci.org/cmmorrow/sci-analysis)
+
 ### What is sci-analysis?
 sci-analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as how the data is distributed.
 
