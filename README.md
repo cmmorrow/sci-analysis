@@ -3,6 +3,7 @@ An easy to use python based data exploration and analysis tool by Chris Morrow
 
 ## Current Version:
 1.4 --- Released August 19, 2016
+
 [![PyPI](https://img.shields.io/pypi/v/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
 [![PyPI](https://img.shields.io/pypi/format/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
 [![PyPI](https://img.shields.io/pypi/pyversions/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
