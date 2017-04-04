@@ -5,11 +5,11 @@ Functions:
     is_data: test if the passed array_like argument is a sci_analysis Data object.
 """
 from __future__ import absolute_import
-# Import from numpy
-import numpy as np
+# Import packages
+import pandas as pd
 
 # Import from local
-from ..operations.data_operations import is_array, is_dict, is_iterable, to_float, flatten
+from ..operations.data_operations import is_dict, is_iterable, flatten
 
 
 def assign(obj, other=None):
@@ -65,6 +65,23 @@ def is_data(obj):
     return isinstance(obj, Data)
 
 
+def is_numeric(obj):
+    """
+    Test if the passed array_like argument is a sci_analysis Numeric object.
+
+    Parameters
+    ----------
+    obj : object
+        The input object.
+
+    Returns
+    -------
+    test result : bool
+        The test result of whether seq is a sci_analysis Numeric object or not.
+    """
+    return isinstance(obj, Numeric)
+
+
 class EmptyVectorError(Exception):
     """
     Exception raised when the length of a Vector object is 0.
@@ -103,17 +120,6 @@ class Data(object):
         """
         self._values = v
         self._name = n
-
-    def data_prep(self):
-        """
-        Converts the values of _name to conform to the Data object standards.
-
-        Returns
-        -------
-        data : np.array
-            The enclosed data represented as a numpy array.
-        """
-        return self.data
 
     def is_empty(self):
         """
@@ -212,119 +218,64 @@ class Data(object):
         return self._values.__iter__()
 
 
-class Vector(Data):
-    """
-    The sci_analysis representation of continuous, numeric data.
-    """
+class Numeric(Data):
+    """An abstract class that all Data classes that represent numeric data should inherit from."""
 
     def __init__(self, sequence=None, name=None):
-        """
-        Takes an array-like object and converts it to a numpy Array of
-        dtype float64, with any non-numeric values converted to nan.
+        """Takes an array-like object and converts it to a pandas Series with any non-numeric values converted to NaN.
 
         Parameters
         ----------
         sequence : array-like
             The input object
         name : str, optional
-            The name of the Vector object
+            The name of the Numeric object
         """
-
-        super(Vector, self).__init__(v=sequence, n=name)
-        if is_vector(sequence):
-            # Create a copy of the input Vector
-            self._values = sequence.data
-            self._name = sequence.name
-            self._type = sequence.data_type
-        elif is_array(sequence):
-            # Convert the Array dtype to float64
+        if sequence is None:
+            self._values = pd.Series([])
+            self._type = None
+        elif isinstance(sequence, Data):
+            super(Numeric, self).__init__(v=sequence.data, n=name)
+            self._type = sequence._type
+        elif is_iterable(sequence):
+            if hasattr(sequence, 'shape'):
+                if len(sequence.shape) > 1:
+                    sequence = sequence.flatten()
+            elif not is_dict(sequence):
+                sequence = flatten(sequence)
+            self._values = pd.to_numeric(pd.Series(sequence), errors='coerce')
+            self._type = self._values.dtype
+        else:
             try:
-                self._values = np.asfarray(sequence)
-                self._type = self._values.dtype
-            # Convert each value of the Array to a float or nan (which is technically a float)
-            except ValueError:
-                self._values = np.array(to_float(sequence))
-                self._type = self._values.dtype
-        else:
-            # Convert the input dict to an Array
-            if is_dict(sequence):
-                values = list(sequence.values())
-                sequence = flatten(values)
-            # Convert the python list or tuple to an Array
-            if is_iterable(sequence):
-                self._values = np.array(to_float(sequence))
-                self._type = self._values.dtype
-            else:
-                # Convert a single value to a 1d Array
-                try:
-                    self._values = np.array([float(sequence)])
-                # Create an empty Array
-                except (ValueError, TypeError):
-                    self._values = np.array([])
-        # Flatten a multi-dimensional Array
-        if len(self._values.shape) > 1:
-            self._values = self._values.flatten()
+                self._values = pd.to_numeric(pd.Series([sequence], index=[0]), errors='coerce')
+            except (ValueError, TypeError):
+                self._values = pd.Series([])
+            self._type = None
+        self._name = name
 
-    @property
-    def data_type(self):
-        return self._type
-
-    def data_prep(self, other=None):
+    def data_prep(self):
         """
-        Remove all nan values from the encapsulated Array.
-
-        Parameters
-        ----------
-        other : array-like, optional
-            A secondary array-like object with corresponding nan values to remove.
+        Converts the values of _name to conform to the Data object standards.
 
         Returns
         -------
-        vector : Vector
-            A vector object with all nan values removed.
+        data : np.array
+            The enclosed data represented as a numpy array.
         """
-        if other is not None:
-            vector = other if is_vector(other) else Vector(other)
-            if len(self.data) != len(vector):
-                raise UnequalVectorLengthError("x and y data lengths are not equal")
-
-            x, y = self.drop_nan_intersect(vector)
-
-            if len(x) == 0 or len(y) == 0:
-                return None
-                # raise EmptyVectorError("Passed data is empty")
-            return x, y
-        elif not is_iterable(self.data):
-            return np.array(float(self.data))
-        else:
-            v = self.drop_nan()
-            if len(v) == 0:
-                return None
-                # raise EmptyVectorError("Passed data is empty")
-            return v
-
-    def is_empty(self):
-        """
-        Overrides the super class's method to also check for length of zero.
-
-        Returns
-        -------
-        test_result : bool
-            The result of whether the length of the Vector object is 0 or not.
-        """
-        return len(self._values) == 0
+        raise NotImplementedError
 
     def drop_nan(self):
         """
-        Removes nan values from the Vector object and returns a numpy Array. The length of the returned Vector is the
-        length of the Vector object minus the number of nan values removed from the Vector object.
+        Removes NaN values from the Numeric object and returns the resulting pandas Series. The length of the returned
+        object is the original object length minus the number of NaN values removed from the object.
 
         Returns
         -------
-        arr : numpy.Array
-            A copy of the Vector object's internal Array with all nan values removed.
+        arr : pandas.Series
+            A copy of the Numeric object's internal Series with all NaN values removed.
         """
-        return np.array([]) if self.is_empty() else self.data[~np.isnan(self.data)]
+        # return np.array([]) if self.is_empty() else self.data[~np.isnan(self.data)]
+        return self._values.dropna().reset_index(drop=True)
 
     def drop_nan_intersect(self, seq):
         """
@@ -341,9 +292,138 @@ class Vector(Data):
         arr1, arr2 : tuple
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
-        if self.is_empty() or seq.is_empty():
-            return np.array([]), np.array([])
-        c = np.logical_and(~np.isnan(self.data), ~np.isnan(seq.data))
-        if not any(c):
-            return np.array([]), np.array([])
-        return self.data[c], seq.data[c]
+        # if self.is_empty() or seq.is_empty():
+        #     return np.array([]), np.array([])
+        # c = np.logical_and(~np.isnan(self.data), ~np.isnan(seq.data))
+        # if not any(c):
+        #     return np.array([]), np.array([])
+        # return self.data[c], seq.data[c]
+        c = pd.DataFrame({'self': self._values, 'other': seq}).dropna().reset_index(drop=True)
+        return c['self'], c['other']
+
+
+class Vector(Numeric):
+    """
+    The sci_analysis representation of continuous, numeric data.
+    """
+
+    def __init__(self, sequence=None, name=None):
+        """
+        Takes an array-like object and converts it to a pandas Series of
+        dtype float64, with any non-numeric values converted to NaN.
+
+        Parameters
+        ----------
+        sequence : array-like
+            The input object
+        name : str, optional
+            The name of the Vector object
+        """
+
+        super(Vector, self).__init__(sequence=sequence, name=name)
+        if not self._values.empty:
+            self._values = self._values.astype('float')
+            if self._values.dtype != self._type:
+                self._type = self._values.dtype
+        # self._values = None
+        # self._type = None
+        # self._name = name or None
+        # if is_vector(sequence):
+        #     # Create a copy of the input Vector
+        #     self._values = sequence.data
+        #     self._name = sequence.name
+        #     self._type = sequence.data_type
+        # elif is_iterable(sequence):
+        #     if hasattr(sequence, 'shape'):
+        #         if len(sequence.shape) > 1:
+        #             sequence = sequence.flatten()
+        #     elif not is_dict(sequence):
+        #         sequence = flatten(sequence)
+        #     self._values = pd.to_numeric(pd.Series(sequence), errors='coerce').astype('float')
+        #     self._type = self._values.dtype
+        # else:
+        #     try:
+        #         self._values = pd.Series([float(sequence)], index=[0])
+        #     except (ValueError, TypeError):
+        #         self._values = pd.Series([])
+
+
+        # elif is_array(sequence):
+        #     # Convert the Array dtype to float64
+        #     try:
+        #         self._values = np.asfarray(sequence)
+        #         self._type = self._values.dtype
+        #     # Convert each value of the Array to a float or nan (which is technically a float)
+        #     except ValueError:
+        #         self._values = np.array(to_float(sequence))
+        #         self._type = self._values.dtype
+        # else:
+        #     # Convert the input dict to an Array
+        #     if is_dict(sequence):
+        #         values = list(sequence.values())
+        #         sequence = flatten(values)
+        #     # Convert the python list or tuple to an Array
+        #     if is_iterable(sequence):
+        #         self._values = np.array(to_float(sequence))
+        #         self._type = self._values.dtype
+        #     else:
+        #         # Convert a single value to a 1d Array
+        #         try:
+        #             self._values = np.array([float(sequence)])
+        #         # Create an empty Array
+        #         except (ValueError, TypeError):
+        #             self._values = np.array([])
+        # Flatten a multi-dimensional Array
+        # if len(self._values.shape) > 1:
+        #     self._values = self._values.flatten()
+
+    @property
+    def data_type(self):
+        return self._type
+
+    def data_prep(self, other=None):
+        """
+        Remove all nan values from the encapsulated Array.
+
+        Parameters
+        ----------
+        other : array-like, optional
+            A secondary array-like object with corresponding NaN values to remove.
+
+        Returns
+        -------
+        vector : Vector
+            A vector object with all nan values removed.
+        """
+        if other is not None:
+            vector = other if is_vector(other) else Vector(other)
+            if len(self.data) != len(vector.data):
+                raise UnequalVectorLengthError("x and y data lengths are not equal")
+
+            x, y = self.drop_nan_intersect(vector)
+
+            if len(x) == 0 or len(y) == 0:
+                return None
+                # raise EmptyVectorError("Passed data is empty")
+            return x, y
+        elif not is_iterable(self.data):
+            return pd.Series(float(self.data))
+        else:
+            v = self.drop_nan()
+            if len(v) == 0:
+                return None
+                # raise EmptyVectorError("Passed data is empty")
+            return v
+
+    def is_empty(self):
+        """
+        Overrides the super class's method to also check for length of zero.
+
+        Returns
+        -------
+        test_result : bool
+            The result of whether the length of the Vector object is 0 or not.
+        """
+        # return len(self._values) == 0
+        return self._values.empty
+

@@ -485,13 +485,13 @@ class MyTestCase(unittest.TestCase):
         """Test the flatten method on a 2 dim array"""
         input_flatten = [[1, 2, 3], [4, 5, 6]]
         out_flatten = [1, 2, 3, 4, 5, 6]
-        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 2dim")
+        self.assertTrue(np.array_equal(flatten(input_flatten), out_flatten), "FAIL: Error in flatten 2dim")
 
     def test_061_flatten_3_dim(self):
         """Test the flatten method on a 3 dim array"""
         input_flatten = [[[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]]]
         out_flatten = [1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]
-        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 3dim")
+        self.assertTrue(np.array_equal(flatten(input_flatten), out_flatten), "FAIL: Error in flatten 3dim")
 
     def test_062_flatten_4_dim(self):
         """Test the flatten method on a 4 dim array"""
@@ -499,7 +499,7 @@ class MyTestCase(unittest.TestCase):
                          [[[111, 112, 113], [114, 115, 116]], [[1111, 1112, 1113], [1114, 1115, 1116]]]]
         out_flatten = [1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16,
                        111, 112, 113, 114, 115, 116, 1111, 1112, 1113, 1114, 1115, 1116]
-        self.assertEqual(flatten(input_flatten), out_flatten, "FAIL: Error in flatten 4dim")
+        self.assertTrue(np.array_equal(flatten(input_flatten), out_flatten), "FAIL: Error in flatten 4dim")
 
 
 if __name__ == '__main__':

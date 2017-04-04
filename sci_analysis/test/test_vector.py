@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import pandas as pd
 import scipy.stats as st
 from ..data.data import Vector, UnequalVectorLengthError
 
@@ -25,14 +26,14 @@ class MyTestCase(unittest.TestCase):
 
     def test_102_create_vector_empty_list(self):
         """Test vector creation from an empty list"""
-        self.assertFalse(Vector().data, "FAIL: Error in empty list vector creation")
+        # self.assertFalse(Vector().data, "FAIL: Error in empty list vector creation")
+        self.assertTrue(Vector().data.empty, "FAIL: Error in empty list vector creation")
 
     def test_103_create_vector_2dim_array(self):
-        """Test vector creation from a 2dim list"""
+        """Test vector creation from a 2dim array"""
         input_array = np.array([[1, 2, 3], [1, 2, 3]])
         out_array = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
-        self.assertTrue(np.array_equal(Vector(input_array).data, out_array),
-                        "FAIL: Error in 2dim array vector creation")
+        self.assertTrue(np.array_equal(Vector(input_array).data, out_array))
 
     def test_104_create_vector_dict(self):
         """Test vector creation from a dict"""
@@ -52,6 +53,10 @@ class MyTestCase(unittest.TestCase):
         """Test vector creation from an array"""
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=100)
+        test_obj = Vector(input_array)
+        self.assertEqual(len(test_obj), 100)
+        self.assertIsInstance(test_obj, Vector)
+        self.assertIsInstance(test_obj.data, pd.Series)
         self.assertEqual(Vector(input_array).data_type, np.dtype('float64'),
                          "FAIL: Error in array vector creation dtype")
 
@@ -68,6 +73,12 @@ class MyTestCase(unittest.TestCase):
         input_array = Vector(st.norm.rvs(size=100))
         self.assertEqual(Vector(input_array).data_type, np.dtype('float64'),
                          "FAIL: Error in vector from vector creation dtype")
+
+    def test_109_create_vector_2dim_list(self):
+        """Test vector creation from a 2dim list"""
+        input_array = [[1, 2, 3], [1, 2, 3]]
+        out_array = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
+        self.assertTrue(np.array_equal(Vector(input_array).data, out_array))
 
     def test_120_create_vector_none(self):
         """Test vector creation from None"""
@@ -101,7 +112,7 @@ class MyTestCase(unittest.TestCase):
     def test_125_drop_nan_empty(self):
         """Test the drop_nan method on an empty array"""
         input_array = ["one", "two", "three", "four"]
-        self.assertFalse(Vector(input_array).drop_nan(), "FAIL: drop_nan did not identify the empty array")
+        self.assertTrue(Vector(input_array).drop_nan().empty, "FAIL: drop_nan did not identify the empty array")
 
     def test_126_drop_nan_intersect(self):
         """Test the drop_nan_intersect method"""
@@ -125,7 +136,7 @@ class MyTestCase(unittest.TestCase):
     def test_128_drop_nan_empty(self):
         """Test the drop_nan method on an empty array"""
         input_array = Vector(np.array([]))
-        self.assertFalse(input_array.drop_nan(), "FAIL: Error in drop_nan empty array")
+        self.assertTrue(input_array.drop_nan().empty, "FAIL: Error in drop_nan empty array")
 
     def test_129_vector_data_prep(self):
         """Test the vector data_prep method"""
@@ -155,8 +166,8 @@ class MyTestCase(unittest.TestCase):
         input_array_2[2] = float("nan")
         input_array_2[4] = float("nan")
         input_array_2[8] = float("nan")
-        result = Vector(input_array_1).data_prep(Vector(input_array_2))
-        self.assertEqual((len(result[0]), len(result[1])), (93, 93),
+        x, y = Vector(input_array_1).data_prep(Vector(input_array_2))
+        self.assertEqual((len(x), len(y)), (93, 93),
                          "FAIL: Error in data prep with two vectors")
 
     def test_132_vector_data_prep_two_unequal_arrays(self):
@@ -176,11 +187,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_134_vector_data_prep_int(self):
         """Test the vector data_prep method on an int value"""
-        self.assertEqual(Vector(4).data_prep(), np.array([4.]), "FAIL: Error data prep on float value")
+        self.assertTrue(Vector(4).data_prep().equals(pd.Series([4.])), "FAIL: Error data prep on float value")
 
     def test_135_vector_data_prep_float(self):
         """Test the vector data_prep method on an int value"""
-        self.assertEqual(Vector(4.0).data_prep(), np.array([4.]), "FAIL: Error data prep on float value")
+        self.assertTrue(Vector(4.0).data_prep().equals(pd.Series([4.])), "FAIL: Error data prep on float value")
 
     def test_136_vector_data_prep_string(self):
         """Test the vector data_prep method on an int value"""

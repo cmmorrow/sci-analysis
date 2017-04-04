@@ -27,6 +27,6 @@ setup(
     ],
     keywords='statistics data EDA graphing visualization analysis scientific',
     description='A light weight python data exploration and analysis tool',
-    install_requires=['numpy', 'scipy', 'matplotlib', 'six'],
+    install_requires=['numpy', 'scipy', 'pandas', 'matplotlib', 'six'],
     test_suite='nose.collector'
 )

@@ -444,8 +444,9 @@ class GraphScatter(Graph):
         y = self._data[1]
         p = polyfit(x, y, 1, full=True)
         fit = polyval(p[0], x)
-        index = argsort(x)
-        return [x[index[0]], x[index[-1]]], [fit[index[0]], fit[index[-1]]]
+        # index = argsort(x)
+        # return (x[index[0]], x[index[-1]]), (fit[index[0]], fit[index[-1]])
+        return (x.min(), x.max()), (fit.min(), fit.max())
 
     def draw(self):
         """

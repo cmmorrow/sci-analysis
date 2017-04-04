@@ -15,6 +15,8 @@ Functions:
 """
 from __future__ import absolute_import
 import six
+import numpy as np
+import pandas as pd
 
 
 def to_float(seq):
@@ -75,13 +77,14 @@ def flatten(seq):
     >>> flatten([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     """
-    flat = list()
-    for row in seq:
-        if is_iterable(row):
-            for col in flatten(row):
-                flat.append(col)
-        else:
-            flat.append(row)
+    flat = np.array(seq).flatten()
+    # flat = list()
+    # for row in seq:
+    #     if is_iterable(row):
+    #         for col in flatten(row):
+    #             flat.append(col)
+    #     else:
+    #         flat.append(row)
     return flat
 
 
@@ -178,6 +181,24 @@ def is_array(seq):
     True
     """
     return hasattr(seq, 'dtype')
+
+
+def is_series(seq):
+    """
+    Checks if a given sequence is a Pandas Series object.
+    Args:
+        seq: array_like
+
+    Returns: bool
+
+    Examples:
+        >>> is_series([1, 2, 3])
+        False
+
+        >>> is_series(pd.Series([1, 2, 3]))
+        True
+    """
+    return isinstance(seq, pd.Series)
 
 
 def is_dict(seq):
