@@ -236,7 +236,7 @@ class Numeric(Data):
             self._type = None
         elif isinstance(sequence, Data):
             super(Numeric, self).__init__(v=sequence.data, n=name)
-            self._type = sequence._type
+            self._type = self._values.dtype
         elif is_iterable(sequence):
             if hasattr(sequence, 'shape'):
                 if len(sequence.shape) > 1:

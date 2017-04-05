@@ -109,14 +109,13 @@ class MyTestCase(unittest.TestCase):
                                                           alpha=a,
                                                           display=False).w_value)
 
-    # TODO: Update this to use a specific exception in the future
     def test_457_EqualVariance_Bartlett_single_argument(self):
         """Test the EqualVariance class for normally distributed unmatched variances"""
         np.random.seed(987654321)
         x_parms = [4, 1.35]
         x_input_array = st.norm.rvs(*x_parms, size=100)
         a = 0.05
-        self.assertRaises(TypeError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
+        self.assertRaises(MinimumSizeError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
 
     def test_458_EqualVariance_Levene_matched(self):
         """Test the EqualVariance class for non-normally distributed matched variances"""
