@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import numpy.ma as ma
 
-from ..data.data import Vector, is_data, is_vector
+from ..data.data import Vector, is_data, is_vector, is_numeric
 from ..operations.data_operations import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, \
-    flatten
+    flatten, is_series
 
 
 class MyTestCase(unittest.TestCase):
@@ -306,6 +306,72 @@ class MyTestCase(unittest.TestCase):
         'dict_of_lists': 1
     }
 
+    ans_series = {
+        'num': 0,
+        'string': 0,
+        'char': 0,
+        'none': 0,
+        'list': 0,
+        'num_list': 0,
+        'mixed_list': 0,
+        'zero_len_list': 0,
+        'multiple_dim_list': 0,
+        'tuple': 0,
+        'num_tuple': 0,
+        'mixed_tuple': 0,
+        'dict': 0,
+        'array': 0,
+        'float_array': 0,
+        'nan_array': 0,
+        'negative_array': 0,
+        'masked_array': 0,
+        'multi_dim_array': 0,
+        'scalar_array': 0,
+        'zero_len_array': 0,
+        'empty_array': 0,
+        'vector': 0,
+        'series': 1,
+        'dict_series': 1,
+        'large_array': 0,
+        'large_list': 0,
+        'group': 0,
+        'group_of_lists': 0,
+        'dict_of_lists': 0
+    }
+
+    ans_numeric = {
+        'num': 0,
+        'string': 0,
+        'char': 0,
+        'none': 0,
+        'list': 0,
+        'num_list': 0,
+        'mixed_list': 0,
+        'zero_len_list': 0,
+        'multiple_dim_list': 0,
+        'tuple': 0,
+        'num_tuple': 0,
+        'mixed_tuple': 0,
+        'dict': 0,
+        'array': 0,
+        'float_array': 0,
+        'nan_array': 0,
+        'negative_array': 0,
+        'masked_array': 0,
+        'multi_dim_array': 0,
+        'scalar_array': 0,
+        'zero_len_array': 0,
+        'empty_array': 0,
+        'vector': 1,
+        'series': 0,
+        'dict_series': 0,
+        'large_array': 0,
+        'large_list': 0,
+        'group': 0,
+        'group_of_lists': 0,
+        'dict_of_lists': 0
+    }
+
     # Test logic tests
 
     def test_001_is_array(self):
@@ -322,7 +388,8 @@ class MyTestCase(unittest.TestCase):
             except AssertionError:
                 print("FAIL: " + name)
                 eval_array[name] = 0
-        self.assertTrue(eval_array == self.ans_array, "FAIL: is_array test")
+        # self.assertTrue(eval_array == self.ans_array, "FAIL: is_array test")
+        self.assertDictEqual(eval_array, self.ans_array, "FAIL: is_array test")
 
     def test_002_is_dict(self):
         """Tests the is_dict method"""
@@ -436,7 +503,38 @@ class MyTestCase(unittest.TestCase):
                 eval_dict_group[name] = 0
         self.assertTrue(eval_dict_group == self.ans_dict_group, "FAIL: is_dict_group test")
 
-        # Test to_float function
+    def test_009_is_series(self):
+        """Test the is_series method"""
+        eval_series = {}
+        print("")
+        print("is_series test")
+        print("-" * 70)
+        for name, test in self.inputs.items():
+            try:
+                assert is_series(test)
+                print("PASS: " + name)
+                eval_series[name] = 1
+            except AssertionError:
+                print("FAIL: " + name)
+                eval_series[name] = 0
+        # self.assertTrue(eval_dict_group == self.ans_series, "FAIL: is_dict_group test")
+        self.assertDictEqual(eval_series, self.ans_series, "FAIL: is_series test")
+
+    def test_010_is_numeric(self):
+        """Tests the is_numeric method"""
+        eval_numeric = {}
+        print("")
+        print("is_numeric test")
+        print("-" * 70)
+        for name, test in self.inputs.items():
+            try:
+                assert is_numeric(test)
+                print("PASS: " + name)
+                eval_numeric[name] = 1
+            except AssertionError:
+                print("FAIL: " + name)
+                eval_numeric[name] = 0
+        self.assertTrue(eval_numeric == self.ans_numeric, "FAIL: is_numeric test")
 
     def test_050_to_float_list(self):
         """Test the to_float int list conversion"""
