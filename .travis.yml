@@ -19,5 +19,10 @@ install:
   - "pip install matplotlib"
   - "pip install six"
   - "pip install pytest"
+  - "pip install pytest-pep8"
+  - "pip install pytest-cov"
+  - "pip install python-coveralls"
 # command to run tests
-script: py.test
+script: py.test sci_analysis/test/* --doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
+after_sucess:
+  - coveralls
