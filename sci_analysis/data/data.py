@@ -5,11 +5,21 @@ Functions:
     is_data: test if the passed array_like argument is a sci_analysis Data object.
 """
 from __future__ import absolute_import
+from warnings import warn
 # Import packages
 import pandas as pd
 
 # Import from local
-from ..operations.data_operations import is_dict, is_iterable, flatten
+from sci_analysis.operations.data_operations import is_dict, is_iterable, flatten
+
+
+class NumberOfCategoriesWarning(Warning):
+
+    warn_categories = 50
+
+    def __str__(self):
+        return "The number of categories is greater than {} which might make analysis difficult. " \
+               "If this isn't a mistake, consider subsetting the data first".format(self.warn_categories)
 
 
 def assign(obj, other=None):
@@ -80,6 +90,22 @@ def is_numeric(obj):
         The test result of whether seq is a sci_analysis Numeric object or not.
     """
     return isinstance(obj, Numeric)
+
+
+def is_categorical(obj):
+    """
+    Test if the passed array_like argument is a sci_analysis Categorical object.
+    Parameters
+    ----------
+    obj : object
+        The input object.
+
+    Returns
+    -------
+    test result : bool
+        The test result of whether obj is a sci_analysis Categorical object.
+    """
+    return isinstance(obj, Categorical)
 
 
 class EmptyVectorError(Exception):
@@ -234,7 +260,7 @@ class Numeric(Data):
         if sequence is None:
             self._values = pd.Series([])
             self._type = None
-        elif isinstance(sequence, Data):
+        elif is_data(sequence):
             super(Numeric, self).__init__(v=sequence.data, n=name)
             self._type = self._values.dtype
         elif is_iterable(sequence):
@@ -292,12 +318,6 @@ class Numeric(Data):
         arr1, arr2 : tuple
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
-        # if self.is_empty() or seq.is_empty():
-        #     return np.array([]), np.array([])
-        # c = np.logical_and(~np.isnan(self.data), ~np.isnan(seq.data))
-        # if not any(c):
-        #     return np.array([]), np.array([])
-        # return self.data[c], seq.data[c]
         c = pd.DataFrame({'self': self._values, 'other': seq}).dropna().reset_index(drop=True)
         return c['self'], c['other']
 
@@ -325,57 +345,6 @@ class Vector(Numeric):
             self._values = self._values.astype('float')
             if self._values.dtype != self._type:
                 self._type = self._values.dtype
-        # self._values = None
-        # self._type = None
-        # self._name = name or None
-        # if is_vector(sequence):
-        #     # Create a copy of the input Vector
-        #     self._values = sequence.data
-        #     self._name = sequence.name
-        #     self._type = sequence.data_type
-        # elif is_iterable(sequence):
-        #     if hasattr(sequence, 'shape'):
-        #         if len(sequence.shape) > 1:
-        #             sequence = sequence.flatten()
-        #     elif not is_dict(sequence):
-        #         sequence = flatten(sequence)
-        #     self._values = pd.to_numeric(pd.Series(sequence), errors='coerce').astype('float')
-        #     self._type = self._values.dtype
-        # else:
-        #     try:
-        #         self._values = pd.Series([float(sequence)], index=[0])
-        #     except (ValueError, TypeError):
-        #         self._values = pd.Series([])
-
-
-        # elif is_array(sequence):
-        #     # Convert the Array dtype to float64
-        #     try:
-        #         self._values = np.asfarray(sequence)
-        #         self._type = self._values.dtype
-        #     # Convert each value of the Array to a float or nan (which is technically a float)
-        #     except ValueError:
-        #         self._values = np.array(to_float(sequence))
-        #         self._type = self._values.dtype
-        # else:
-        #     # Convert the input dict to an Array
-        #     if is_dict(sequence):
-        #         values = list(sequence.values())
-        #         sequence = flatten(values)
-        #     # Convert the python list or tuple to an Array
-        #     if is_iterable(sequence):
-        #         self._values = np.array(to_float(sequence))
-        #         self._type = self._values.dtype
-        #     else:
-        #         # Convert a single value to a 1d Array
-        #         try:
-        #             self._values = np.array([float(sequence)])
-        #         # Create an empty Array
-        #         except (ValueError, TypeError):
-        #             self._values = np.array([])
-        # Flatten a multi-dimensional Array
-        # if len(self._values.shape) > 1:
-        #     self._values = self._values.flatten()
 
     @property
     def data_type(self):
@@ -427,3 +396,77 @@ class Vector(Numeric):
         # return len(self._values) == 0
         return self._values.empty
 
+
+class Categorical(Data):
+    """
+    The sci_analysis representation of categorical, quantitative or textual data.
+    """
+
+    def __init__(self, sequence=None, name=None, order=None):
+        """Takes an array-like object and converts it to a pandas Categorical object.
+
+        Parameters
+        ----------
+        sequence : array-like
+            The input object
+        name : str, optional
+            The name of the Categorical object
+        order : array-like
+            The order categories in sequence should appear
+        """
+        if sequence is None:
+            self._values = pd.Series([])
+            self._counts = pd.Series([])
+            self._order = order
+            self._name = name
+        elif is_data(sequence):
+            new_name = sequence.name or name
+            super(Categorical, self).__init__(v=sequence.data, n=new_name)
+            self._order = sequence.order
+        else:
+            cat_kwargs = {'dtype': 'category'}
+            if order is not None:
+                cat_kwargs.update({'categories': order, 'ordered': True})
+            try:
+                self._values = pd.Series(sequence).astype(**cat_kwargs)
+            # except (ValueError, TypeError):
+            except ValueError:
+                self._values = pd.Series([])
+            self._name = name
+            try:
+                # TODO: Need to fix this to work with numeric lists
+                sequence += 1
+                self._order = self.categories
+            except TypeError:
+                self._order = order
+        self._counts = self._values.value_counts(sort=False)
+        if self.categories is not None:
+            if len(self.categories) > NumberOfCategoriesWarning.warn_categories:
+                warn(NumberOfCategoriesWarning())
+
+    def is_empty(self):
+        """
+        Overrides the super class's method to also check for length of zero.
+
+        Returns
+        -------
+        test_result : bool
+            The result of whether the length of the Vector object is 0 or not.
+        """
+        # return len(self._values) == 0
+        return self._values.empty
+
+    def data_prep(self, categories=None, order=None):
+        pass
+
+    @property
+    def counts(self):
+        return self._counts
+
+    @property
+    def order(self):
+        return self._order
+
+    @property
+    def categories(self):
+        return self._values.cat.categories if len(self._values) > 0 else None

@@ -14,9 +14,9 @@ clean and strip.
 """
 from __future__ import absolute_import
 
-from .analysis import analysis
-from .graphs import graph
-from .data import data
+from sci_analysis.analysis import analysis
+from sci_analysis.graphs import graph
+from sci_analysis.data import data
 __all__ = ["data", "analysis", "graph", "operations"]
 from .analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics,\
