@@ -1,7 +1,7 @@
 import unittest
 from warnings import catch_warnings, simplefilter
 import numpy as np
-from pandas import Series
+from pandas import Series, MultiIndex
 from sci_analysis.data import Categorical, is_categorical, is_data, NumberOfCategoriesWarning
 
 
@@ -152,7 +152,6 @@ class MyTestCase(TestWarnings):
         """Create a Categorical object from a numpy array of integers"""
         np.random.seed(987654321)
         input_array = Categorical(np.random.randint(-10, 10, 100))
-        # input_array = Categorical([random.randint(-10, 10) for _ in range(0, 100)])
         counts = [(-10, 4), (-9, 5), (-8, 8), (-7, 4), (-6, 7),
                   (-5, 3), (-4, 5), (-3, 6), (-2, 4), (-1, 2),
                   (0, 6), (1, 3), (2, 7), (3, 4), (4, 6),
@@ -174,6 +173,44 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.name, 'large')
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 5000, 'b': 5000, 'c': 5000})
         self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c'])
+        self.assertFalse(input_array.is_empty())
+
+    def test_114_create_categorical_from_nested_lists(self):
+        """Create a Categorical object from a nested list"""
+        input_array = Categorical([['a', 'b', 'c'], ['d', 'e', 'f']])
+        self.assertTrue(is_categorical(input_array))
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertDictEqual(input_array.counts.to_dict(), dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1] * 6)))
+        self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c', 'd', 'e', 'f'])
+        self.assertFalse(input_array.is_empty())
+        self.assertTrue(input_array.data.equals(Series(['a', 'b', 'c', 'd', 'e', 'f']).astype('category')))
+
+    def test_115_create_categorical_from_2dim_array(self):
+        """Make sure pandas throws an exception when trying to use a 2dim array"""
+        input_array = np.array([['a', 'b', 'c'], ['d', 'e', 'f']])
+        self.assertRaises(Exception, lambda: Categorical(input_array))
+
+    def test_116_create_categorical_from_dict(self):
+        """Create a Categorical object from a dictionary"""
+        input_array = Categorical({'a': 1, 'b': 2, 'c': 3, 'd': 2})
+        self.assertTrue(is_categorical(input_array))
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertDictEqual(input_array.counts.to_dict(), {1: 1, 2: 2, 3: 1})
+        self.assertListEqual(input_array.categories.tolist(), [1, 2, 3])
+        self.assertFalse(input_array.is_empty())
+        self.assertTrue(input_array.data.equals(Series({'a': 1, 'b': 2, 'c': 3, 'd': 2}).astype('category')))
+
+    def test_117_create_categorical_with_multiindex(self):
+        """Create a Categorical object with a multiindex"""
+        index = MultiIndex.from_tuples([('a', 'foo'), ('a', 'bar'), ('b', 'foo'), ('b', 'bar')])
+        input_array = Categorical(Series([1, 2, 3, 4], index=index))
+        self.assertTrue(is_categorical(input_array))
+        self.assertListEqual(input_array.order.values.tolist(), [1, 2, 3, 4])
+        self.assertIsNone(input_array.name)
+        self.assertDictEqual(input_array.counts.to_dict(), {1: 1, 2: 1, 3: 1, 4: 1})
+        self.assertListEqual(input_array.categories.tolist(), [1, 2, 3, 4])
         self.assertFalse(input_array.is_empty())
 
 if __name__ == '__main__':

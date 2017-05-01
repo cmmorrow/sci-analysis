@@ -429,7 +429,8 @@ class Categorical(Data):
                 cat_kwargs.update({'categories': order, 'ordered': True})
             try:
                 self._values = pd.Series(sequence).astype(**cat_kwargs)
-            # except (ValueError, TypeError):
+            except TypeError:
+                self._values = pd.Series(flatten(sequence)).astype(**cat_kwargs)
             except ValueError:
                 self._values = pd.Series([])
             self._name = name
