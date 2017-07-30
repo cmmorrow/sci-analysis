@@ -11,12 +11,22 @@ class TestMannWhitney(unittest.TestCase):
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=100)
+        y_input = st.weibull_min.rvs(*y_parms, size=100)
         alpha = 0.05
-        self.assertGreater(MannWhitney(st.weibull_min.rvs(*x_parms, size=100),
-                                       st.weibull_min.rvs(*y_parms, size=100),
-                                       alpha=alpha, display=False).p_value,
-                           alpha,
+        output = """
+
+Mann Whitney U Test
+-------------------
+
+u value =  4976.0000
+p value =  0.9542
+
+H0: Locations are matched
+"""
+        self.assertGreater(MannWhitney(x_input, y_input, alpha=alpha, display=True).p_value, alpha,
                            "FAIL: MannWhitney Type I error")
+        self.assertEqual(str(MannWhitney(x_input, y_input, alpha=alpha, display=False)), output)
 
     def test_MannWhitney_unmatched(self):
         """Test the MannWhitney U test with two unmatched samples"""

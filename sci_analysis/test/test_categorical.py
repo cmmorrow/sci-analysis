@@ -91,10 +91,11 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c', 'd'])
         self.assertFalse(input_array.is_empty())
 
-    def test_107_create_categorical_with_missing_data(self):
-        """Create a Categorical object containing missing values"""
-        ref = ["a", "b", "c", "d", float("nan"), "b", "c", float("nan"), "b"]
-        input_array = Categorical(ref, name='test')
+    def test_107_create_categorical_drop_missing_data(self):
+        """Create a Categorical object containing missing values and drop them"""
+        i = ["a", "b", "c", "d", np.nan, "b", "c", np.nan, "b"]
+        ref = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 5: 'b', 6: 'c', 8: 'b'}
+        input_array = Categorical(i, name='test', dropna=True)
         self.assertTrue(is_categorical(input_array))
         self.assertIsNone(input_array.order)
         self.assertEqual(input_array.name, 'test')
@@ -212,6 +213,38 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), {1: 1, 2: 1, 3: 1, 4: 1})
         self.assertListEqual(input_array.categories.tolist(), [1, 2, 3, 4])
         self.assertFalse(input_array.is_empty())
+
+    def test_118_create_categorical_with_missing_data(self):
+        """Create a Categorical object containing missing values"""
+        ref = ["a", "b", "c", "d", np.nan, "b", "c", np.nan, "b"]
+        input_array = Categorical(ref, name='test')
+        self.assertTrue(is_categorical(input_array))
+        self.assertIsNone(input_array.order)
+        self.assertEqual(input_array.name, 'test')
+        self.assertDictEqual(input_array.counts.to_dict(), {np.nan: 2, 'a': 1, 'b': 3, 'c': 2, 'd': 1})
+        # TODO: Once NaN is displayed as a category, this test will need to be updated.
+        self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c', 'd'])
+        self.assertFalse(input_array.is_empty())
+        self.assertTrue(input_array.data.equals(Series(ref).astype('category')))
+
+    def test_119_create_categorical_with_extra_order_categories(self):
+        ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
+        order = ['e', 'd', 'c', 'b', 'a']
+        input_array = Categorical(ref, order=order)
+        self.assertTrue(is_categorical(input_array))
+        self.assertListEqual(input_array.categories.tolist(), ['e', 'd', 'c', 'b', 'a'])
+        self.assertListEqual(input_array.order, order)
+        self.assertIsNone(input_array.name)
+        self.assertDictEqual(input_array.counts.to_dict(), {'a': 2, 'b': 2, 'c': 3, 'd': 1, 'e': 0})
+
+    def test_120_create_categorical_with_invalid_order_categories(self):
+        ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
+        order = ['z', 'y', 'x', 'w']
+        input_array = Categorical(ref, order=order)
+        self.assertTrue(is_categorical(input_array))
+        self.assertTrue(input_array.categories.tolist(), [])
+        self.assertTrue(input_array.order, order)
+        self.assertDictEqual(input_array.counts.to_dict(), dict([('z', 0), ('y', 0), ('x', 0), ('w', 0), (np.nan, 8)]))
 
 if __name__ == '__main__':
     unittest.main()

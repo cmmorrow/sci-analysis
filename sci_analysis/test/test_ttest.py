@@ -12,10 +12,22 @@ class MyTestCase(unittest.TestCase):
         """Test the TTest against a given matched value"""
         np.random.seed(987654321)
         x_parms = [4, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=100)
         y_val = 4.0
         alpha = 0.05
-        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).p_value > alpha,
+        output = """
+
+1 Sample T Test
+---------------
+
+t value =  0.0781
+p value =  0.9379
+
+H0: Means are matched
+"""
+        self.assertTrue(TTest(x_input, y_val, display=False).p_value > alpha,
                         "FAIL: TTest single type I error")
+        self.assertEqual(str(TTest(x_input, y_val, display=False)), output)
 
     def test_201_TTest_single_matched_test_type(self):
         """Verify the TTest single test"""

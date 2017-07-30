@@ -10,9 +10,21 @@ class MyTestCase(unittest.TestCase):
         """Test the normal distribution check"""
         np.random.seed(987654321)
         parms = [5, 0.1]
+        x_input = st.norm.rvs(*parms, size=100)
         alpha = 0.05
-        self.assertGreater(NormTest(st.norm.rvs(*parms, size=100), display=False, alpha=alpha).p_value, alpha,
+        other = """
+
+Shapiro-Wilk test for normality
+-------------------------------
+
+W value =  0.9880
+p value =  0.5050
+
+H0: Data is normally distributed
+"""
+        self.assertGreater(NormTest(x_input, display=False, alpha=alpha).p_value, alpha,
                            "FAIL: Normal test Type I error")
+        self.assertEqual(str(NormTest(x_input, display=False, alpha=alpha)), other)
 
     def test_301_Norm_test_single_fail(self):
         """Test the normal distribution check fails for a different distribution"""

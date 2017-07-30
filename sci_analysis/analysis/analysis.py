@@ -26,12 +26,16 @@ from scipy.stats import linregress, shapiro, pearsonr, spearmanr, ttest_ind, \
     ttest_1samp, f_oneway, kruskal, bartlett, levene, skew, kurtosis, kstest, sem, ks_2samp, mannwhitneyu
 
 # Numpy imports
-from numpy import mean, std, median, amin, amax, percentile
+from numpy import mean, std, median, amin, amax, percentile, float_, int_
+
+# Pandas imports
+from pandas import DataFrame
 
 # Local imports
-from ..operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
-from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
-from ..data.data import assign
+from sci_analysis.operations.data_operations import is_dict, is_iterable, is_group, is_dict_group
+from sci_analysis.graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+from sci_analysis.data import Vector, Categorical
+# from ..data.data import assign
 
 
 class MinimumSizeError(Exception):
@@ -42,6 +46,85 @@ class MinimumSizeError(Exception):
 class NoDataError(Exception):
     """Thrown when the Data object passed to a Graph object is empty or has no graph-able data."""
     pass
+
+
+def std_output(name, results, order, precision=4, spacing=14):
+    """
+
+    Parameters
+    ----------
+    name : str
+        The name of the analysis report.
+    results : dict or list
+        The input dict or list to print.
+    order : list
+        The list of keys in results to display and the order to display them in.
+    precision : int
+        The number of decimal places to show for float values.
+    spacing : int
+        The max number of characters for each printed column.
+
+    Returns
+    -------
+    output_string : str
+        The report to be printed to stdout.
+    """
+
+    def format_header(col_names):
+        line = ""
+        for n in col_names:
+            line += '{:{}s}'.format(n, spacing)
+        return line
+
+    def format_row(_row, _order):
+        line = ""
+        for column in _order:
+            value = _row[column]
+            t = type(value)
+            if t in [float, float_]:
+                line += '{:< {}.{}f}'.format(value, spacing, precision)
+            elif t in [float, float_]:
+                line += '{:< {}d}'.format(value, spacing)
+            else:
+                line += '{:<{}s}'.format(str(value), spacing)
+        return line
+
+    def format_items(label, value):
+        if type(value) in {float, float_}:
+            line = '{:{}s}'.format(label, max_length) + ' = ' + '{:< .{}f}'.format(value, precision)
+        elif type(value) in {int, int_}:
+            line = '{:{}s}'.format(label, max_length) + ' = ' + '{:< d}'.format(value)
+        else:
+            line = '{:{}s}'.format(label, max_length) + ' = ' + str(value)
+        return line
+
+    table = list()
+    header = ''
+
+    if isinstance(results, list):
+        header = format_header(order)
+        for row in results:
+            table.append(format_row(row, order))
+    elif isinstance(results, dict):
+        # max_length = Series(results.keys()).apply(lambda k: len(k)).max()
+        max_length = max([len(label) for label in results.keys()])
+        for key in order:
+            table.append(format_items(key, results[key]))
+
+    out = [
+        '',
+        '',
+        name,
+        '-' * len(name),
+        ''
+    ]
+    if len(header) > 0:
+        out.extend([
+            header,
+            '-' * len(header)
+        ])
+    out.append('\n'.join(table))
+    return '\n'.join(out)
 
 
 class Analysis(object):
@@ -92,7 +175,7 @@ class Analysis(object):
         Override this method to modify the execution sequence of the analysis.
         """
         if self._data is None:
-            pass
+            return
         self.run()
         if self._display:
             print(self)
@@ -104,87 +187,87 @@ class Analysis(object):
         """
         raise NotImplementedError
 
-    def output(self, name, order=list(), no_format=list(), precision=4):
-        """Print the results of the test in a user-friendly format"""
-        label_max_length = 0
-
-        def format_output(n, v):
-            """Format the results with a consistent look"""
-            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
-
-        def no_precision_output(n, v):
-            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
-
-        for label in self._results.keys():
-            if len(label) > label_max_length:
-                label_max_length = len(label)
-
-        report = [
-            ' ',
-            name,
-            '-' * len(name),
-            ' ',
-        ]
-
-        if order:
-            for key in order:
-                for label, value in self._results.items():
-                    if label == key:
-                        if label in no_format:
-                            report.append(no_precision_output(label, value))
-                        else:
-                            report.append(format_output(label, value))
-                        continue
-        else:
-            for label, value in self._results.items():
-                report.append(format_output(label, value))
-
-        report.append(" ")
-
-        return "\n".join(report)
+    # def output(self, name, order=list(), no_format=list(), precision=4):
+    #     """Print the results of the test in a user-friendly format"""
+    #     label_max_length = 0
+    #
+    #     def format_output(n, v):
+    #         """Format the results with a consistent look"""
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+    #
+    #     def no_precision_output(n, v):
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+    #
+    #     for label in self._results.keys():
+    #         if len(label) > label_max_length:
+    #             label_max_length = len(label)
+    #
+    #     report = [
+    #         ' ',
+    #         name,
+    #         '-' * len(name),
+    #         ' ',
+    #     ]
+    #
+    #     if order:
+    #         for key in order:
+    #             for label, value in self._results.items():
+    #                 if label == key:
+    #                     if label in no_format:
+    #                         report.append(no_precision_output(label, value))
+    #                     else:
+    #                         report.append(format_output(label, value))
+    #                     continue
+    #     else:
+    #         for label, value in self._results.items():
+    #             report.append(format_output(label, value))
+    #
+    #     report.append(" ")
+    #
+    #     return "\n".join(report)
 
     def __str__(self):
-        return self.output(self._name)
+        return std_output(self._name, self._results, self._results.keys())
 
 
-class GroupAnalysis(Analysis):
-
-    def output(self, name, order=list(), no_format=list(), precision=4, spacing=14):
-        grid = list()
-
-        def format_header(names):
-            line = ""
-            for n in names:
-                line += '{:{}s}'.format(n, spacing)
-            return line
-
-        def format_row(_row, _order):
-            line = ""
-            for _label in _order:
-                for k, v in _row.items():
-                    if k == _label:
-                        if k in no_format:
-                            line += '{:<{}s}'.format(str(v), spacing)
-                        else:
-                            line += '{:< {}.{}f}'.format(v, spacing, precision)
-                        continue
-            return line
-
-        header = format_header(order)
-        for row in self._results:
-            grid.append(format_row(row, order))
-
-        return '\n'.join((
-            name,
-            " ",
-            header,
-            "-" * len(header),
-            '\n'.join(grid),
-            " "
-        ))
-
-    def run(self):
-        raise NotImplementedError
+# class GroupAnalysis(Analysis):
+#
+#     def output(self, name, order=list(), no_format=list(), precision=4, spacing=14):
+#         grid = list()
+#
+#         def format_header(names):
+#             line = ""
+#             for n in names:
+#                 line += '{:{}s}'.format(n, spacing)
+#             return line
+#
+#         def format_row(_row, _order):
+#             line = ""
+#             for _label in _order:
+#                 for k, v in _row.items():
+#                     if k == _label:
+#                         if k in no_format:
+#                             line += '{:<{}s}'.format(str(v), spacing)
+#                         else:
+#                             line += '{:< {}.{}f}'.format(v, spacing, precision)
+#                         continue
+#             return line
+#
+#         header = format_header(order)
+#         for row in self._results:
+#             grid.append(format_row(row, order))
+#
+#         return '\n'.join((
+#             name,
+#             " ",
+#             header,
+#             "-" * len(header),
+#             '\n'.join(grid),
+#             " "
+#         ))
+#
+#     def run(self):
+#         raise NotImplementedError
 
 
 class Test(Analysis):
@@ -216,7 +299,8 @@ class Test(Analysis):
         self._alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
         data = list()
         for d in args:
-            clean = assign(d).data_prep()
+            # clean = assign(d).data_prep()
+            clean = Vector(d).data_prep()
             if clean is None:
                 continue
             if len(clean) <= self._min_size:
@@ -243,46 +327,61 @@ class Test(Analysis):
         """The p-value returned by the function called in the run method"""
         return self._results['p value']
 
-    def output(self, name, order=list(), no_format=list(), precision=4):
-        """Print the results of the test in a user-friendly format"""
-        label_max_length = 0
+    def __str__(self):
+        out = list()
+        order = list()
+        res = list(self._results.keys())
+        if 'p value' in res:
+            order.append('p value')
+            res.remove('p value')
+        order.extend(res)
 
-        def format_output(n, v):
-            """Format the results with a consistent look"""
-            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+        out.append(std_output(self.name, self._results, reversed(order)))
+        out.append('')
+        out.append(self._h0 if self.p_value > self._alpha else self._ha)
+        out.append('')
+        return '\n'.join(out)
 
-        def no_precision_output(n, v):
-            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
-
-        for label in self._results.keys():
-            if len(label) > label_max_length:
-                label_max_length = len(label)
-
-        report = [
-            ' ',
-            name,
-            '-' * len(name),
-            ' ',
-        ]
-
-        if order:
-            for key in order:
-                for label, value in self._results.items():
-                    if label == key:
-                        if label in no_format:
-                            report.append(no_precision_output(label, value))
-                        else:
-                            report.append(format_output(label, value))
-                        continue
-        else:
-            for label, value in self._results.items():
-                report.append(format_output(label, value))
-
-        report.append(" ")
-        report.append(self._h0 if self.p_value > self._alpha else self._ha)
-        report.append(" ")
-
-        return "\n".join(report)
+    # def output(self, name, order=list(), no_format=list(), precision=4):
+    #     """Print the results of the test in a user-friendly format"""
+    #     label_max_length = 0
+    #
+    #     def format_output(n, v):
+    #         """Format the results with a consistent look"""
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+    #
+    #     def no_precision_output(n, v):
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+    #
+    #     for label in self._results.keys():
+    #         if len(label) > label_max_length:
+    #             label_max_length = len(label)
+    #
+    #     report = [
+    #         ' ',
+    #         name,
+    #         '-' * len(name),
+    #         ' ',
+    #     ]
+    #
+    #     if order:
+    #         for key in order:
+    #             for label, value in self._results.items():
+    #                 if label == key:
+    #                     if label in no_format:
+    #                         report.append(no_precision_output(label, value))
+    #                     else:
+    #                         report.append(format_output(label, value))
+    #                     continue
+    #     else:
+    #         for label, value in self._results.items():
+    #             report.append(format_output(label, value))
+    #
+    #     report.append(" ")
+    #     report.append(self._h0 if self.p_value > self._alpha else self._ha)
+    #     report.append(" ")
+    #
+    #     return "\n".join(report)
 
     def run(self):
         raise NotImplementedError
@@ -298,7 +397,8 @@ class Comparison(Analysis):
 
     def __init__(self, xdata, ydata, alpha=0.05, display=True):
         self._alpha = alpha
-        x, y = assign(xdata, ydata)
+        # x, y = assign(xdata, ydata)
+        x, y = Vector(xdata), Vector(ydata)
         if x is None or y is None:
             raise NoDataError("Cannot perform test because there is no data")
         try:
@@ -340,47 +440,62 @@ class Comparison(Analysis):
         """The p-value returned by the function called in the run method"""
         return self._results['p value']
 
-    def output(self, name, order=list(), no_format=list(), precision=4):
-        """Print the results of the test in a user-friendly format"""
-        label_max_length = 0
+    def __str__(self):
+        out = list()
+        order = list()
+        res = list(self._results.keys())
+        if 'p value' in res:
+            order.append('p value')
+            res.remove('p value')
+        order.extend(res)
 
-        def format_output(n, v):
-            """Format the results with a consistent look"""
-            return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+        out.append(std_output(self.name, self._results, reversed(order)))
+        out.append('')
+        out.append(self._h0 if self.p_value > self._alpha else self._ha)
+        out.append('')
+        return '\n'.join(out)
 
-        def no_precision_output(n, v):
-            return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
-
-        for label in self._results.keys():
-            if len(label) > label_max_length:
-                label_max_length = len(label)
-
-        report = [
-            ' ',
-            name,
-            '-' * len(name),
-            ' ',
-        ]
-
-        if order:
-            for key in order:
-                for label, value in self._results.items():
-                    if label == key:
-                        if label in no_format:
-                            report.append(no_precision_output(label, value))
-                        else:
-                            report.append(format_output(label, value))
-                        continue
-        else:
-            for label, value in self._results.items():
-                report.append(format_output(label, value))
-
-        if self.p_value:
-            report.append(" ")
-            report.append(self._h0 if self.p_value > self._alpha else self._ha)
-            report.append(" ")
-
-        return "\n".join(report)
+    # def output(self, name, order=list(), no_format=list(), precision=4):
+    #     """Print the results of the test in a user-friendly format"""
+    #     label_max_length = 0
+    #
+    #     def format_output(n, v):
+    #         """Format the results with a consistent look"""
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + '{:< .{}f}'.format(v, precision)
+    #
+    #     def no_precision_output(n, v):
+    #         return '{:{}s}'.format(n, label_max_length) + " = " + " " + str(v)
+    #
+    #     for label in self._results.keys():
+    #         if len(label) > label_max_length:
+    #             label_max_length = len(label)
+    #
+    #     report = [
+    #         ' ',
+    #         name,
+    #         '-' * len(name),
+    #         ' ',
+    #     ]
+    #
+    #     if order:
+    #         for key in order:
+    #             for label, value in self._results.items():
+    #                 if label == key:
+    #                     if label in no_format:
+    #                         report.append(no_precision_output(label, value))
+    #                     else:
+    #                         report.append(format_output(label, value))
+    #                     continue
+    #     else:
+    #         for label, value in self._results.items():
+    #             report.append(format_output(label, value))
+    #
+    #     if self.p_value:
+    #         report.append(" ")
+    #         report.append(self._h0 if self.p_value > self._alpha else self._ha)
+    #         report.append(" ")
+    #
+    #     return "\n".join(report)
 
     def run(self):
         raise NotImplementedError
@@ -497,7 +612,7 @@ class MannWhitney(Test):
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
-    _name = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
+    _names = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
     _h0 = "H0: Means are matched"
     _ha = "HA: Means are significantly different"
     _min_size = 3
@@ -525,6 +640,7 @@ class TTest(Test):
                 t, p = ttest_ind(*self._data, equal_var=False, axis=0)
                 test = 'welch_t'
         self._test = test
+        self._name = self._names[test]
         self._results.update({'p value': p, 't value': float(t)})
 
     @property
@@ -543,10 +659,10 @@ class TTest(Test):
     def statistic(self):
         return self._results['t value']
 
-    def __str__(self):
-        """If the result is greater than the significance, print the null hypothesis, otherwise,
-        the alternate hypothesis"""
-        return self.output(self._name[self._test])
+    # def __str__(self):
+    #     """If the result is greater than the significance, print the null hypothesis, otherwise,
+    #     the alternate hypothesis"""
+    #     return self.output(self._name[self._test])
 
 
 class LinearRegression(Comparison):
@@ -597,14 +713,29 @@ class LinearRegression(Comparison):
     def __str__(self):
         """If the result is greater than the significance, print the null hypothesis, otherwise,
         the alternate hypothesis"""
-        return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'r', 'r^2', 'Std Err', 'p value'],
-                           no_format=['Count'])
+        out = list()
+        order = [
+            'Count',
+            'Slope',
+            'Intercept',
+            'r',
+            'r^2',
+            'Std Err',
+            'p value'
+        ]
+        out.append(std_output(self._name, self._results, order=order))
+        out.append('')
+        out.append(self._h0 if self.p_value > self._alpha else self._ha)
+        out.append('')
+        return '\n'.join(out)
+        # return self.output(self._name, order=['Count', 'Slope', 'Intercept', 'r', 'r^2', 'Std Err', 'p value'],
+        #                    no_format=['Count'])
 
 
 class Correlation(Comparison):
     """Performs a pearson or spearman correlation between two vectors."""
 
-    _name = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
+    _names = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
 
@@ -619,6 +750,7 @@ class Correlation(Comparison):
         else:
             r_value, p_value = spearmanr(self.xdata, self.ydata)
             r = "spearman"
+        self._name = self._names[r]
         self._test = r
         self._results.update({'r value': r_value, 'p value': p_value})
 
@@ -636,10 +768,10 @@ class Correlation(Comparison):
         """The test that was used to determine the correlation coefficient"""
         return self._test
 
-    def __str__(self):
-        """If the result is greater than the significance, print the null hypothesis, otherwise,
-        the alternate hypothesis"""
-        return self.output(self._name[self._test])
+    # def __str__(self):
+    #     """If the result is greater than the significance, print the null hypothesis, otherwise,
+    #     the alternate hypothesis"""
+    #     return self.output(self._name[self._test])
 
 
 class Anova(Test):
@@ -687,7 +819,7 @@ class Kruskal(Test):
 class EqualVariance(Test):
     """Checks a group of vectors for equal variance."""
 
-    _name = {'Bartlett': 'Bartlett Test', 'Levene': 'Levene Test'}
+    _names = {'Bartlett': 'Bartlett Test', 'Levene': 'Levene Test'}
     _h0 = "H0: Variances are equal"
     _ha = "HA: Variances are not equal"
 
@@ -700,12 +832,14 @@ class EqualVariance(Test):
             pass
         if NormTest(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
             statistic, p_value = bartlett(*self._data)
-            self._test = 'Bartlett'
+            r = 'Bartlett'
             self._results.update({'p value': p_value, 'T value': statistic})
         else:
             statistic, p_value = levene(*self._data)
-            self._test = 'Levene'
+            r = 'Levene'
             self._results.update({'p value': p_value, 'W value': statistic})
+        self._test = r
+        self._name = self._names[r]
 
     @property
     def t_value(self):
@@ -728,10 +862,10 @@ class EqualVariance(Test):
         """The test that was used to check for equal variance"""
         return self._test
 
-    def __str__(self):
-        """If the result is greater than the significance, print the null hypothesis, otherwise,
-        the alternate hypothesis"""
-        return self.output(self._name[self._test])
+    # def __str__(self):
+    #     """If the result is greater than the significance, print the null hypothesis, otherwise,
+    #     the alternate hypothesis"""
+    #     return self.output(self._name[self._test])
 
 
 class VectorStatistics(Analysis):
@@ -742,7 +876,8 @@ class VectorStatistics(Analysis):
 
     def __init__(self, data, sample=True, display=True):
         self._sample = sample
-        d = assign(data).data_prep()
+        # d = assign(data).data_prep()
+        d = Vector(data).data_prep()
         if d is None:
             raise NoDataError("Cannot perform the test because there is no data")
         if len(d) <= self._min_size:
@@ -835,24 +970,23 @@ class VectorStatistics(Analysis):
         return self._results['IQR']
 
     def __str__(self):
-        """If the result is greater than the significance, print the null hypothesis, otherwise,
-        the alternate hypothesis"""
-        return self.output(self._name, order=['Count',
-                                              'Mean',
-                                              'Std Dev',
-                                              'Std Error',
-                                              'Skewness',
-                                              'Kurtosis',
-                                              'Maximum',
-                                              '75%',
-                                              '50%',
-                                              '25%',
-                                              'Minimum',
-                                              'IQR',
-                                              'Range'], no_format=['Count'])
+        order = ['Count',
+                 'Mean',
+                 'Std Dev',
+                 'Std Error',
+                 'Skewness',
+                 'Kurtosis',
+                 'Maximum',
+                 '75%',
+                 '50%',
+                 '25%',
+                 'Minimum',
+                 'IQR',
+                 'Range']
+        return std_output(self._name, results=self._results, order=order)
 
 
-class GroupStatistics(GroupAnalysis):
+class GroupStatistics(Analysis):
     """Reports basic summary stats for a group of vectors."""
 
     _min_size = 1
@@ -867,7 +1001,8 @@ class GroupStatistics(GroupAnalysis):
             _data = args[0]
         data = dict()
         for g, d in _data.items():
-            clean = assign(d).data_prep()
+            # clean = assign(d).data_prep()
+            clean = Vector(d).data_prep()
             if clean is None:
                 continue
             if len(clean) <= self._min_size:
@@ -906,11 +1041,55 @@ class GroupStatistics(GroupAnalysis):
             self._results.append(row_result)
 
     def __str__(self):
-        return self.output(self._name, ['Count', 'Mean', 'Std Dev', 'Min', 'Median', 'Max', 'Group'],
-                           no_format=['Count', 'Group'])
+        order = [
+            'Count',
+            'Mean',
+            'Std Dev',
+            'Min',
+            'Median',
+            'Max',
+            'Group'
+        ]
+        return std_output(self._name, self._results, order=order)
+        # return self.output(self._name, ['Count', 'Mean', 'Std Dev', 'Min', 'Median', 'Max', 'Group'],
+        #                    no_format=['Count', 'Group'])
 
 
-def analyze(*data, **kwargs):
+class CategoricalStatistics(Analysis):
+    """Reports basic summary stats for Categorical data."""
+
+    _min_size = 1
+    _name = 'Statistics'
+
+    def __init__(self, data, display=True):
+        self.total = None
+        d = Categorical(data)
+        if d.data.empty or len(d.categories) == 0:
+            raise NoDataError("Cannot perform the test because there is no data")
+
+        super(CategoricalStatistics, self).__init__(d, display=display)
+        self.logic()
+
+    def run(self):
+        results = list()
+        ranks = self.data.counts.rank(method='first', na_option='bottom', ascending=False).astype('int')
+        df = DataFrame({'Rank': ranks,
+                        'Category': self.data.counts.index,
+                        'Frequency': self.data.counts})
+        for _, row in df.sort_values('Rank').iterrows() if self.data.order is None else df.iterrows():
+            results.append(row.to_dict())
+        self._results = results
+
+    def __str__(self):
+        order = [
+            'Rank',
+            'Frequency',
+            'Category'
+        ]
+        return std_output(self._name, self._results, order=order)
+
+
+def analyze(xdata, ydata=None, groups=None, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.
 
@@ -938,13 +1117,11 @@ def analyze(*data, **kwargs):
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
     debug = True if 'debug' in kwargs else False
-    xdata = data[0]
-    ydata = data[1] if len(data) > 1 else None
     parms = kwargs
     tested = list()
 
-    if len(data) > 2:
-        raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
+    # if len(data) > 2:
+    #     raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
     if xdata is None:
         raise ValueError("xdata was not provided.")
     if not is_iterable(xdata):

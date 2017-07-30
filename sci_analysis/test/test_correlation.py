@@ -13,8 +13,19 @@ class MyTestCase(unittest.TestCase):
         x_input_array = list(st.norm.rvs(size=100))
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
-        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
+        output = """
+
+Pearson Correlation Coefficient
+-------------------------------
+
+r value =  1.0000
+p value =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=True).p_value, alpha,
                         "FAIL: Correlation pearson Type II error")
+        self.assertEqual(str(Correlation(x_input_array, y_input_array, alpha, display=False)), output)
 
     def test_401_Correlation_corr_pearson_test_type(self):
         """Test the Correlation class for correlated normally distributed data"""

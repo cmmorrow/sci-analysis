@@ -13,8 +13,24 @@ class MyTestCase(unittest.TestCase):
         x_input_array = range(1, 101)
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
+        output = """
+
+Linear Regression
+-----------------
+
+Count     =  100
+Slope     =  3.0000
+Intercept =  0.0000
+r         =  1.0000
+r^2       =  1.0000
+Std Err   =  0.0000
+p value   =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
         self.assertLess(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
                         "FAIL: Linear Regression Type II error")
+        self.assertEqual(str(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False)), output)
 
     def test_351_LinRegress_no_corr(self):
         """Test the Linear Regression class for uncorrelated data"""

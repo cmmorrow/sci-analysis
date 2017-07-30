@@ -14,9 +14,20 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*x_parms, size=100)
         z_input_array = st.norm.rvs(*x_parms, size=100)
         alpha = 0.05
-        self.assertGreater(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
+        output = """
+
+Oneway ANOVA
+------------
+
+f value =  0.1076
+p value =  0.8980
+
+H0: Group means are matched
+"""
+        self.assertGreater(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=True).p_value,
                            alpha,
                            "FAIL: ANOVA Type I error")
+        self.assertEqual(str(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False)), output)
 
     def test_551_ANOVA_matched_statistic(self):
         """Test the ANOVA class on matched data"""

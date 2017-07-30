@@ -6,12 +6,35 @@ from ..analysis.analysis import VectorStatistics, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
+
+    display = True
+
     def test_1000_Vector_stats_count(self):
         """Test the vector statistics class"""
         np.random.seed(987654321)
         parms = [4, 1.75]
         input_array = st.norm.rvs(*parms, size=100)
-        self.assertEqual(VectorStatistics(input_array, sample=True, display=False).count, 100, "FAIL: Stat count")
+        output = """
+
+Statistics
+----------
+
+Count     =  100
+Mean      =  4.0145
+Std Dev   =  1.8622
+Std Error =  0.1862
+Skewness  = -0.0256
+Kurtosis  = -0.4830
+Maximum   =  7.9315
+75%       =  5.0664
+50%       =  4.1331
+25%       =  2.6576
+Minimum   = -0.3256
+IQR       =  2.4088
+Range     =  8.2571"""
+
+        self.assertEqual(VectorStatistics(input_array, sample=True, display=self.display).count, 100, "FAIL: Stat count")
+        self.assertEqual(str(VectorStatistics(input_array, sample=True, display=False)), output)
 
     def test_1001_Vector_stats_mean(self):
         """Test the vector statistics class"""

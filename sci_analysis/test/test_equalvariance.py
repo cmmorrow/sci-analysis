@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import EqualVariance, MinimumSizeError, NoDataError
+from sci_analysis.analysis.analysis import EqualVariance, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -16,9 +16,21 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*y_parms, size=100)
         z_input_array = st.norm.rvs(*z_parms, size=100)
         a = 0.05
-        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
+        output = """
+
+Bartlett Test
+-------------
+
+T value =  0.2264
+p value =  0.8930
+
+H0: Variances are equal
+"""
+        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=True).p_value,
                            a,
                            "FAIL: Equal variance Bartlett Type I error")
+        self.assertEqual(str(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False)),
+                         output)
 
     def test_451_EqualVariance_Bartlett_matched_test_type(self):
         """Test the EqualVariance class for normally distributed matched variances"""

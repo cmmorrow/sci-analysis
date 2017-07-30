@@ -11,7 +11,19 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         distro = 'norm'
-        self.assertGreater(KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False).p_value, alpha)
+        test = KSTest(st.norm.rvs(size=100), distro, alpha=alpha, display=False)
+        output = """
+
+Kolmogorov-Smirnov Test
+-----------------------
+
+D value =  0.0584
+p value =  0.8853
+
+H0: Data is matched to the norm distribution
+"""
+        self.assertGreater(test.p_value, alpha)
+        self.assertEqual(str(test), output)
 
     def test_251_Kolmogorov_Smirnov_normal_test_distribution_type(self):
         """Test the normal distribution detection"""

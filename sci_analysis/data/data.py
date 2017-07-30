@@ -22,23 +22,23 @@ class NumberOfCategoriesWarning(Warning):
                "If this isn't a mistake, consider subsetting the data first".format(self.warn_categories)
 
 
-def assign(obj, other=None):
-    """
-    Convert the passed array_like arguements to the correct sci_analysis object.
-
-    Parameters
-    ----------
-    obj : object
-        The input object.
-    other : object of unknown type, optional
-        A secondary object corresponding to the input object
-
-    Returns
-    -------
-    subseq : Data
-        A sci_analysis object that inherits from Data
-    """
-    return (Vector(obj), Vector(other)) if other is not None else Vector(obj)
+# def assign(obj, other=None):
+#     """
+#     Convert the passed array_like arguements to the correct sci_analysis object.
+#
+#     Parameters
+#     ----------
+#     obj : object
+#         The input object.
+#     other : object of unknown type, optional
+#         A secondary object corresponding to the input object
+#
+#     Returns
+#     -------
+#     subseq : Data
+#         A sci_analysis object that inherits from Data
+#     """
+#     return (Vector(obj), Vector(other)) if other is not None else Vector(obj)
 
 
 def is_vector(obj):
@@ -300,7 +300,6 @@ class Numeric(Data):
         arr : pandas.Series
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
-        # return np.array([]) if self.is_empty() else self.data[~np.isnan(self.data)]
         return self._values.dropna().reset_index(drop=True)
 
     def drop_nan_intersect(self, seq):
@@ -376,7 +375,7 @@ class Vector(Numeric):
                 # raise EmptyVectorError("Passed data is empty")
             return x, y
         elif not is_iterable(self.data):
-            return pd.Series(float(self.data))
+            return pd.Series(self.data).astype(float)
         else:
             v = self.drop_nan()
             if len(v) == 0:
@@ -402,17 +401,19 @@ class Categorical(Data):
     The sci_analysis representation of categorical, quantitative or textual data.
     """
 
-    def __init__(self, sequence=None, name=None, order=None):
+    def __init__(self, sequence=None, name=None, order=None, dropna=False):
         """Takes an array-like object and converts it to a pandas Categorical object.
 
         Parameters
         ----------
-        sequence : array-like
-            The input object
+        sequence : array-like or Data or Categorical
+            The input object.
         name : str, optional
-            The name of the Categorical object
+            The name of the Categorical object.
         order : array-like
-            The order categories in sequence should appear
+            The order that categories in sequence should appear.
+        dropna : bool
+            Remove all occurances of numpy NaN.
         """
         if sequence is None:
             self._values = pd.Series([])
@@ -434,16 +435,19 @@ class Categorical(Data):
             except ValueError:
                 self._values = pd.Series([])
             self._name = name
+            if dropna:
+                self._values = self._values.dropna()
             try:
                 # TODO: Need to fix this to work with numeric lists
                 sequence += 1
                 self._order = self.categories
             except TypeError:
                 self._order = order
-        self._counts = self._values.value_counts(sort=False)
+        self._counts = self._values.value_counts(sort=False, dropna=False)
         if self.categories is not None:
             if len(self.categories) > NumberOfCategoriesWarning.warn_categories:
                 warn(NumberOfCategoriesWarning())
+        # self._total = len(self.categories) if self.categories is not None else 0.0
 
     def is_empty(self):
         """
@@ -454,11 +458,14 @@ class Categorical(Data):
         test_result : bool
             The result of whether the length of the Vector object is 0 or not.
         """
-        # return len(self._values) == 0
         return self._values.empty
 
-    def data_prep(self, categories=None, order=None):
-        pass
+    def data_prep(self):
+        return self._values.dropna().reset_index(drop=True)
+
+    @property
+    def data_type(self):
+        return self.data.dtype
 
     @property
     def counts(self):
@@ -470,4 +477,5 @@ class Categorical(Data):
 
     @property
     def categories(self):
+        # TODO: Need to fix this to show NaN since Pandas will drop NaN automatically.
         return self._values.cat.categories if len(self._values) > 0 else None

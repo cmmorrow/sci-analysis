@@ -14,9 +14,20 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.weibull_min.rvs(*x_parms, size=100)
         z_input_array = st.weibull_min.rvs(*x_parms, size=100)
         alpha = 0.05
-        self.assertGreater(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
+        output = """
+
+Kruskal-Wallis
+--------------
+
+h value =  0.4042
+p value =  0.8170
+
+H0: Group means are matched
+"""
+        self.assertGreater(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha, display=True).p_value,
                            alpha,
                            "FAIL: Kruskal Type I error")
+        self.assertEqual(str(Kruskal(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False)), output)
 
     def test_501_Kruskal_matched_statistic(self):
         """Test the Kruskal Wallis class on matched data"""

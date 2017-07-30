@@ -11,13 +11,22 @@ class TestTwoSampleKS(unittest.TestCase):
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=20)
+        y_input = st.weibull_min.rvs(*y_parms, size=20)
         alpha = 0.05
-        self.assertGreater(TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=20),
-                                           st.weibull_min.rvs(*y_parms, size=20),
-                                           alpha=alpha,
-                                           display=False).p_value,
-                           alpha,
+        output = """
+
+Two Sample Kolmogorov-Smirnov Test
+----------------------------------
+
+D value =  0.2000
+p value =  0.7710
+
+H0: Both samples come from the same distribution
+"""
+        self.assertGreater(TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False).p_value, alpha,
                            "FAIL: Two Sample KS Test Type I error")
+        self.assertEqual(str(TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False)), output)
 
     def test_two_sample_KS_unmatched(self):
         """Test the Two Sample KS Test with unmatched samples"""

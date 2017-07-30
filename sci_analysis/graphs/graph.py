@@ -21,8 +21,9 @@ from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack
 from scipy.stats import probplot, gaussian_kde
 
 # local imports
-from ..data.data import assign
-from ..operations.data_operations import is_dict, is_group
+# from ..data.data import assign
+from sci_analysis.data import Vector
+from sci_analysis.operations.data_operations import is_dict, is_group
 # TODO: Add preferences back in a future version
 # from ..preferences.preferences import GraphPreferences
 # from six.moves import range
@@ -96,7 +97,8 @@ class Graph(object):
         self._yname = kwargs['yname'] if 'yname' in kwargs else 'y'
 
         if 'intersect' in kwargs:
-            x, y = assign(args[0], args[1])
+            # x, y = assign(args[0], args[1])
+            x, y = Vector(args[0]), Vector(args[1])
             if x is None or y is None:
                 raise NoDataError("Cannot graph because there is no data")
             try:
@@ -109,7 +111,8 @@ class Graph(object):
         else:
             data = list()
             for d in args:
-                clean = assign(d).data_prep()
+                # clean = assign(d).data_prep()
+                clean = Vector(d).data_prep()
                 if clean is None:
                     data.append(None)
                     continue
