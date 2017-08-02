@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import GroupStatistics, MinimumSizeError, NoDataError
+from analysis import GroupStatistics, MinimumSizeError, NoDataError
 
 
 class TestGroupStatistics(unittest.TestCase):

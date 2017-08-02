@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import MannWhitney, MinimumSizeError, NoDataError
+from analysis import MannWhitney, MinimumSizeError, NoDataError
 
 
 class TestMannWhitney(unittest.TestCase):

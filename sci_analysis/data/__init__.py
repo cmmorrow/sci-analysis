@@ -2,7 +2,12 @@
 Modules:
     data - the sci_analysis Data class
     operations - sci_analysis Data functions
-    vector - the sci_analysis Vector class
 """
-from .data import Data, Vector, Categorical, is_data, is_numeric, is_categorical, is_vector, \
-    EmptyVectorError, UnequalVectorLengthError, NumberOfCategoriesWarning
+from .data import Data, is_data
+
+from .data_operations import to_float, flatten, is_tuple, is_iterable, is_array, is_series, is_dict, is_group, \
+    is_dict_group
+
+from .categories import NumberOfCategoriesWarning, is_categorical, Categorical
+
+from .numeric import EmptyVectorError, UnequalVectorLengthError, is_numeric, is_vector, Numeric, Vector

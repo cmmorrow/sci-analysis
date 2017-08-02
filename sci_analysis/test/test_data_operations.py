@@ -1,11 +1,11 @@
 import unittest
-import pandas as pd
+
 import numpy as np
 import numpy.ma as ma
+import pandas as pd
 
-from ..data.data import Vector, is_data, is_vector, is_numeric
-from ..operations.data_operations import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, \
-    flatten, is_series
+from data import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, flatten, is_series, \
+    Vector, is_data, is_vector, is_numeric
 
 
 class MyTestCase(unittest.TestCase):

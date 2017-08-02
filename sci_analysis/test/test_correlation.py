@@ -2,8 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Correlation, MinimumSizeError, NoDataError
-from ..data.data import UnequalVectorLengthError
+from analysis import Correlation, MinimumSizeError, NoDataError
+from data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):

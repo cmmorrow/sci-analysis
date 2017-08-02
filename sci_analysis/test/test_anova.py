@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Anova, MinimumSizeError, NoDataError
+from analysis.hypo_tests import Anova
+from analysis.func import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):

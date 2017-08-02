@@ -2,7 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
-from ..analysis.analysis import TTest, MinimumSizeError, NoDataError
+from analysis import TTest, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):

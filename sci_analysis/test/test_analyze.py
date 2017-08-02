@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from sci_analysis.analysis.analysis import analyze, NoDataError
+from analysis import analyze, NoDataError
 
 
 class MyTestCase(unittest.TestCase):

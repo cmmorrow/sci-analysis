@@ -2,7 +2,8 @@ import unittest
 from warnings import catch_warnings, simplefilter
 import numpy as np
 from pandas import Series, MultiIndex
-from sci_analysis.data import Categorical, is_categorical, is_data, NumberOfCategoriesWarning
+
+from data import Categorical, is_categorical, is_data, NumberOfCategoriesWarning
 
 
 class TestWarnings(unittest.TestCase):

@@ -2,9 +2,10 @@ import unittest
 from numpy import nan
 from numpy.random import seed, randint
 from pandas import Series
-from sci_analysis.analysis.analysis import CategoricalStatistics, NoDataError
-from sci_analysis.data import Categorical, NumberOfCategoriesWarning
-from sci_analysis.test.test_categorical import TestWarnings
+
+from analysis import CategoricalStatistics, NoDataError
+from data import Categorical, NumberOfCategoriesWarning
+from test.test_categorical import TestWarnings
 
 
 class MyTestCase(TestWarnings):
@@ -31,7 +32,7 @@ Rank          Frequency     Category
 
     def test_101_categorical_stats_simple_ordered_categories(self):
         input_array = Categorical(['one', 'two', 'one', 'three'], order=['three', 'two', 'one'])
-        obj = CategoricalStatistics(input_array, display=True)
+        obj = CategoricalStatistics(input_array, display=False)
         output = """
 
 Statistics
