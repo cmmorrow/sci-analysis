@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from graphs.graph import GraphHisto, NoDataError, MinimumSizeError
+from ..graphs.graph import GraphHisto, NoDataError, MinimumSizeError
 
 
 class MyTestCase(unittest.TestCase):

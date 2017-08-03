@@ -3,8 +3,8 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from graphs.graph import GraphScatter, NoDataError, MinimumSizeError
-from data import UnequalVectorLengthError
+from ..graphs.graph import GraphScatter, NoDataError, MinimumSizeError
+from ..data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):

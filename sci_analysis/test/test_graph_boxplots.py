@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from graphs.graph import GraphBoxplot, MinimumSizeError, NoDataError
+from ..graphs.graph import GraphBoxplot, MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
