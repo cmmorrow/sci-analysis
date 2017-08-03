@@ -33,7 +33,7 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
     xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
 
     """
-    from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
+    from ..graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
     from ..data import is_dict, is_iterable, is_group, is_dict_group
     from .exc import NoDataError
     groups = kwargs['groups'] if 'groups' in kwargs else None

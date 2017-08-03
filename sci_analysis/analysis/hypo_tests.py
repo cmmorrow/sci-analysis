@@ -37,7 +37,7 @@ class Test(Analysis):
     def __init__(self, *args, **kwargs):
         """Initialize the object"""
 
-        from data import Vector
+        from ..data import Vector
         self._alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
         data = list()
         for d in args:
