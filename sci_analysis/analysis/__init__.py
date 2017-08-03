@@ -3,7 +3,6 @@ Modules:
     analysis - sci_analysis test and calculation classes and functions
 """
 
-from .func import MinimumSizeError, NoDataError, std_output
 from .hypo_tests import NormTest, KSTest, TwoSampleKSTest, MannWhitney, TTest, Anova, Kruskal, EqualVariance
 from .comparison import LinearRegression, Correlation
 from .stats import VectorStatistics, GroupStatistics, CategoricalStatistics
@@ -36,6 +35,7 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
     """
     from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
     from data import is_dict, is_iterable, is_group, is_dict_group
+    from .exc import NoDataError
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
     debug = True if 'debug' in kwargs else False

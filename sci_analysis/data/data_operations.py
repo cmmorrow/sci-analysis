@@ -13,7 +13,7 @@ Functions:
     is_group - checks if a given variable is a list of iterable objects.
     is_group_dict - checks if a given variable is a dictionary of iterable objects.
 """
-from __future__ import absolute_import
+# from __future__ import absolute_import
 import six
 import numpy as np
 import pandas as pd

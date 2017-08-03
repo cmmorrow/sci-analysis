@@ -6,8 +6,8 @@ Classes:
     GraphBoxplot - Draws box plots of the provided data as well as an optional probability plot.
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
+# from __future__ import absolute_import
+# from __future__ import print_function
 
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \

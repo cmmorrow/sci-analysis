@@ -11,7 +11,7 @@ VectorStatistics, GroupStatistics, GraphHisto, GraphScatter and GraphBoxplot. Th
 following methods are imported so that they are exposed at a high level: analyze,
 clean and strip.
 """
-from __future__ import absolute_import
+# from __future__ import absolute_import
 
 # from sci_analysis.analysis import analysis
 # from sci_analysis.graphs import graph

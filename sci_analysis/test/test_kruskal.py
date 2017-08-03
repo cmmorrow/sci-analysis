@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from analysis import Kruskal, MinimumSizeError, NoDataError
+from analysis import Kruskal
+from analysis.exc import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):

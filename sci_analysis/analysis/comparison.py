@@ -3,7 +3,7 @@ from scipy.stats import linregress, pearsonr, spearmanr
 
 from data import Vector
 from analysis.base import Analysis, std_output
-from analysis.func import NoDataError, MinimumSizeError
+from analysis.exc import NoDataError, MinimumSizeError
 from analysis.hypo_tests import NormTest
 
 

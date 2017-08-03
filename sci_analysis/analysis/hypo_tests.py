@@ -8,7 +8,7 @@ try:
     from analysis.base import std_output
 except ImportError:
     pass
-from analysis.func import NoDataError, MinimumSizeError
+from analysis.exc import NoDataError, MinimumSizeError
 
 
 class Test(Analysis):

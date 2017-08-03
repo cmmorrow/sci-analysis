@@ -3,7 +3,7 @@ Functions:
     is_vector: test if the passed array_like argument is a sci_analysis Vector object.
     is_data: test if the passed array_like argument is a sci_analysis Data object.
 """
-from __future__ import absolute_import
+# from __future__ import absolute_import
 
 
 def is_data(obj):

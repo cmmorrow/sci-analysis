@@ -3,7 +3,8 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from analysis import analyze, NoDataError
+from analysis.exc import NoDataError
+from analysis import analyze
 
 
 class MyTestCase(unittest.TestCase):

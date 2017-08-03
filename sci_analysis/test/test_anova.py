@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as st
 
 from analysis.hypo_tests import Anova
-from analysis.func import MinimumSizeError, NoDataError
+from analysis.exc import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
