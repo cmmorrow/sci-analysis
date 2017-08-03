@@ -3,9 +3,9 @@ from numpy import nan
 from numpy.random import seed, randint
 from pandas import Series
 
-from analysis import CategoricalStatistics
-from analysis.exc import NoDataError
-from data import Categorical, NumberOfCategoriesWarning
+from ..analysis import CategoricalStatistics
+from ..analysis.exc import NoDataError
+from ..data import Categorical, NumberOfCategoriesWarning
 from .test_categorical import TestWarnings
 
 

@@ -2,7 +2,8 @@
 import pandas as pd
 
 # Import from local
-from data import Data, is_data, is_iterable, is_dict, flatten
+from .data import Data, is_data
+from .data_operations import is_iterable, is_dict, flatten
 
 
 class EmptyVectorError(Exception):

@@ -34,7 +34,7 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
 
     """
     from graphs.graph import GraphHisto, GraphScatter, GraphBoxplot
-    from data import is_dict, is_iterable, is_group, is_dict_group
+    from ..data import is_dict, is_iterable, is_group, is_dict_group
     from .exc import NoDataError
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05

@@ -2,9 +2,9 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from analysis import LinearRegression
-from analysis.exc import MinimumSizeError, NoDataError
-from data import UnequalVectorLengthError
+from ..analysis import LinearRegression
+from ..analysis.exc import MinimumSizeError, NoDataError
+from ..data import UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):

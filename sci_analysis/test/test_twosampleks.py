@@ -2,8 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from analysis import TwoSampleKSTest
-from analysis.exc import MinimumSizeError, NoDataError
+from ..analysis import TwoSampleKSTest
+from ..analysis.exc import MinimumSizeError, NoDataError
 
 
 class TestTwoSampleKS(unittest.TestCase):

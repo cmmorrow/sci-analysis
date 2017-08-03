@@ -7,9 +7,9 @@ from numpy import mean, std, median, amin, amax, percentile
 # Scipy imports
 from scipy.stats import skew, kurtosis, sem
 
-from analysis.base import Analysis, std_output
-from analysis.exc import NoDataError, MinimumSizeError
-from data import Vector, Categorical, is_dict
+from .base import Analysis, std_output
+from .exc import NoDataError, MinimumSizeError
+from ..data import Vector, Categorical, is_dict
 
 
 class VectorStatistics(Analysis):

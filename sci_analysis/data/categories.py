@@ -4,7 +4,8 @@ from warnings import warn
 import pandas as pd
 
 # Import from local
-from data import Data, flatten, is_data
+from .data import Data, is_data
+from .data_operations import flatten
 
 
 class NumberOfCategoriesWarning(Warning):

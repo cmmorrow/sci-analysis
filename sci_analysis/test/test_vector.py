@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import scipy.stats as st
-from data import Vector, UnequalVectorLengthError
+from ..data import Vector, UnequalVectorLengthError
 
 
 class MyTestCase(unittest.TestCase):

@@ -2,13 +2,13 @@
 from scipy.stats import shapiro, kstest, ks_2samp, mannwhitneyu, ttest_1samp, ttest_ind, f_oneway, kruskal, bartlett, \
     levene
 
-from data import is_group, is_iterable
-from analysis.base import Analysis
+from ..data import is_group, is_iterable
+from .base import Analysis
 try:
-    from analysis.base import std_output
+    from .base import std_output
 except ImportError:
     pass
-from analysis.exc import NoDataError, MinimumSizeError
+from .exc import NoDataError, MinimumSizeError
 
 
 class Test(Analysis):

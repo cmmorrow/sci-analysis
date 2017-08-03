@@ -4,7 +4,7 @@ import numpy as np
 import numpy.ma as ma
 import pandas as pd
 
-from data import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, flatten, is_series, \
+from ..data import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, flatten, is_series, \
     Vector, is_data, is_vector, is_numeric
 
 

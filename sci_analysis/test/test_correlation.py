@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis import Correlation, MinimumSizeError, NoDataError
+from ..analysis import Correlation
+from ..analysis.exc import MinimumSizeError, NoDataError
 from ..data import UnequalVectorLengthError
 
 
