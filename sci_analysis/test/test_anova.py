@@ -20,6 +20,7 @@ class MyTestCase(unittest.TestCase):
 Oneway ANOVA
 ------------
 
+alpha   =  0.0500
 f value =  0.1076
 p value =  0.8980
 

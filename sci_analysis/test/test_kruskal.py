@@ -20,6 +20,7 @@ class MyTestCase(unittest.TestCase):
 Kruskal-Wallis
 --------------
 
+alpha   =  0.0500
 h value =  0.4042
 p value =  0.8170
 

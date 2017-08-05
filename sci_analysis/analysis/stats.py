@@ -17,6 +17,19 @@ class VectorStatistics(Analysis):
 
     _min_size = 1
     _name = 'Statistics'
+    _n = 'n'
+    _mean = 'mean'
+    _std = 'Std Dev'
+    _ste = 'Std Error'
+    _range = 'Range'
+    _skew = 'Skewness'
+    _kurt = 'Kurtosis'
+    _iqr = 'IQR'
+    _q1 = '25%'
+    _q2 = '50%'
+    _q3 = '75%'
+    _min = 'Minimum'
+    _max = "Maximum"
 
     def __init__(self, data, sample=True, display=True):
         self._sample = sample
@@ -46,86 +59,88 @@ class VectorStatistics(Analysis):
         q1 = percentile(self._data, 25)
         q3 = percentile(self._data, 75)
         iqr = q3 - q1
-        self._results = {"Count": count,
-                         "Mean": avg,
-                         "Std Dev": sd,
-                         "Std Error": error,
-                         "50%": med,
-                         "Minimum": vmin,
-                         "Maximum": vmax,
-                         "Range": vrange,
-                         "Skewness": sk,
-                         "Kurtosis": kurt,
-                         "25%": q1,
-                         "75%": q3,
-                         "IQR": iqr}
+        self._results = {self._n: count,
+                         self._mean: avg,
+                         self._std: sd,
+                         self._ste: error,
+                         self._q2: med,
+                         self._min: vmin,
+                         self._max: vmax,
+                         self._range: vrange,
+                         self._skew: sk,
+                         self._kurt: kurt,
+                         self._q1: q1,
+                         self._q3: q3,
+                         self._iqr: iqr,
+                         }
 
     @property
     def count(self):
-        return self._results['Count']
+        return self._results[self._n]
 
     @property
     def mean(self):
-        return self._results['Mean']
+        return self._results[self._mean]
 
     @property
     def std_dev(self):
-        return self._results['Std Dev']
+        return self._results[self._std]
 
     @property
     def std_err(self):
-        return self._results['Std Error']
+        return self._results[self._ste]
 
     @property
     def median(self):
-        return self._results['50%']
+        return self._results[self._q2]
 
     @property
     def minimum(self):
-        return self._results['Minimum']
+        return self._results[self._min]
 
     @property
     def maximum(self):
-        return self._results['Maximum']
+        return self._results[self._max]
 
     @property
     def range(self):
-        return self._results['Range']
+        return self._results[self._range]
 
     @property
     def skewness(self):
-        return self._results['Skewness']
+        return self._results[self._skew]
 
     @property
     def kurtosis(self):
-        return self._results['Kurtosis']
+        return self._results[self._kurt]
 
     @property
     def q1(self):
-        return self._results['25%']
+        return self._results[self._q1]
 
     @property
     def q3(self):
-        return self._results['75%']
+        return self._results[self._q3]
 
     @property
     def iqr(self):
-        return self._results['IQR']
+        return self._results[self._iqr]
 
     def __str__(self):
-        order = ['Count',
-                 'Mean',
-                 'Std Dev',
-                 'Std Error',
-                 'Skewness',
-                 'Kurtosis',
-                 'Maximum',
-                 '75%',
-                 '50%',
-                 '25%',
-                 'Minimum',
-                 'IQR',
-                 'Range']
+        order = [self._n,
+                 self._mean,
+                 self._std,
+                 self._ste,
+                 self._skew,
+                 self._kurt,
+                 self._max,
+                 self._q3,
+                 self._q2,
+                 self._q1,
+                 self._min,
+                 self._iqr,
+                 self._range,
+                 ]
         return std_output(self._name, results=self._results, order=order)
 
 
@@ -134,6 +149,13 @@ class GroupStatistics(Analysis):
 
     _min_size = 1
     _name = 'Group Statistics'
+    _group = 'Group'
+    _n = 'n'
+    _mean = 'Mean'
+    _std = 'Std Dev'
+    _max = 'Max'
+    _q2 = 'Median'
+    _min = 'Min'
 
     def __init__(self, *args, **kwargs):
         groups = kwargs['groups'] if 'groups' in kwargs else None
@@ -173,24 +195,25 @@ class GroupStatistics(Analysis):
             vmax = amax(vector)
             vmin = amin(vector)
             q2 = median(vector)
-            row_result = {"Group": group,
-                          "Count": count,
-                          "Mean": avg,
-                          "Std Dev": sd,
-                          "Max": vmax,
-                          "Median": q2,
-                          "Min": vmin}
+            row_result = {self._group: group,
+                          self._n: count,
+                          self._mean: avg,
+                          self._std: sd,
+                          self._max: vmax,
+                          self._q2: q2,
+                          self._min: vmin,
+                          }
             self._results.append(row_result)
 
     def __str__(self):
         order = [
-            'Count',
-            'Mean',
-            'Std Dev',
-            'Min',
-            'Median',
-            'Max',
-            'Group'
+            self._n,
+            self._mean,
+            self._std,
+            self._min,
+            self._q2,
+            self._max,
+            self._group,
         ]
         return std_output(self._name, self._results, order=order)
 
@@ -200,6 +223,9 @@ class CategoricalStatistics(Analysis):
 
     _min_size = 1
     _name = 'Statistics'
+    _rank = 'Rank'
+    _cat = 'Category'
+    _freq = 'Frequency'
 
     def __init__(self, data, display=True):
         self.total = None
@@ -213,17 +239,18 @@ class CategoricalStatistics(Analysis):
     def run(self):
         results = list()
         ranks = self.data.counts.rank(method='first', na_option='bottom', ascending=False).astype('int')
-        df = DataFrame({'Rank': ranks,
-                        'Category': self.data.counts.index,
-                        'Frequency': self.data.counts})
+        df = DataFrame({self._rank: ranks,
+                        self._cat: self.data.counts.index,
+                        self._freq: self.data.counts
+                        })
         for _, row in df.sort_values('Rank').iterrows() if self.data.order is None else df.iterrows():
             results.append(row.to_dict())
         self._results = results
 
     def __str__(self):
         order = [
-            'Rank',
-            'Frequency',
-            'Category'
+            self._rank,
+            self._freq,
+            self._cat,
         ]
         return std_output(self._name, self._results, order=order)

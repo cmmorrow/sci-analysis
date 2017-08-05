@@ -20,7 +20,7 @@ class MyTestCase(unittest.TestCase):
 Statistics
 ----------
 
-Count     =  100
+n         =  100
 Mean      =  4.0145
 Std Dev   =  1.8622
 Std Error =  0.1862

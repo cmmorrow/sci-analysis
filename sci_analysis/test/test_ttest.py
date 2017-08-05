@@ -21,6 +21,7 @@ class MyTestCase(unittest.TestCase):
 1 Sample T Test
 ---------------
 
+alpha   =  0.0500
 t value =  0.0781
 p value =  0.9379
 

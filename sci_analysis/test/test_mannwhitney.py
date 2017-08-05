@@ -20,6 +20,7 @@ class TestMannWhitney(unittest.TestCase):
 Mann Whitney U Test
 -------------------
 
+alpha   =  0.0500
 u value =  4976.0000
 p value =  0.9542
 

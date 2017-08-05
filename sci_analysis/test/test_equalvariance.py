@@ -22,6 +22,7 @@ class MyTestCase(unittest.TestCase):
 Bartlett Test
 -------------
 
+alpha   =  0.0500
 T value =  0.2264
 p value =  0.8930
 

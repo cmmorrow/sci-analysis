@@ -18,6 +18,7 @@ class MyTestCase(unittest.TestCase):
 Shapiro-Wilk test for normality
 -------------------------------
 
+alpha   =  0.0500
 W value =  0.9880
 p value =  0.5050
 

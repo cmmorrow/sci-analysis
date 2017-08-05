@@ -18,6 +18,7 @@ class MyTestCase(unittest.TestCase):
 Kolmogorov-Smirnov Test
 -----------------------
 
+alpha   =  0.0500
 D value =  0.0584
 p value =  0.8853
 

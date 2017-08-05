@@ -20,6 +20,7 @@ class TestTwoSampleKS(unittest.TestCase):
 Two Sample Kolmogorov-Smirnov Test
 ----------------------------------
 
+alpha   =  0.0500
 D value =  0.2000
 p value =  0.7710
 

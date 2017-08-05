@@ -18,7 +18,7 @@ class TestGroupStatistics(unittest.TestCase):
 Group Statistics
 ----------------
 
-Count         Mean          Std Dev       Min           Median        Max           Group         
+n             Mean          Std Dev       Min           Median        Max           Group         
 --------------------------------------------------------------------------------------------------
 100            2.0083        1.0641       -0.4718        2.0761        4.2466       1             
 45             2.3678        3.5551       -4.8034        2.2217        11.4199      2             

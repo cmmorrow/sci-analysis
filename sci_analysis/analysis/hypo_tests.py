@@ -3,11 +3,7 @@ from scipy.stats import shapiro, kstest, ks_2samp, mannwhitneyu, ttest_1samp, tt
     levene
 
 from ..data import is_group, is_iterable
-from .base import Analysis
-try:
-    from .base import std_output
-except ImportError:
-    pass
+from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
 
 
@@ -60,24 +56,28 @@ class Test(Analysis):
 
     @property
     def statistic(self):
-        """The test statistic returned by the function called in the run method"""
+        """The test statistic returned by the function called in the run method."""
         return self._results['statistic']
 
     @property
+    def statistic_name(self):
+        """The test statistic name."""
+        return self._statistic_name
+
+    @property
     def p_value(self):
-        """The p-value returned by the function called in the run method"""
+        """The p-value returned by the function called in the run method."""
         return self._results['p value']
+
+    @property
+    def alpha(self):
+        """The alpha used by the hypothesis test."""
+        return self._alpha
 
     def __str__(self):
         out = list()
-        order = list()
-        res = list(self._results.keys())
-        if 'p value' in res:
-            order.append('p value')
-            res.remove('p value')
-        order.extend(res)
 
-        out.append(std_output(self.name, self._results, reversed(order)))
+        out.append(std_output(self.name, self._results, ['alpha', self.statistic_name, 'p value']))
         out.append('')
         out.append(self._h0 if self.p_value > self._alpha else self._ha)
         out.append('')
@@ -91,6 +91,7 @@ class NormTest(Test):
     """Tests for whether data is normally distributed or not."""
 
     _name = "Shapiro-Wilk test for normality"
+    _statistic_name = 'W value'
     _h0 = "H0: Data is normally distributed"
     _ha = "HA: Data is not normally distributed"
 
@@ -107,21 +108,22 @@ class NormTest(Test):
             min_p = min(p_value)
             w_value = w_value[p_value.index(min_p)]
             p_value = min_p
-        self._results.update({'W value': w_value, 'p value': p_value})
+        self._results.update({self._statistic_name: w_value, 'p value': p_value, 'alpha': self._alpha})
 
     @property
     def statistic(self):
-        return self._results['W value']
+        return self._results[self._statistic_name]
 
     @property
     def w_value(self):
-        return self._results['W value']
+        return self._results[self._statistic_name]
 
 
 class KSTest(Test):
     """Tests whether data comes from a specified distribution or not."""
 
     _name = "Kolmogorov-Smirnov Test"
+    _statistic_name = 'D value'
 
     def __init__(self, data, distribution='norm', parms=(), alpha=0.05, display=True):
         self._distribution = distribution
@@ -135,7 +137,7 @@ class KSTest(Test):
         if self._parms:
             args.append(self._parms)
         d_value, p_value = kstest(*args)
-        self._results.update({'D value': d_value, 'p value': p_value})
+        self._results.update({self._statistic_name: d_value, 'p value': p_value, 'alpha': self._alpha})
 
     @property
     def distribution(self):
@@ -144,17 +146,18 @@ class KSTest(Test):
 
     @property
     def statistic(self):
-        return self._results['D value']
+        return self._results[self._statistic_name]
 
     @property
     def d_value(self):
-        return self._results['D value']
+        return self._results[self._statistic_name]
 
 
 class TwoSampleKSTest(Test):
     """Tests whether two independent vectors come from the same distribution"""
 
     _name = "Two Sample Kolmogorov-Smirnov Test"
+    _statistic_name = 'D value'
     _h0 = "H0: Both samples come from the same distribution"
     _ha = "HA: Samples do not come from the same distribution"
 
@@ -163,42 +166,44 @@ class TwoSampleKSTest(Test):
 
     def run(self):
         d_value, p_value = ks_2samp(*self._data)
-        self._results.update({'D value': d_value, 'p value': p_value})
+        self._results.update({self._statistic_name: d_value, 'p value': p_value, 'alpha': self._alpha})
 
     @property
     def statistic(self):
-        return self._results['D value']
+        return self._results[self._statistic_name]
 
     @property
     def d_value(self):
-        return self._results['D value']
+        return self._results[self._statistic_name]
 
 
 class MannWhitney(Test):
     """Performs a Mann Whitney U Test on two vectors"""
 
     _name = "Mann Whitney U Test"
+    _statistic_name = 'u value'
     _h0 = "H0: Locations are matched"
     _ha = "HA: Locations are not matched"
     _min_size = 30
 
     def run(self):
         u_value, p_value = mannwhitneyu(*self._data)
-        self._results.update({'u value': u_value, 'p value': p_value * 2})
+        self._results.update({self._statistic_name: u_value, 'p value': p_value * 2, 'alpha': self._alpha})
 
     @property
     def statistic(self):
-        return self._results['u value']
+        return self._results[self._statistic_name]
 
     @property
     def u_value(self):
-        return self._results['u value']
+        return self._results[self._statistic_name]
 
 
 class TTest(Test):
     """Performs a T-Test on the two provided vectors."""
 
     _names = {'1_sample': '1 Sample T Test', 't_test': 'T Test', 'welch_t': "Welch's T Test"}
+    _statistic_name = 't value'
     _h0 = "H0: Means are matched"
     _ha = "HA: Means are significantly different"
     _min_size = 3
@@ -227,7 +232,7 @@ class TTest(Test):
                 test = 'welch_t'
         self._test = test
         self._name = self._names[test]
-        self._results.update({'p value': p, 't value': float(t)})
+        self._results.update({'p value': p, self._statistic_name: float(t), 'alpha': self._alpha})
 
     @property
     def test_type(self):
@@ -239,59 +244,62 @@ class TTest(Test):
 
     @property
     def t_value(self):
-        return self._results['t value']
+        return self._results[self._statistic_name]
 
     @property
     def statistic(self):
-        return self._results['t value']
+        return self._results[self._statistic_name]
 
 
 class Anova(Test):
     """Performs a one-way ANOVA on a group of vectors."""
 
     _name = "Oneway ANOVA"
+    _statistic_name = 'f value'
     _h0 = "H0: Group means are matched"
     _ha = "HA: Group means are not matched"
 
     def run(self):
         f_value, p_value = f_oneway(*self.data)
-        self._results.update({'p value': p_value, 'f value': f_value})
+        self._results.update({'p value': p_value, self._statistic_name: f_value, 'alpha': self._alpha})
 
     @property
     def f_value(self):
         """The f value returned by the ANOVA f test"""
-        return self._results['f value']
+        return self._results[self._statistic_name]
 
     @property
     def statistic(self):
-        return self._results['f value']
+        return self._results[self._statistic_name]
 
 
 class Kruskal(Test):
     """Performs a non-parametric Kruskal-Wallis test on a group of vectors."""
 
     _name = "Kruskal-Wallis"
+    _statistic_name = 'h value'
     _h0 = "H0: Group means are matched"
     _ha = "HA: Group means are not matched"
 
     def run(self):
         h_value, p_value = kruskal(*self.data)
-        self._results.update({'p value': p_value, 'h value': h_value})
+        self._results.update({'p value': p_value, self._statistic_name: h_value, 'alpha': self._alpha})
 
     @property
     def h_value(self):
         """The h value returned by the Kruskal test"""
-        return self._results['h value']
+        return self._results[self._statistic_name]
 
     @property
     def statistic(self):
-        return self._results['h value']
+        return self._results[self._statistic_name]
 
 
 class EqualVariance(Test):
     """Checks a group of vectors for equal variance."""
 
     _names = {'Bartlett': 'Bartlett Test', 'Levene': 'Levene Test'}
+    _statistic_name = {'Bartlett': 'T value', 'Levene': 'W value'}
     _h0 = "H0: Variances are equal"
     _ha = "HA: Variances are not equal"
 
@@ -305,29 +313,33 @@ class EqualVariance(Test):
         if NormTest(*self._data, display=False, alpha=self._alpha).p_value > self._alpha:
             statistic, p_value = bartlett(*self._data)
             r = 'Bartlett'
-            self._results.update({'p value': p_value, 'T value': statistic})
+            self._results.update({'p value': p_value, self._statistic_name[r]: statistic, 'alpha': self._alpha})
         else:
             statistic, p_value = levene(*self._data)
             r = 'Levene'
-            self._results.update({'p value': p_value, 'W value': statistic})
+            self._results.update({'p value': p_value, self._statistic_name[r]: statistic, 'alpha': self._alpha})
         self._test = r
         self._name = self._names[r]
 
     @property
     def t_value(self):
-        return self._results['T value']
+        return self._results[self._statistic_name['Bartlett']]
 
     @property
     def w_value(self):
-        return self._results['W value']
+        return self._results[self._statistic_name['Levene']]
 
     @property
     def statistic(self):
         try:
-            s = self._results['W value']
+            s = self._results[self._statistic_name['Levene']]
         except KeyError:
-            s = self._results['T value']
+            s = self._results[self._statistic_name['Bartlett']]
         return s
+
+    @property
+    def statistic_name(self):
+        return self._statistic_name[self._test]
 
     @property
     def test_type(self):
