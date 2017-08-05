@@ -18,7 +18,7 @@ class VectorStatistics(Analysis):
     _min_size = 1
     _name = 'Statistics'
     _n = 'n'
-    _mean = 'mean'
+    _mean = 'Mean'
     _std = 'Std Dev'
     _ste = 'Std Error'
     _range = 'Range'
