@@ -3,7 +3,8 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from ..graphs.graph import GraphBoxplot, MinimumSizeError, NoDataError
+from ..graphs import GraphBoxplot
+from ..analysis.exc import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -120,8 +121,8 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
         input_2_array = st.norm.rvs(1, size=2000)
-        indicies_x = [x for x in np.random.randint(0, 1999, 200)]
-        indicies_y = [y for y in np.random.randint(0, 1999, 200)]
+        indicies_x = list(np.random.randint(0, 1999, 200))
+        indicies_y = list(np.random.randint(0, 1999, 200))
         for i in indicies_x:
             input_1_array = np.insert(input_1_array, i, np.nan, axis=0)
         for i in indicies_y:

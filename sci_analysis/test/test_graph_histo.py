@@ -3,7 +3,8 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from ..graphs.graph import GraphHisto, NoDataError, MinimumSizeError
+from ..graphs import GraphHisto
+from ..analysis.exc import NoDataError, MinimumSizeError
 
 
 class MyTestCase(unittest.TestCase):
@@ -306,7 +307,7 @@ class MyTestCase(unittest.TestCase):
         """Generate a histogram graph with 500 random missing values"""
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=5000)
-        indicies = [x for x in np.random.randint(0, 4999, 500)]
+        indicies = list(np.random.randint(0, 4999, 500))
         for x in indicies:
             input_array = np.insert(input_array, x, np.nan, axis=0)
         self.assertTrue(GraphHisto(input_array, name='Missing Test', save_to='{}test_histo_131'.format(self.save_path)))
