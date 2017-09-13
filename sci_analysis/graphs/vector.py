@@ -23,7 +23,7 @@ class VectorGraph(Graph):
         labels. The default values are "x" and "y".
         """
 
-        if 'intersect' in kwargs.keys():
+        if 'intersect' in kwargs:
             if len(tuple(args)) != 2:
                 raise ValueError('x and y vectors must be suplied if intersect is set.')
             x, y = Vector(args[0]), Vector(args[1])
@@ -34,7 +34,7 @@ class VectorGraph(Graph):
             except TypeError:
                 raise NoDataError("Cannot perform test because there is no data")
             if len(x) <= self._min_size or len(y) <= self._min_size:
-                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+                raise MinimumSizeError("Length of data is less than the minimum size {}.".format(self._min_size))
             super(VectorGraph, self).__init__((x, y), **kwargs)
         else:
             data = list()
@@ -47,7 +47,7 @@ class VectorGraph(Graph):
                     raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
                 data.append(clean)
             if not is_group(data):
-                raise NoDataError("Cannot perform test because there is no data")
+                raise NoDataError("Cannot draw graph because there is no data")
             if len(data) == 1:
                 data = data[0]
             super(VectorGraph, self).__init__(data, **kwargs)
@@ -238,7 +238,7 @@ class GraphHisto(VectorGraph):
             ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
-        ax_hist.hist(self._data, self._bins, normed=True, color=self.get_color(0))
+        ax_hist.hist(self._data, self._bins, normed=True, color=self.get_color(0), zorder=2)
         ax_hist.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         ax_hist.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if self._fit:

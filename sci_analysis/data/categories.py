@@ -54,36 +54,48 @@ class Categorical(Data):
         """
         if sequence is None:
             self._values = pd.Series([])
-            self._counts = pd.Series([])
             self._order = order
             self._name = name
+            self._summary = pd.DataFrame([], columns=['counts', 'ranks', 'percents', 'categories'])
         elif is_data(sequence):
             new_name = sequence.name or name
             super(Categorical, self).__init__(v=sequence.data, n=new_name)
             self._order = sequence.order
+            self._values = sequence.data
+            self._name = sequence.name
+            self._summary = sequence.summary
         else:
+            self._name = name
             cat_kwargs = {'dtype': 'category'}
             if order is not None:
-                cat_kwargs.update({'categories': order, 'ordered': True})
+                cat_kwargs.update(dict(categories=order, ordered=True))
             try:
                 self._values = pd.Series(sequence).astype(**cat_kwargs)
             except TypeError:
                 self._values = pd.Series(flatten(sequence)).astype(**cat_kwargs)
             except ValueError:
                 self._values = pd.Series([])
-            self._name = name
             if dropna:
                 self._values = self._values.dropna()
             try:
                 # TODO: Need to fix this to work with numeric lists
                 sequence += 1
-                self._order = self.categories
+                self._order = None if self._values.empty else self._values.cat.categories
             except TypeError:
                 self._order = order
-        self._counts = self._values.value_counts(sort=False, dropna=False)
-        if self.categories is not None:
-            if len(self.categories) > NumberOfCategoriesWarning.warn_categories:
-                warn(NumberOfCategoriesWarning())
+            counts = self._values.value_counts(sort=False, dropna=False, ascending=False)
+            self._summary = pd.DataFrame({
+                'counts': counts,
+                'ranks': counts.rank(method='dense', na_option='bottom', ascending=False).astype('int'),
+                'percents': (counts / counts.sum() * 100) if not all(counts == 0) else 0.0
+            })
+            self._summary['categories'] = self._summary.index.to_series()
+            if order is not None:
+                self._summary.sort_index(level=self._order, inplace=True, axis=0, na_position='last')
+            else:
+                self._summary.sort_values('ranks', inplace=True)
+        if not self._summary.empty and len(self.categories) > NumberOfCategoriesWarning.warn_categories:
+            warn(NumberOfCategoriesWarning())
 
     def is_empty(self):
         """
@@ -100,18 +112,25 @@ class Categorical(Data):
         return self._values.dropna().reset_index(drop=True)
 
     @property
-    def data_type(self):
-        return self.data.dtype
+    def summary(self):
+        return self._summary
 
     @property
     def counts(self):
-        return self._counts
+        return self._summary.counts
+
+    @property
+    def percents(self):
+        return self._summary.percents
 
     @property
     def order(self):
         return self._order
 
     @property
+    def ranks(self):
+        return self._summary.ranks
+
+    @property
     def categories(self):
-        # TODO: Need to fix this to show NaN since Pandas will drop NaN automatically.
-        return self._values.cat.categories if len(self._values) > 0 else None
+        return self._summary.categories

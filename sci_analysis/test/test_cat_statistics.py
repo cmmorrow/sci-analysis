@@ -19,35 +19,35 @@ class MyTestCase(TestWarnings):
 Statistics
 ----------
 
-Rank          Frequency     Category      
-------------------------------------------
-1             2             one           
-2             1             three         
-3             1             two           """
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             2              50.0000      one           
+2             1              25.0000      three         
+2             1              25.0000      two           """
         self.assertEqual(str(obj), output)
         self.assertEqual(obj.name, 'Statistics')
         self.assertTrue(obj.data.data.equals(Series(input_array).astype('category')))
-        self.assertListEqual(obj.results, [{'Rank': 1, 'Category': 'one', 'Frequency': 2},
-                                           {'Rank': 2, 'Category': 'three', 'Frequency': 1},
-                                           {'Rank': 3, 'Category': 'two', 'Frequency': 1}])
+        self.assertListEqual(obj.results, [{'Rank': 1, 'Category': 'one', 'Frequency': 2, 'Percent': 50.0},
+                                           {'Rank': 2, 'Category': 'three', 'Frequency': 1, 'Percent': 25.0},
+                                           {'Rank': 2, 'Category': 'two', 'Frequency': 1, 'Percent': 25.0}])
 
     def test_101_categorical_stats_simple_ordered_categories(self):
-        input_array = Categorical(['one', 'two', 'one', 'three'], order=['three', 'two', 'one'])
-        obj = CategoricalStatistics(input_array, display=False)
+        input_array = ['one', 'two', 'one', 'three']
+        obj = CategoricalStatistics(input_array, order=['three', 'two', 'one'], display=False)
         output = """
 
 Statistics
 ----------
 
-Rank          Frequency     Category      
-------------------------------------------
-2             1             three         
-3             1             two           
-1             2             one           """
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+2             1              25.0000      three         
+2             1              25.0000      two           
+1             2              50.0000      one           """
         self.assertEqual(str(obj), output)
-        self.assertListEqual(obj.results, [{'Frequency': 1, 'Category': 'three', 'Rank': 2},
-                                           {'Frequency': 1, 'Category': 'two', 'Rank': 3},
-                                           {'Frequency': 2, 'Category': 'one', 'Rank': 1}])
+        self.assertListEqual(obj.results, [{'Frequency': 1, 'Category': 'three', 'Rank': 2, 'Percent': 25},
+                                           {'Frequency': 1, 'Category': 'two', 'Rank': 2, 'Percent': 25},
+                                           {'Frequency': 2, 'Category': 'one', 'Rank': 1, 'Percent': 50}])
 
     def test_102_categorical_stats_with_na(self):
         seed(987654321)
@@ -62,53 +62,99 @@ Rank          Frequency     Category
 Statistics
 ----------
 
-Rank          Frequency     Category      
-------------------------------------------
-1             6             abcdefghijklmnop
-2             5             abc           
-3             5             abcdefg       
-4             5             abcdefghijk   
-5             4             abcdefgh      
-6             4              nan          
-7             3             a             
-8             3             ab            
-9             3             abcdefghij    
-10            3             abcdefghijklm 
-11            2             abcde         
-12            2             abcdefghi     
-13            2             abcdefghijklmno
-14            1             abcd          
-15            1             abcdef        
-16            1             abcdefghijkl  """
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             6              12.0000      abcdefghijklmnop
+2             5              10.0000      abc           
+2             5              10.0000      abcdefg       
+2             5              10.0000      abcdefghijk   
+3             4              8.0000       abcdefgh      
+3             4              8.0000        nan          
+4             3              6.0000       a             
+4             3              6.0000       ab            
+4             3              6.0000       abcdefghij    
+4             3              6.0000       abcdefghijklm 
+5             2              4.0000       abcde         
+5             2              4.0000       abcdefghi     
+5             2              4.0000       abcdefghijklmno
+6             1              2.0000       abcd          
+6             1              2.0000       abcdef        
+6             1              2.0000       abcdefghijkl  """
         test = CategoricalStatistics(input_array, display=False)
-        self.assertTrue(str(test), output)
+        self.assertEqual(str(test), output)
+        self.assertListEqual(test.results, [{'Frequency': 6, 'Category': 'abcdefghijklmnop', 'Rank': 1, 'Percent': 12.},
+                                            {'Frequency': 5, 'Category': 'abc', 'Rank': 2, 'Percent': 10.0},
+                                            {'Frequency': 5, 'Category': 'abcdefg', 'Rank': 2, 'Percent': 10.0},
+                                            {'Frequency': 5, 'Category': 'abcdefghijk', 'Rank': 2, 'Percent': 10.0},
+                                            {'Frequency': 4, 'Category': 'abcdefgh', 'Rank': 3, 'Percent': 8.0},
+                                            {'Frequency': 4, 'Category': nan, 'Rank': 3, 'Percent': 8.0},
+                                            {'Frequency': 3, 'Category': 'a', 'Rank': 4, 'Percent': 6.0},
+                                            {'Frequency': 3, 'Category': 'ab', 'Rank': 4, 'Percent': 6.0},
+                                            {'Frequency': 3, 'Category': 'abcdefghij', 'Rank': 4, 'Percent': 6.0},
+                                            {'Frequency': 3, 'Category': 'abcdefghijklm', 'Rank': 4, 'Percent': 6.0},
+                                            {'Frequency': 2, 'Category': 'abcde', 'Rank': 5, 'Percent': 4.0},
+                                            {'Frequency': 2, 'Category': 'abcdefghi', 'Rank': 5, 'Percent': 4.0},
+                                            {'Frequency': 2, 'Category': 'abcdefghijklmno', 'Rank': 5, 'Percent': 4.0},
+                                            {'Frequency': 1, 'Category': 'abcd', 'Rank': 6, 'Percent': 2.0},
+                                            {'Frequency': 1, 'Category': 'abcdef', 'Rank': 6, 'Percent': 2.0},
+                                            {'Frequency': 1, 'Category': 'abcdefghijkl', 'Rank': 6, 'Percent': 2.0}])
 
     def test_103_no_data(self):
         input_array = None
         self.assertRaises(NoDataError, lambda: CategoricalStatistics(input_array, display=False))
         input_array = Categorical(['a', 'b', 'a', 'c', 'c', 'd'], order=['z', 'y', 'x', 'w'], dropna=True)
         self.assertRaises(NoDataError, lambda: CategoricalStatistics(input_array, display=False))
+        input_array = []
+        self.assertRaises(NoDataError, lambda: CategoricalStatistics(input_array, display=False))
 
     def test_104_no_data_except_nan(self):
-        input_array = Categorical(['a', 'b', 'a', 'c', 'c', 'd'], order=['z', 'y', 'x', 'w'])
+        input_array = ['a', 'b', 'a', 'c', 'c', 'd']
         output = """
 
 Statistics
 ----------
 
-Rank          Frequency     Category      
-------------------------------------------
-2             0             z             
-3             0             y             
-4             0             x             
-5             0             w             
-1             6              nan          """
-        test = CategoricalStatistics(input_array, display=False)
-        self.assertTrue(str(test), output)
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             6              100.0000      nan          
+2             0              0.0000       z             
+2             0              0.0000       y             
+2             0              0.0000       x             
+2             0              0.0000       w             """
+        test = CategoricalStatistics(input_array, order=['z', 'y', 'x', 'w'], display=False)
+        self.assertEqual(str(test), output)
 
     def test_105_too_many_categories_warning(self):
         input_array = [str(x) for x in range(100)]
-        self.assertWarnsCrossCompatible(NumberOfCategoriesWarning, lambda: CategoricalStatistics(input_array, False))
+        self.assertWarnsCrossCompatible(NumberOfCategoriesWarning,
+                                        lambda: CategoricalStatistics(input_array, display=False))
+
+    def test_106_single_category(self):
+        input_array = ['a', 'b', 'a', 'c', 'c', 'd']
+        order = []
+        output = """
+
+Statistics
+----------
+
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             6              100.0000      nan          """
+        test = CategoricalStatistics(input_array, order=order, display=False)
+        self.assertEqual(str(test), output)
+        self.assertListEqual(test.results, [{'Frequency': 6, 'Category': nan, 'Rank': 1, 'Percent': 100.0}])
+        order = 'c'
+        output = """
+
+Statistics
+----------
+
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             2              100.0000     c             """
+        test = CategoricalStatistics(input_array, order=order, display=False, dropna=True)
+        self.assertEqual(str(test), output)
+        self.assertListEqual(test.results, [{'Frequency': 2, 'Category': 'c', 'Rank': 1, 'Percent': 100.0}])
 
 
 if __name__ == '__main__':

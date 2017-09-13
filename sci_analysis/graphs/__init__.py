@@ -4,3 +4,4 @@ Modules:
 """
 
 from .vector import GraphHisto, GraphScatter, GraphBoxplot
+from .categorical import GraphFrequency

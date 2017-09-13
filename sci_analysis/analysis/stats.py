@@ -9,7 +9,7 @@ from scipy.stats import skew, kurtosis, sem
 
 from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
-from ..data import Vector, Categorical, is_dict
+from ..data import Vector, Categorical, is_dict, is_categorical
 
 
 class VectorStatistics(Analysis):
@@ -226,11 +226,12 @@ class CategoricalStatistics(Analysis):
     _rank = 'Rank'
     _cat = 'Category'
     _freq = 'Frequency'
+    _perc = 'Percent'
 
-    def __init__(self, data, display=True):
-        self.total = None
-        d = Categorical(data)
-        if d.data.empty or len(d.categories) == 0:
+    def __init__(self, data, order=None, dropna=False, display=True):
+        self.ordered = True if order is not None else False
+        d = data if is_categorical(data) else Categorical(data, order=order, dropna=dropna)
+        if d.is_empty():
             raise NoDataError("Cannot perform the test because there is no data")
 
         super(CategoricalStatistics, self).__init__(d, display=display)
@@ -238,12 +239,11 @@ class CategoricalStatistics(Analysis):
 
     def run(self):
         results = list()
-        ranks = self.data.counts.rank(method='first', na_option='bottom', ascending=False).astype('int')
-        df = DataFrame({self._rank: ranks,
-                        self._cat: self.data.counts.index,
-                        self._freq: self.data.counts
-                        })
-        for _, row in df.sort_values('Rank').iterrows() if self.data.order is None else df.iterrows():
+        self.data.summary.rename(columns={'categories': self._cat,
+                                          'counts': self._freq,
+                                          'percents': self._perc,
+                                          'ranks': self._rank}, inplace=True)
+        for _, row in self.data.summary.iterrows():
             results.append(row.to_dict())
         self._results = results
 
@@ -251,6 +251,7 @@ class CategoricalStatistics(Analysis):
         order = [
             self._rank,
             self._freq,
+            self._perc,
             self._cat,
         ]
         return std_output(self._name, self._results, order=order)
