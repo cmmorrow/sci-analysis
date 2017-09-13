@@ -258,7 +258,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.ranks.to_dict(), dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1] * 6)))
         self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c', 'd', 'e', 'f'])
         self.assertDictEqual(input_array.percents.to_dict(),
-                             dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1 / 6 * 100] * 6)))
+                             dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1 / 6.0 * 100] * 6)))
         self.assertFalse(input_array.is_empty())
         self.assertTrue(input_array.data.equals(Series(['a', 'b', 'c', 'd', 'e', 'f']).astype('category')))
 
