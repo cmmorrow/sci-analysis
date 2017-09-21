@@ -8,6 +8,45 @@ from .comparison import LinearRegression, Correlation
 from .stats import VectorStatistics, GroupStatistics, CategoricalStatistics
 
 
+def determine_analysis_type(data):
+    """Attempts to determine the type of data and returns the corresponding sci_analysis Data object.
+
+    Parameters
+    ----------
+    data : array-like
+        The sequence of unknown data type.
+
+    Returns
+    -------
+    data : sci_analysis.data.Data
+        A subclass of sci_analysis Data that corresponds to the analysis type to perform.
+    """
+    from numpy import (
+        float16, float32, float64,
+        int8, int16, int32, int64
+    )
+    from pandas import Series
+    from ..data import is_iterable, is_vector, is_categorical, Vector, Categorical
+    from .exc import NoDataError
+    numeric_types = [float16, float32, float64,
+                     int8, int16, int32, int64]
+    if not is_iterable(data):
+        raise ValueError('data cannot be a scalar value.')
+    elif len(data) == 0:
+        raise NoDataError
+    elif is_vector(data):
+        return data
+    elif is_categorical(data):
+        return data
+    else:
+        if not hasattr(data, 'dtype'):
+            data = Series(data)
+        if data.dtype in numeric_types:
+            return Vector(data)
+        else:
+            return Categorical(data)
+
+
 def analyze(xdata, ydata=None, groups=None, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.

@@ -20,6 +20,7 @@ class NumberOfCategoriesWarning(Warning):
 def is_categorical(obj):
     """
     Test if the passed array_like argument is a sci_analysis Categorical object.
+
     Parameters
     ----------
     obj : object

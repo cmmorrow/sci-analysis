@@ -17,9 +17,6 @@ Classes:
 Functions:
     analyze - Magic method for performing quick data analysis.
 """
-# Python3 compatability
-# from __future__ import absolute_import
-# from __future__ import print_function
 
 # Numpy imports
 from numpy import float_, int_
