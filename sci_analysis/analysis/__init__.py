@@ -47,6 +47,34 @@ def determine_analysis_type(data):
             return Categorical(data)
 
 
+def analyse(xdata, ydata=None, groups=None, **kwargs):
+    """
+    Alias for analyze.
+
+    Parameters
+    ----------
+    xdata : array-like
+        The primary set of data.
+    ydata : array-like
+        The response data set.
+    groups : array-like
+        The group names used for a oneway analysis.
+    kwargs
+
+    Returns
+    -------
+    xdata, ydata : tuple(array-like, array-like)
+        The input xdata and ydata.
+
+    Notes
+    -----
+    xdata : array-like, ydata : None - Distribution
+    xdata : array-like, ydata : array-like -- Bivariate
+    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
+    """
+    return analyze(xdata, ydata=ydata, groups=groups, **kwargs)
+
+
 def analyze(xdata, ydata=None, groups=None, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.
@@ -72,8 +100,8 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
     xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
 
     """
-    from ..graphs import GraphHisto, GraphScatter, GraphBoxplot
-    from ..data import is_dict, is_iterable, is_group, is_dict_group
+    from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency
+    from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
     groups = kwargs['groups'] if 'groups' in kwargs else None
     alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
@@ -146,27 +174,39 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
         Correlation(xdata, ydata, alpha=alpha)
         return tested if debug else None
 
-    # Histogram and Basic Stats
+    # Histogram and Basic Stats or Categories and Frequencies
     elif is_iterable(xdata):
-        tested.append('Distribution')
+        xdata = determine_analysis_type(xdata)
+        if is_vector(xdata):
+            tested.append('Distribution')
 
-        # Show the histogram and stats
-        out_stats = VectorStatistics(xdata, display=False)
-        if 'distribution' in kwargs:
-            distro = kwargs['distribution']
-            distro_class = getattr(__import__('scipy.stats',
-                                              globals(),
-                                              locals(),
-                                              [distro], 0), distro)
-            parms = distro_class.fit(xdata)
-            fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
-            tested.append('KSTest')
+            # Show the histogram and stats
+            out_stats = VectorStatistics(xdata, display=False)
+            if 'distribution' in kwargs:
+                distro = kwargs['distribution']
+                distro_class = getattr(__import__('scipy.stats',
+                                                  globals(),
+                                                  locals(),
+                                                  [distro], 0), distro)
+                parms = distro_class.fit(xdata)
+                fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
+                tested.append('KSTest')
+            else:
+                fit = NormTest(xdata, alpha=alpha, display=False)
+                tested.append('NormTest')
+            GraphHisto(xdata,
+                       mean="{: .4f}".format(out_stats.mean),
+                       std_dev="{: .4f}".format(out_stats.std_dev),
+                       **kwargs)
+            print(out_stats)
+            print(fit)
+            return tested if debug else None
         else:
-            fit = NormTest(xdata, alpha=alpha, display=False)
-            tested.append('NormTest')
-        GraphHisto(xdata, mean="{: .4f}".format(out_stats.mean), std_dev="{: .4f}".format(out_stats.std_dev), **kwargs)
-        print(out_stats)
-        print(fit)
-        return tested if debug else None
+            tested.append('Frequencies')
+
+            # Show the histogram and stats
+            GraphFrequency(xdata, **kwargs)
+            CategoricalStatistics(xdata, **kwargs)
+            return tested if debug else None
     else:
         return xdata, ydata

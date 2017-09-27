@@ -43,7 +43,7 @@ class GraphFrequency(CategoricalGraph):
     def __init__(self, data, **kwargs):
 
         self._percent = kwargs['percent'] if 'percent' in kwargs else False
-        self._vertical = kwargs['vertical'] if 'vertical' in kwargs else False
+        self._vertical = kwargs['vertical'] if 'vertical' in kwargs else True
         self._title = kwargs['title'] if 'title' in kwargs else 'Frequencies'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         order = kwargs['order'] if 'order' in kwargs else None

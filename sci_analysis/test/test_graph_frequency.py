@@ -88,36 +88,36 @@ class MyTestCase(unittest.TestCase):
                                        percent=True,
                                        save_to='{}test_freq_109'.format(self.save_path)))
 
-    def test_110_lots_of_categories_6_vertical(self):
+    def test_110_lots_of_categories_6_horizontal(self):
         np.random.seed(987654321)
         src = 'aaaaaa'
         input_array = [src[:np.random.randint(1, 7)] for _ in range(50)]
         self.assertTrue(GraphFrequency(input_array,
-                                       vertical=True,
+                                       vertical=False,
                                        save_to='{}test_freq_110'.format(self.save_path)))
 
-    def test_111_lots_of_categories_9_vertical(self):
+    def test_111_lots_of_categories_9_horizontal(self):
         np.random.seed(987654321)
         src = 'aaaaaaaaa'
         input_array = [src[:np.random.randint(1, 10)] for _ in range(50)]
         self.assertTrue(GraphFrequency(input_array,
-                                       vertical=True,
+                                       vertical=False,
                                        save_to='{}test_freq_111'.format(self.save_path)))
 
-    def test_112_lots_of_categories_19_vertical(self):
+    def test_112_lots_of_categories_19_horizontal(self):
         np.random.seed(987654321)
         src = 'aaaaaaaaaaaaaaaaaaa'
         input_array = [src[:np.random.randint(1, 20)] for _ in range(50)]
         self.assertTrue(GraphFrequency(input_array,
-                                       vertical=True,
+                                       vertical=False,
                                        save_to='{}test_freq_112'.format(self.save_path)))
 
-    def test_113_lots_of_categories_19_vertical_percent(self):
+    def test_113_lots_of_categories_19_horizontal_percent(self):
         np.random.seed(987654321)
         src = 'aaaaaaaaaaaaaaaaaaa'
         input_array = [src[:np.random.randint(1, 20)] for _ in range(50)]
         self.assertTrue(GraphFrequency(input_array,
-                                       vertical=True,
+                                       vertical=False,
                                        percent=True,
                                        save_to='{}test_freq_113'.format(self.save_path)))
 

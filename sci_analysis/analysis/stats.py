@@ -228,7 +228,10 @@ class CategoricalStatistics(Analysis):
     _freq = 'Frequency'
     _perc = 'Percent'
 
-    def __init__(self, data, order=None, dropna=False, display=True):
+    def __init__(self, data, **kwargs):
+        order = kwargs['order'] if 'order' in kwargs else None
+        dropna = kwargs['dropna'] if 'dropna' in kwargs else False
+        display = kwargs['display'] if 'display' in kwargs else True
         self.ordered = True if order is not None else False
         d = data if is_categorical(data) else Categorical(data, order=order, dropna=dropna)
         if d.is_empty():

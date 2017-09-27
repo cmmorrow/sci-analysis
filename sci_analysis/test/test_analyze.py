@@ -325,6 +325,15 @@ class MyTestCase(unittest.TestCase):
                                  save_to='{}test_analyze_128'.format(self.save_path)),
                          ['Distribution', 'KSTest'])
 
+    def test_129_distribution_categorical_default(self):
+        """Perform a distribution analysis with categorical data and default settings."""
+        np.random.seed(self._seed)
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        self.assertListEqual(analyze(input_array,
+                                     debug=True,
+                                     save_to='{}test_analyze_129'.format(self.save_path)),
+                             ['Frequencies'])
+
 
 if __name__ == '__main__':
     unittest.main()
