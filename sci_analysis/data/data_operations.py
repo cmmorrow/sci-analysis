@@ -233,6 +233,9 @@ def is_group(seq):
     >>> is_group([[1, 2, 3], [4, 5, 6]])
     True
 
+    >>> is_group({'one': 1, 'two': 2, 'three': 3})
+    False
+
     >>> is_group(([1, 2, 3], [4, 5, 6]))
     True
 

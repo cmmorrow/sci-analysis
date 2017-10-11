@@ -15,6 +15,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         parms = [4, 1.75]
         input_array = st.norm.rvs(*parms, size=100)
+        ref = VectorStatistics(input_array, sample=True, display=self.display)
         output = """
 
 Statistics
@@ -34,8 +35,8 @@ Minimum   = -0.3256
 IQR       =  2.4088
 Range     =  8.2571"""
 
-        self.assertEqual(VectorStatistics(input_array, sample=True, display=self.display).count, 100, "FAIL: Stat count")
-        self.assertEqual(str(VectorStatistics(input_array, sample=True, display=False)), output)
+        self.assertEqual(ref.count, 100, "FAIL: Stat count")
+        self.assertEqual(str(ref), output)
 
     def test_1001_Vector_stats_mean(self):
         """Test the vector statistics class"""

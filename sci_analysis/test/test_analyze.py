@@ -334,6 +334,16 @@ class MyTestCase(unittest.TestCase):
                                      save_to='{}test_analyze_129'.format(self.save_path)),
                              ['Frequencies'])
 
+    def test_130_distribution_categorical_percent(self):
+        """Perform a distribution analysis with categorical data and percent y-axis."""
+        np.random.seed(self._seed)
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        self.assertListEqual(analyze(input_array,
+                                     debug=True,
+                                     percent=True,
+                                     save_to='{}test_analyze_130'.format(self.save_path)),
+                             ['Frequencies'])
+
 
 if __name__ == '__main__':
     unittest.main()

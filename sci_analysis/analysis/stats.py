@@ -9,7 +9,7 @@ from scipy.stats import skew, kurtosis, sem
 
 from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
-from ..data import Vector, Categorical, is_dict, is_categorical
+from ..data import Vector, Categorical, is_dict, is_group, is_categorical, is_iterable
 
 
 class VectorStatistics(Analysis):
@@ -43,32 +43,23 @@ class VectorStatistics(Analysis):
         self.logic()
 
     def run(self):
-        dof = 0
-        if self._sample:
-            dof = 1
-        count = len(self._data)
-        avg = mean(self._data)
-        sd = std(self._data, ddof=dof)
-        error = sem(self._data, 0, dof)
-        med = median(self._data)
+        dof = 1 if self._sample else 0
         vmin = amin(self._data)
         vmax = amax(self._data)
         vrange = vmax - vmin
-        sk = skew(self._data)
-        kurt = kurtosis(self._data)
         q1 = percentile(self._data, 25)
         q3 = percentile(self._data, 75)
         iqr = q3 - q1
-        self._results = {self._n: count,
-                         self._mean: avg,
-                         self._std: sd,
-                         self._ste: error,
-                         self._q2: med,
+        self._results = {self._n: len(self._data),
+                         self._mean: mean(self._data),
+                         self._std: std(self._data, ddof=dof),
+                         self._ste: sem(self._data, 0, dof),
+                         self._q2: median(self._data),
                          self._min: vmin,
                          self._max: vmax,
                          self._range: vrange,
-                         self._skew: sk,
-                         self._kurt: kurt,
+                         self._skew: skew(self._data),
+                         self._kurt: kurtosis(self._data),
                          self._q1: q1,
                          self._q3: q3,
                          self._iqr: iqr,
@@ -160,10 +151,12 @@ class GroupStatistics(Analysis):
     def __init__(self, *args, **kwargs):
         groups = kwargs['groups'] if 'groups' in kwargs else None
         display = kwargs['display'] if 'display' in kwargs else True
-        if not is_dict(args[0]):
+        if is_dict(args[0]):
+            _data, = args
+        elif is_group(args,):
             _data = dict(zip(groups, args)) if groups else dict(zip(list(range(1, len(args) + 1)), args))
         else:
-            _data = args[0]
+            _data = None
         data = dict()
         for g, d in _data.items():
             clean = Vector(d).data_prep()
@@ -188,22 +181,83 @@ class GroupStatistics(Analysis):
             print(self)
 
     def run(self):
+        out = list()
         for group, vector in self._data.items():
-            count = len(vector)
-            avg = mean(vector)
-            sd = std(vector, ddof=1)
-            vmax = amax(vector)
-            vmin = amin(vector)
-            q2 = median(vector)
-            row_result = {self._group: group,
-                          self._n: count,
-                          self._mean: avg,
-                          self._std: sd,
-                          self._max: vmax,
-                          self._q2: q2,
-                          self._min: vmin,
+            row_result = {self._group: str(group),
+                          self._n: len(vector),
+                          self._mean: mean(vector),
+                          self._std: std(vector, ddof=1),
+                          self._max: amax(vector),
+                          self._q2: median(vector),
+                          self._min: amin(vector),
                           }
-            self._results.append(row_result)
+            out.append(row_result)
+        self._results = DataFrame(out).sort_values(self._group).to_dict(orient='records')
+
+    def __str__(self):
+        order = [
+            self._n,
+            self._mean,
+            self._std,
+            self._min,
+            self._q2,
+            self._max,
+            self._group,
+        ]
+        return std_output(self._name, self._results, order=order)
+
+
+class GroupStatisticsStacked(Analysis):
+
+    _min_size = 1
+    _name = 'Group Statistics'
+    _group = 'Group'
+    _n = 'n'
+    _mean = 'Mean'
+    _std = 'Std Dev'
+    _max = 'Max'
+    _q2 = 'Median'
+    _min = 'Min'
+
+    def __init__(self, values, groups, **kwargs):
+        display = kwargs['display'] if 'display' in kwargs else True
+        data = dict()
+        if not is_iterable(values):
+            values = [values]
+        _data = DataFrame({'values': values, 'groups': groups}).groupby('groups')
+        for g, d in _data:
+            clean = Vector(d['values']).data_prep()
+            if clean is None:
+                continue
+            if len(clean) <= self._min_size:
+                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+            data.update({g: clean})
+        if len(data) < 1:
+            raise NoDataError("Cannot perform test because there is no data")
+        super(GroupStatisticsStacked, self).__init__(data, display=display)
+        self.logic()
+
+    def logic(self):
+        if not self._data:
+            pass
+        self._results = list()
+        self.run()
+        if self._display:
+            print(self)
+
+    def run(self):
+        out = list()
+        for group, vector in self._data.items():
+            row_result = {self._group: group,
+                          self._n: len(vector),
+                          self._mean: mean(vector),
+                          self._std: std(vector, ddof=1),
+                          self._max: amax(vector),
+                          self._q2: median(vector),
+                          self._min: amin(vector),
+                          }
+            out.append(row_result)
+        self._results = DataFrame(out).sort_values(self._group).to_dict(orient='records')
 
     def __str__(self):
         order = [
@@ -241,14 +295,12 @@ class CategoricalStatistics(Analysis):
         self.logic()
 
     def run(self):
-        results = list()
-        self.data.summary.rename(columns={'categories': self._cat,
-                                          'counts': self._freq,
-                                          'percents': self._perc,
-                                          'ranks': self._rank}, inplace=True)
-        for _, row in self.data.summary.iterrows():
-            results.append(row.to_dict())
-        self._results = results
+        col = dict(categories=self._cat,
+                   counts=self._freq,
+                   percents=self._perc,
+                   ranks=self._rank)
+        self.data.summary.rename(columns=col, inplace=True)
+        self._results = self.data.summary.to_dict(orient='records')
 
     def __str__(self):
         order = [
