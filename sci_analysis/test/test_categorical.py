@@ -319,6 +319,7 @@ class MyTestCase(TestWarnings):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['e', 'd', 'c', 'b', 'a']
         input_array = Categorical(ref, order=order)
+        print(input_array.data)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertListEqual(input_array.categories.tolist(), ['e', 'd', 'c', 'b', 'a'])
@@ -334,6 +335,7 @@ class MyTestCase(TestWarnings):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['z', 'y', 'x', 'w']
         input_array = Categorical(ref, order=order)
+        print(input_array.data)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'z', 'y', 'x', 'w'])
@@ -348,6 +350,7 @@ class MyTestCase(TestWarnings):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = 'c'
         input_array = Categorical(ref, order=order)
+        print(input_array.data)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'c'])
@@ -363,6 +366,7 @@ class MyTestCase(TestWarnings):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = []
         input_array = Categorical(ref, order=order)
+        print(input_array.data)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan])
@@ -377,6 +381,7 @@ class MyTestCase(TestWarnings):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['z', 'y', 'x', 'w']
         input_array = Categorical(ref, order=order, dropna=True)
+        print(input_array.data)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), ['z', 'y', 'x', 'w'])
@@ -386,6 +391,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.percents.to_dict(), {'z': 0.0, 'y': 0.0, 'x': 0.0, 'w': 0.0})
         self.assertTrue(input_array.data.equals(Series([]).astype('category')))
         self.assertTrue(input_array.is_empty())
+
 
 if __name__ == '__main__':
     unittest.main()
