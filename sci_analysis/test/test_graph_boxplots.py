@@ -527,15 +527,15 @@ class MyTestCase(TestWarnings):
         input_1_array = st.norm.rvs(size=2000)
         self.assertRaises(AttributeError, lambda: GraphBoxplot(input_1_array, groups=['Group 1']))
 
-    def test_146_boxplot_issues_depricated_warning(self):
-        """Check to make sure a Deprication warnings is raised if passing in multiple arguments."""
-        np.random.seed(987654321)
-        input_1_array = st.norm.rvs(size=2000)
-        input_2_array = st.norm.rvs(1, size=2000)
-        self.assertWarnsCrossCompatible(FutureWarning,
-                                        lambda: GraphBoxplot(input_1_array, input_2_array,
-                                                             title='Raise Warning',
-                                                             save_to='{}test_box_146'.format(self.save_path)))
+    # def test_146_boxplot_issues_depricated_warning(self):
+    #     """Check to make sure a Deprication warnings is raised if passing in multiple arguments."""
+    #     np.random.seed(987654321)
+    #     input_1_array = st.norm.rvs(size=2000)
+    #     input_2_array = st.norm.rvs(1, size=2000)
+    #     self.assertWarnsCrossCompatible(FutureWarning,
+    #                                     lambda: GraphBoxplot(input_1_array, input_2_array,
+    #                                                          title='Raise Warning',
+    #                                                          save_to='{}test_box_146'.format(self.save_path)))
 
     def test_147_boxplot_scalar(self):
         """Generate a boxplot from a scalar value."""
