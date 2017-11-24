@@ -320,8 +320,6 @@ class MyTestCase(TestWarnings):
         order = ['e', 'd', 'c', 'b', 'a']
         ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
-        print(input_array.data)
-        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertListEqual(input_array.categories.tolist(), ['e', 'd', 'c', 'b', 'a'])
@@ -338,8 +336,6 @@ class MyTestCase(TestWarnings):
         order = ['z', 'y', 'x', 'w']
         ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
-        print(input_array.data)
-        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'z', 'y', 'x', 'w'])
@@ -353,10 +349,11 @@ class MyTestCase(TestWarnings):
     def test_121_create_categorical_with_scalar_order(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = 'c'
-        ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
+        ref_array = (Series(ref)
+                     .astype('category')
+                     .cat.set_categories([order])
+                     .cat.reorder_categories([order], ordered=True))
         input_array = Categorical(ref, order=order)
-        print(input_array.data)
-        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'c'])
@@ -372,8 +369,6 @@ class MyTestCase(TestWarnings):
         order = []
         ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
-        print(input_array.data)
-        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan])
@@ -389,8 +384,6 @@ class MyTestCase(TestWarnings):
         order = ['z', 'y', 'x', 'w']
         ref_array = Series([]).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order, dropna=True)
-        print(input_array.data)
-        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), ['z', 'y', 'x', 'w'])
