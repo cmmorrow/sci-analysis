@@ -347,7 +347,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), dict([('z', 0), ('y', 0), ('x', 0), ('w', 0), (np.nan, 8)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {'z': 2, 'y': 2, 'x': 2, 'w': 2, np.nan: 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'z': 0.0, 'y': 0.0, 'x': 0.0, 'w': 0.0, np.nan: 100.0})
-        self.assertTrue(input_array.data.equals(Series([np.nan for _ in range(8)]).astype('category')))
+        self.assertTrue(input_array.data.equals(ref_array))
         self.assertFalse(input_array.is_empty())
 
     def test_121_create_categorical_with_scalar_order(self):
@@ -364,8 +364,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), dict([('c', 3), (np.nan, 5)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {np.nan: 1, 'c': 2})
         self.assertDictEqual(input_array.percents.to_dict(), {np.nan: 62.5, 'c': 37.5})
-        self.assertTrue(input_array.data.equals(Series([np.nan, np.nan, 'c', np.nan, np.nan, np.nan, 'c', 'c'])
-                                                .astype('category')))
+        self.assertTrue(input_array.data.equals(ref_array))
         self.assertFalse(input_array.is_empty())
 
     def test_122_create_categorical_with_empty_list_order(self):
@@ -383,7 +382,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), dict([(np.nan, 8)]))
         self.assertDictEqual(input_array.percents.to_dict(), {np.nan: 100})
         self.assertDictEqual(input_array.ranks.to_dict(), {np.nan: 1})
-        self.assertTrue(input_array.data.equals(Series([np.nan for _ in range(8)]).astype('category')))
+        self.assertTrue(input_array.data.equals(ref_array))
 
     def test_123_create_categorical_drop_all(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
@@ -399,7 +398,7 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), dict([('z', 0), ('y', 0), ('x', 0), ('w', 0)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {'z': 1, 'y': 1, 'x': 1, 'w': 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'z': 0.0, 'y': 0.0, 'x': 0.0, 'w': 0.0})
-        self.assertTrue(input_array.data.equals(Series([]).astype('category')))
+        self.assertTrue(input_array.data.equals(ref_array))
         self.assertTrue(input_array.is_empty())
 
 
