@@ -11,8 +11,8 @@ class MyTestCase(unittest.TestCase):
         """Test the normal distribution check"""
         np.random.seed(987654321)
         parms = [5, 0.1]
-        x_input = st.norm.rvs(*parms, size=100)
         alpha = 0.05
+        x_input = st.norm.rvs(*parms, size=100)
         other = """
 
 Shapiro-Wilk test for normality
@@ -57,7 +57,7 @@ H0: Data is normally distributed
         np.random.seed(987654321)
         alpha = 0.05
         groups = [st.norm.rvs(5, 0.1, size=100), st.norm.rvs(4, 0.75, size=75), st.norm.rvs(1, 1, size=50)]
-        self.assertGreater(NormTest(*groups, alpha=alpha, display=False).p_value, alpha,
+        self.assertGreater(NormTest(*groups, alpha=alpha, display=True).p_value, alpha,
                            "FAIL: Normal test Type I error")
 
     def test_305_Norm_test_multi_fail(self):

@@ -5,6 +5,7 @@ import scipy.stats as st
 
 from ..analysis import GroupStatistics, GroupStatisticsStacked
 from ..analysis.exc import MinimumSizeError, NoDataError
+from ..data import Vector
 
 
 class TestGroupStatistics(unittest.TestCase):
@@ -166,6 +167,40 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatisticsStacked(ref['values'], ref['groups'], display=True)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+
+    def test_0013_group_statistics_stacked_vector(self):
+        """Test the Stacked Group Statistic class with a Vector input object."""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(2, 1, size=100)
+        y_input_array = st.norm.rvs(2, 3, size=45)
+        z_input_array = st.norm.rvs(8, 1, size=18)
+        vals = np.append(x_input_array, np.append(y_input_array, z_input_array)).tolist()
+        grps = ['x'] * 100 + ['y'] * 45 + ['z'] * 18
+        ref = pd.DataFrame({'values': vals, 'groups': grps})
+        exp = Vector(ref['values'], groups=ref['groups'])
+        output = """
+
+Group Statistics
+----------------
+
+n             Mean          Std Dev       Min           Median        Max           Group         
+--------------------------------------------------------------------------------------------------
+100            2.0083        1.0641       -0.4718        2.0761        4.2466       x             
+45             2.3678        3.5551       -4.8034        2.2217        11.4199      y             
+18             8.0944        1.1855        6.0553        7.9712        10.5272      z             """
+        res = GroupStatisticsStacked(exp, display=False)
+        self.assertTrue(res)
+        self.assertEqual(str(res), output)
+
+    def test_0014_group_statistics_stacked_missing_groups(self):
+        """Test the case where the groups argument is not provided."""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(2, 1, size=100)
+        y_input_array = st.norm.rvs(2, 3, size=45)
+        z_input_array = st.norm.rvs(8, 1, size=18)
+        vals = np.append(x_input_array, np.append(y_input_array, z_input_array)).tolist()
+        self.assertRaises(AttributeError, lambda: GroupStatisticsStacked(vals))
+
 
 if __name__ == '__main__':
     unittest.main()

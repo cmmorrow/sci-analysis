@@ -109,9 +109,6 @@ class Categorical(Data):
         """
         return self._values.empty
 
-    def data_prep(self):
-        return self._values.dropna().reset_index(drop=True)
-
     @property
     def summary(self):
         return self._summary

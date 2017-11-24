@@ -15,6 +15,7 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*x_parms, size=100)
         z_input_array = st.norm.rvs(*x_parms, size=100)
         alpha = 0.05
+        exp = Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False)
         output = """
 
 Oneway ANOVA
@@ -26,36 +27,11 @@ p value =  0.8980
 
 H0: Group means are matched
 """
-        self.assertGreater(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=True).p_value,
-                           alpha,
-                           "FAIL: ANOVA Type I error")
-        self.assertEqual(str(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False)), output)
-
-    def test_551_ANOVA_matched_statistic(self):
-        """Test the ANOVA class on matched data"""
-        np.random.seed(987654321)
-        x_parms = [4, 1.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*x_parms, size=100)
-        z_input_array = st.norm.rvs(*x_parms, size=100)
-        alpha = 0.05
-        self.assertAlmostEqual(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).statistic,
-                               0.1076,
-                               delta=0.0001,
-                               msg="FAIL: ANOVA statistic")
-
-    def test_552_ANOVA_matched_f_value(self):
-        """Test the ANOVA class on matched data"""
-        np.random.seed(987654321)
-        x_parms = [4, 1.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*x_parms, size=100)
-        z_input_array = st.norm.rvs(*x_parms, size=100)
-        alpha = 0.05
-        self.assertAlmostEqual(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).f_value,
-                               0.1076,
-                               delta=0.0001,
-                               msg="FAIL: ANOVA f value")
+        self.assertGreater(exp.p_value, alpha, "FAIL: ANOVA Type I error")
+        self.assertAlmostEqual(exp.statistic, 0.1076, delta=0.0001)
+        self.assertAlmostEqual(exp.f_value, 0.1076, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.898, delta=0.001)
+        self.assertEqual(str(exp), output)
 
     def test_553_ANOVA_unmatched(self):
         """Test the ANOVA class on unmatched data"""
@@ -77,8 +53,20 @@ H0: Group means are matched
         y_input_array = st.norm.rvs(*x_parms, size=3)
         z_input_array = st.norm.rvs(*x_parms, size=3)
         alpha = 0.05
-        self.assertTrue(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
-                        "FAIL: ANOVA just above minimum size")
+        exp = Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=True)
+        output = """
+
+Oneway ANOVA
+------------
+
+alpha   =  0.0500
+f value =  0.0285
+p value =  0.9720
+
+H0: Group means are matched
+"""
+        self.assertGreater(exp.p_value, alpha)
+        self.assertEqual(str(exp), output)
 
     def test_555_ANOVA_matched_just_at_size(self):
         """Test the ANOVA class on matched data at min size"""
@@ -100,9 +88,20 @@ H0: Group means are matched
         y_input_array = ["one", "two", "three", "four", "five"]
         z_input_array = st.norm.rvs(*x_parms, size=100)
         alpha = 0.05
-        self.assertGreater(Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False).p_value,
-                           alpha,
-                           "FAIL: Test should pass with single empty vector")
+        exp = Anova(x_input_array, y_input_array, z_input_array, alpha=alpha, display=False)
+        output = """
+
+Oneway ANOVA
+------------
+
+alpha   =  0.0500
+f value =  0.0672
+p value =  0.7957
+
+H0: Group means are matched
+"""
+        self.assertGreater(exp.p_value, alpha)
+        self.assertEqual(str(exp), output)
 
     def test_557_ANOVA_matched_all_empty_vectors(self):
         """Test the ANOVA class on matched data with all vectors empty"""
@@ -114,6 +113,14 @@ H0: Group means are matched
                                                      y_input_array,
                                                      alpha=alpha,
                                                      display=False).p_value)
+
+    def test_558_ANOVA_matched_single_argument(self):
+        """Test the ANOVA class on matched data"""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
+        a = 0.05
+        self.assertRaises(NoDataError, lambda: Anova(x_input_array, alpha=a, display=False).p_value)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 # Scipy imports
 from scipy.stats import linregress, pearsonr, spearmanr
 
-from ..data import Vector
+from ..data import Vector, is_vector
 from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
 from .hypo_tests import NormTest
@@ -15,39 +15,45 @@ class Comparison(Analysis):
     _h0 = "H0: "
     _ha = "HA: "
 
-    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+    def __init__(self, xdata, ydata=None, alpha=0.05, display=True):
         self._alpha = alpha
-        x, y = Vector(xdata), Vector(ydata)
-        if x is None or y is None:
+        if ydata is None:
+            if is_vector(xdata):
+                v = xdata
+            else:
+                raise AttributeError('ydata argument cannot be None.')
+        else:
+            v = Vector(xdata, other=ydata)
+        if v.data.empty or v.other.empty:
             raise NoDataError("Cannot perform test because there is no data")
-        try:
-            x, y = x.data_prep(y)
-        except TypeError:
-            raise NoDataError("Cannot perform test because there is no data")
-        if len(x) <= self._min_size or len(y) <= self._min_size:
+        # try:
+        #     x, y = x.data_prep(y)
+        # except TypeError:
+        #     raise NoDataError("Cannot perform test because there is no data")
+        if len(v.data) <= self._min_size or len(v.other) <= self._min_size:
             raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-        super(Comparison, self).__init__([x, y], display=display)
+        super(Comparison, self).__init__(v, display=display)
         self.logic()
 
     @property
     def xdata(self):
         """The predictor vector for comparison tests"""
-        return self.data[0]
+        return self.data.data
 
     @property
     def ydata(self):
         """The response vector for comparison tests"""
-        return self.data[1]
+        return self.data.other
 
     @property
     def predictor(self):
         """The predictor vector for comparison tests"""
-        return self.data[0]
+        return self.data.data
 
     @property
     def response(self):
         """The response vector for comparison tests"""
-        return self.data[1]
+        return self.data.other
 
     @property
     def statistic(self):
@@ -85,7 +91,7 @@ class LinearRegression(Comparison):
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
 
-    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+    def __init__(self, xdata, ydata=None, alpha=0.05, display=True):
         super(LinearRegression, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
     def run(self):
@@ -150,7 +156,7 @@ class Correlation(Comparison):
     _h0 = "H0: There is no significant relationship between predictor and response"
     _ha = "HA: There is a significant relationship between predictor and response"
 
-    def __init__(self, xdata, ydata, alpha=0.05, display=True):
+    def __init__(self, xdata, ydata=None, alpha=0.05, display=True):
         self._test = None
         super(Correlation, self).__init__(xdata, ydata, alpha=alpha, display=display)
 
@@ -163,7 +169,7 @@ class Correlation(Comparison):
             r = "spearman"
         self._name = self._names[r]
         self._test = r
-        self._results.update({'r value': r_value, 'p value': p_value})
+        self._results.update({'r value': r_value, 'p value': p_value, 'alpha': self._alpha})
 
     @property
     def r_value(self):
@@ -178,3 +184,12 @@ class Correlation(Comparison):
     def test_type(self):
         """The test that was used to determine the correlation coefficient"""
         return self._test
+
+    def __str__(self):
+        out = list()
+
+        out.append(std_output(self.name, self._results, ['alpha', 'r value', 'p value']))
+        out.append('')
+        out.append(self._h0 if self.p_value > self._alpha else self._ha)
+        out.append('')
+        return '\n'.join(out)

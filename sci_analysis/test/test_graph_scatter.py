@@ -4,7 +4,8 @@ import scipy.stats as st
 from os import path, getcwd
 
 from ..graphs import GraphScatter
-from ..analysis.exc import NoDataError, MinimumSizeError
+from ..data import Vector
+from ..analysis.exc import NoDataError
 from ..data import UnequalVectorLengthError
 
 
@@ -156,7 +157,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_x_array = []
         input_y_array = st.norm.rvs(size=2000)
-        self.assertRaises(UnequalVectorLengthError, lambda: GraphScatter(input_x_array, input_y_array))
+        self.assertRaises(NoDataError, lambda: GraphScatter(input_x_array, input_y_array))
 
     def test_114_other_empty_list(self):
         """Catch the case where the input is an empty list"""
@@ -192,12 +193,12 @@ class MyTestCase(unittest.TestCase):
         input_y_array = st.norm.rvs(size=2)
         self.assertTrue(GraphScatter(input_x_array, input_y_array, save_to='{}test_scatter_117'.format(self.save_path)))
 
-    def test_118_min_size(self):
-        """Generate a scatter plot below min size"""
+    def test_118_single_point(self):
+        """Generate a scatter plot with a single point"""
         np.random.seed(987654321)
         input_x_array = st.norm.rvs(size=1)
         input_y_array = st.norm.rvs(size=1)
-        self.assertRaises(MinimumSizeError, lambda: GraphScatter(input_x_array, input_y_array))
+        self.assertTrue(GraphScatter(input_x_array, input_y_array, save_to='{}test_scatter_118'.format(self.save_path)))
 
     def test_119_default_corr(self):
         """Generate a scatter plot with correlating data"""
@@ -285,13 +286,33 @@ class MyTestCase(unittest.TestCase):
     def test_128_scatter_3dim_arrays(self):
         """Generate a scatter plot a 3dim arrays"""
         np.random.seed(987654321)
-        print(getcwd())
-        self.assertTrue(True)
         input_x_array = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
         input_y_array = np.array([[[3, 6, 9], [12, 15, 18]], [[21, 24, 27], [30, 33, 36]]])
         self.assertTrue(GraphScatter(input_x_array, input_y_array,
                                      title='3dim Arrays',
                                      save_to='{}test_scatter_128'.format(self.save_path)))
+
+    def test_129_scatter_missing_ydata(self):
+        """Check to make sure an AttributeError is raised is ydata is None."""
+        np.random.seed(987654321)
+        input_x_array = st.norm.rvs(size=2000)
+        input_y_array = None
+        self.assertRaises(AttributeError, lambda: GraphScatter(input_x_array, input_y_array))
+
+    def test_130_scatter_vector(self):
+        """Generate a scatter plot with a Vector object."""
+        np.random.seed(987654321)
+        input_x_array = st.norm.rvs(size=2000)
+        input_y_array = st.norm.rvs(size=2000)
+        vector = Vector(input_x_array, other=input_y_array)
+        self.assertTrue(GraphScatter(vector,
+                                     title='Vector Scatter',
+                                     save_to='{}test_scatter_130'.format(self.save_path)))
+
+    def test_131_scatter_empty_vector(self):
+        """Check to make sure a NoDataError exception is raised if an empty Vector is passed."""
+        vector = Vector()
+        self.assertRaises(NoDataError, lambda: GraphScatter(vector))
 
 
 if __name__ == '__main__':

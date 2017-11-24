@@ -15,6 +15,7 @@ class TestTwoSampleKS(unittest.TestCase):
         x_input = st.weibull_min.rvs(*x_parms, size=20)
         y_input = st.weibull_min.rvs(*y_parms, size=20)
         alpha = 0.05
+        exp = TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False)
         output = """
 
 Two Sample Kolmogorov-Smirnov Test
@@ -26,82 +27,86 @@ p value =  0.7710
 
 H0: Both samples come from the same distribution
 """
-        self.assertGreater(TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False).p_value, alpha,
-                           "FAIL: Two Sample KS Test Type I error")
-        self.assertEqual(str(TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False)), output)
+        self.assertGreater(exp.p_value, alpha, "FAIL: Two Sample KS Test Type I error")
+        self.assertEqual(str(exp), output)
 
     def test_two_sample_KS_unmatched(self):
         """Test the Two Sample KS Test with unmatched samples"""
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [8.2]
+        x_input = st.weibull_min.rvs(*x_parms, size=20)
+        y_input = st.weibull_min.rvs(*y_parms, size=20)
         alpha = 0.06
-        self.assertLess(TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=20),
-                                        st.weibull_min.rvs(*y_parms, size=20),
-                                        alpha=alpha,
-                                        display=False).p_value,
-                        alpha,
-                        "FAIL: Two Sample KS Test Type II error")
+        exp = TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False)
+        output = """
+
+Two Sample Kolmogorov-Smirnov Test
+----------------------------------
+
+alpha   =  0.0600
+D value =  0.4000
+p value =  0.0591
+
+HA: Samples do not come from the same distribution
+"""
+        self.assertLess(exp.p_value, alpha, "FAIL: Two Sample KS Test Type II error")
+        self.assertEqual(str(exp), output)
 
     def test_two_sample_KS_statistic(self):
         """Test the Two Sample KS Test test statistic"""
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=20)
+        y_input = st.weibull_min.rvs(*y_parms, size=20)
         alpha = 0.05
-        self.assertAlmostEqual(TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=20),
-                                               st.weibull_min.rvs(*y_parms, size=20),
-                                               alpha=alpha,
-                                               display=False).statistic,
-                               0.2,
-                               delta=0.1,
-                               msg="FAIL: Two Sample KS Test statistic")
-
-    def test_two_sample_KS_d_value(self):
-        """Test the Two Sample KS Test test d value"""
-        np.random.seed(987654321)
-        x_parms = [1.7]
-        y_parms = [1.7]
-        alpha = 0.05
-        self.assertAlmostEqual(TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=20),
-                                               st.weibull_min.rvs(*y_parms, size=20),
-                                               alpha=alpha,
-                                               display=False).statistic,
-                               0.2,
-                               delta=0.1,
-                               msg="FAIL: Two Sample KS Test d value")
+        exp = TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False)
+        self.assertAlmostEqual(exp.statistic, 0.2, delta=0.1, msg="FAIL: Two Sample KS Test statistic")
+        self.assertAlmostEqual(exp.d_value, 0.2, delta=0.1, msg="FAIL: Two Sample KS Test d_value")
+        self.assertAlmostEqual(exp.p_value, 0.771, delta=0.001, msg="FAIL: Two Sample KS Test p_value")
 
     def test_two_sample_KS_matched_at_min_size(self):
         """Test the Two Sample KS Test with matched samples at the minimum size"""
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=2)
+        y_input = st.weibull_min.rvs(*y_parms, size=2)
         alpha = 0.05
-        self.assertRaises(MinimumSizeError, lambda: TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=2),
-                                                                    st.weibull_min.rvs(*y_parms, size=2),
-                                                                    alpha=alpha,
-                                                                    display=False).p_value)
+        self.assertRaises(MinimumSizeError, lambda: TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False))
 
     def test_two_sample_KS_matched_just_above_min_size(self):
         """Test the Two Sample KS Test with matched samples just above the minimum size"""
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=3)
+        y_input = st.weibull_min.rvs(*y_parms, size=3)
         alpha = 0.05
-        self.assertTrue(TwoSampleKSTest(st.weibull_min.rvs(*x_parms, size=3),
-                                        st.weibull_min.rvs(*y_parms, size=3),
-                                        alpha=alpha,
-                                        display=False).p_value,
-                        "FAIL: Just above the min value")
+        exp = TwoSampleKSTest(x_input, y_input, alpha=alpha, display=True)
+        output = """
+
+Two Sample Kolmogorov-Smirnov Test
+----------------------------------
+
+alpha   =  0.0500
+D value =  0.6667
+p value =  0.3197
+
+H0: Both samples come from the same distribution
+"""
+        self.assertAlmostEqual(exp.p_value, 0.3197, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, 0.6667, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_two_sample_KS_matched_empty(self):
         """Test the Two Sample KS Test with empty vectors"""
         np.random.seed(987654321)
+        x_input = [np.nan, np.nan, "one", np.nan]
+        y_input = ["one", "two", "three", "four"]
         alpha = 0.05
-        self.assertRaises(NoDataError, lambda: TwoSampleKSTest([float("nan"), float("nan"), "one", float("nan")],
-                                                               ["one", "two", "three", "four"],
-                                                               alpha=alpha,
-                                                               display=False).p_value)
+        self.assertRaises(NoDataError, lambda: TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False))
 
 
 if __name__ == '__main__':

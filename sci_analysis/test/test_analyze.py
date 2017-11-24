@@ -1,15 +1,18 @@
 import unittest
 import numpy as np
+import pandas as pd
 import scipy.stats as st
 from os import path, getcwd
 
 from ..analysis.exc import NoDataError
-from ..analysis import analyze
+from ..analysis import analyze, analyse
 
 
 class MyTestCase(unittest.TestCase):
 
     _seed = 987654321
+
+
 
     @property
     def save_path(self):
@@ -343,6 +346,35 @@ class MyTestCase(unittest.TestCase):
                                      percent=True,
                                      save_to='{}test_analyze_130'.format(self.save_path)),
                              ['Frequencies'])
+
+    def test_131_distribution_categorical_percent_alias(self):
+        """Perform a distribution analysis with categorical data and percent y-axis using the analyse alias."""
+        np.random.seed(self._seed)
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        self.assertListEqual(analyse(input_array,
+                                     debug=True,
+                                     percent=True,
+                                     save_to='{}test_analyze_131'.format(self.save_path)),
+                             ['Frequencies'])
+
+    def test_132_stacked_ttest_default(self):
+        np.random.seed(self._seed)
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(size=2000), 'group': ['Group 1'] * 2000})
+        input_2_array = pd.DataFrame({'input': st.norm.rvs(1, size=2000), 'group': ['Group 2'] * 2000})
+        df = pd.concat([input_1_array, input_2_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_132'.format(self.save_path)),
+                         ['Stacked Oneway', 'TTest'])
+
+    # def test_104_ttest_large_default(self):
+    #     """Perform an analysis on a large sample using the ttest"""
+    #     np.random.seed(self._seed)
+    #     input_1_array = st.norm.rvs(size=100)
+    #     input_2_array = st.norm.rvs(size=100)
+    #     self.assertEqual(analyze([input_1_array, input_2_array], debug=True,
+    #                              save_to='{}test_analyze_104'.format(self.save_path)),
+    #                      ['Oneway', 'TTest'])
 
 
 if __name__ == '__main__':

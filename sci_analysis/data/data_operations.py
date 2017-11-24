@@ -71,9 +71,14 @@ def flatten(seq):
 
     >>> flatten([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
     array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12])
+
+    >>> flatten(([1, 2, 3], [4, 5, 6]))
+    array([1, 2, 3, 4, 5, 6])
+
+    >>> flatten(list(zip([1, 2, 3], [4, 5, 6])))
+    array([1, 4, 2, 5, 3, 6])
     """
-    flat = np.array(seq).flatten()
-    return flat
+    return np.array(seq).flatten()
 
 
 def is_tuple(obj):
@@ -128,6 +133,11 @@ def is_iterable(obj):
     Strings arguments return False.
 
     >>> is_iterable('foobar')
+    False
+
+    Scalars return False.
+
+    >>> is_iterable(42)
     False
 
     """

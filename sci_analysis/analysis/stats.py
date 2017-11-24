@@ -9,7 +9,7 @@ from scipy.stats import skew, kurtosis, sem
 
 from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
-from ..data import Vector, Categorical, is_dict, is_group, is_categorical, is_iterable
+from ..data import Vector, Categorical, is_dict, is_group, is_categorical, is_vector
 
 
 class VectorStatistics(Analysis):
@@ -33,8 +33,8 @@ class VectorStatistics(Analysis):
 
     def __init__(self, data, sample=True, display=True):
         self._sample = sample
-        d = Vector(data).data_prep()
-        if d is None:
+        d = Vector(data)
+        if d.is_empty():
             raise NoDataError("Cannot perform the test because there is no data")
         if len(d) <= self._min_size:
             raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
@@ -44,22 +44,22 @@ class VectorStatistics(Analysis):
 
     def run(self):
         dof = 1 if self._sample else 0
-        vmin = amin(self._data)
-        vmax = amax(self._data)
+        vmin = amin(self._data.data)
+        vmax = amax(self._data.data)
         vrange = vmax - vmin
-        q1 = percentile(self._data, 25)
-        q3 = percentile(self._data, 75)
+        q1 = percentile(self._data.data, 25)
+        q3 = percentile(self._data.data, 75)
         iqr = q3 - q1
-        self._results = {self._n: len(self._data),
-                         self._mean: mean(self._data),
-                         self._std: std(self._data, ddof=dof),
-                         self._ste: sem(self._data, 0, dof),
-                         self._q2: median(self._data),
+        self._results = {self._n: len(self._data.data),
+                         self._mean: mean(self._data.data),
+                         self._std: std(self._data.data, ddof=dof),
+                         self._ste: sem(self._data.data, 0, dof),
+                         self._q2: median(self._data.data),
                          self._min: vmin,
                          self._max: vmax,
                          self._range: vrange,
-                         self._skew: skew(self._data),
-                         self._kurt: kurtosis(self._data),
+                         self._skew: skew(self._data.data),
+                         self._kurt: kurtosis(self._data.data),
                          self._q1: q1,
                          self._q3: q3,
                          self._iqr: iqr,
@@ -157,18 +157,25 @@ class GroupStatistics(Analysis):
             _data = dict(zip(groups, args)) if groups else dict(zip(list(range(1, len(args) + 1)), args))
         else:
             _data = None
-        data = dict()
+        # data = dict()
+        # for g, d in _data.items():
+        #     clean = Vector(d)
+        #     if clean.is_empty():
+        #         continue
+        #     if len(clean) <= self._min_size:
+        #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+        #     data.update({g: clean})
+        data = Vector()
         for g, d in _data.items():
-            clean = Vector(d).data_prep()
-            if clean is None:
-                continue
-            if len(clean) <= self._min_size:
+            if len(d) == 0:
+                raise NoDataError("Cannot perform test because there is no data")
+            if len(d) <= self._min_size:
                 raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-            data.update({g: clean})
-        if len(data) < 1:
+            data.append(Vector(d, groups=[g for _ in range(0, len(d))]))
+        if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
-        if len(data) == 1:
-            data = data[0]
+        # if len(data) == 1:
+        #     data = data[0]
         super(GroupStatistics, self).__init__(data, display=display)
         self.logic()
 
@@ -182,7 +189,7 @@ class GroupStatistics(Analysis):
 
     def run(self):
         out = list()
-        for group, vector in self._data.items():
+        for group, vector in self._data.groups.items():
             row_result = {self._group: str(group),
                           self._n: len(vector),
                           self._mean: mean(vector),
@@ -219,20 +226,29 @@ class GroupStatisticsStacked(Analysis):
     _q2 = 'Median'
     _min = 'Min'
 
-    def __init__(self, values, groups, **kwargs):
+    def __init__(self, values, groups=None, **kwargs):
         display = kwargs['display'] if 'display' in kwargs else True
-        data = dict()
-        if not is_iterable(values):
-            values = [values]
-        _data = DataFrame({'values': values, 'groups': groups}).groupby('groups')
-        for g, d in _data:
-            clean = Vector(d['values']).data_prep()
-            if clean is None:
-                continue
-            if len(clean) <= self._min_size:
-                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-            data.update({g: clean})
-        if len(data) < 1:
+        if groups is None:
+            if is_vector(values):
+                data = values
+            else:
+                raise AttributeError('ydata argument cannot be None.')
+        else:
+            data = Vector(values, groups=groups)
+        # data = dict()
+        # if not is_iterable(values):
+        #     values = [values]
+        # _data = DataFrame({'values': values, 'groups': groups}).groupby('groups')
+        # for g, d in _data:
+        #     clean = Vector(d['values']).data_prep()
+        #     if clean is None:
+        #         continue
+        #     if len(clean) <= self._min_size:
+        #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
+        #     data.update({g: clean})
+        # if len(data) < 1:
+        #     raise NoDataError("Cannot perform test because there is no data")
+        if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
         super(GroupStatisticsStacked, self).__init__(data, display=display)
         self.logic()
@@ -247,7 +263,9 @@ class GroupStatisticsStacked(Analysis):
 
     def run(self):
         out = list()
-        for group, vector in self._data.items():
+        for group, vector in self._data.groups.items():
+            if len(vector) <= self._min_size:
+                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
             row_result = {self._group: group,
                           self._n: len(vector),
                           self._mean: mean(vector),

@@ -8,13 +8,17 @@ from .comparison import LinearRegression, Correlation
 from .stats import VectorStatistics, GroupStatistics, GroupStatisticsStacked, CategoricalStatistics
 
 
-def determine_analysis_type(data):
+def determine_analysis_type(data, other=None, groups=None):
     """Attempts to determine the type of data and returns the corresponding sci_analysis Data object.
 
     Parameters
     ----------
     data : array-like
         The sequence of unknown data type.
+    other : array-like or None
+        A second sequence of unknown data type.
+    groups : array-like or None
+        The group names to include if data is determined to be a Vector.
 
     Returns
     -------
@@ -41,8 +45,20 @@ def determine_analysis_type(data):
     else:
         if not hasattr(data, 'dtype'):
             data = Series(data)
+        if other is not None:
+            if not hasattr(other, 'dtype'):
+                other = Series(other)
         if data.dtype in numeric_types:
-            return Vector(data)
+            if other is not None and other.dtype in numeric_types:
+                if groups is not None:
+                    return Vector(data, other=other, groups=groups)
+                else:
+                    return Vector(data, other=other)
+            else:
+                if groups is not None:
+                    return Vector(data, groups=groups)
+                else:
+                    return Vector(data)
         else:
             return Categorical(data)
 
@@ -75,7 +91,7 @@ def analyse(xdata, ydata=None, groups=None, **kwargs):
     return analyze(xdata, ydata=ydata, groups=groups, **kwargs)
 
 
-def analyze(xdata, ydata=None, groups=None, **kwargs):
+def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.
 
@@ -87,6 +103,8 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
         The response data set.
     groups : array-like
         The group names used for a oneway analysis.
+    alpha : float
+        The sensitivity to use for hypothesis tests.
 
     Returns
     -------
@@ -103,10 +121,8 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
     from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency
     from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
-    groups = kwargs['groups'] if 'groups' in kwargs else None
-    alpha = kwargs['alpha'] if 'alpha' in kwargs else 0.05
+    # groups = kwargs['groups'] if 'groups' in kwargs else None
     debug = True if 'debug' in kwargs else False
-    parms = kwargs
     tested = list()
 
     # if len(data) > 2:
@@ -118,34 +134,31 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
     if len(xdata) == 0:
         raise NoDataError("No data was passed to analyze")
 
-    # Compare Group Means and Variance
+     # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
         tested.append('Oneway')
-        name = kwargs['name'] if 'name' in kwargs else 'Values'
-        categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
-        xname = kwargs['xname'] if 'xname' in kwargs else categories
-        yname = kwargs['yname'] if 'yname' in kwargs else name
-        parms['xname'] = xname
-        parms['yname'] = yname
         if is_dict(xdata):
             groups = list(xdata.keys())
             xdata = list(xdata.values())
-        parms['groups'] = groups
 
         # Show the box plot and stats
-        GraphBoxplot(*xdata, **parms)
+        print(groups)
+        if groups is not None:
+            GraphBoxplot(*xdata, groups=groups, **kwargs)
+        else:
+            GraphBoxplot(*xdata, **kwargs)
         GroupStatistics(*xdata, groups=groups)
 
         if len(xdata) == 2:
             norm = NormTest(*xdata, alpha=alpha, display=False)
             if norm.p_value > alpha:
-                TTest(xdata[0], xdata[1])
+                TTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TTest')
             elif len(xdata[0]) > 25 and len(xdata[1]) > 25:
-                MannWhitney(xdata[0], xdata[1])
+                MannWhitney(xdata[0], xdata[1], alpha=alpha)
                 tested.append('MannWhitney')
             else:
-                TwoSampleKSTest(xdata[0], xdata[1])
+                TwoSampleKSTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TwoSampleKSTest')
         else:
             e = EqualVariance(*xdata, alpha=alpha)
@@ -153,35 +166,73 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
             # If normally distributed and variances are equal, perform one-way ANOVA
             # Otherwise, perform a non-parametric Kruskal-Wallis test
             if e.test_type == 'Bartlett' and e.p_value > alpha:
-                    Anova(*xdata, alpha=alpha)
-                    tested.append('Anova')
+                Anova(*xdata, alpha=alpha)
+                tested.append('Anova')
             else:
-                    Kruskal(*xdata, alpha=alpha)
-                    tested.append('Kruskal')
+                Kruskal(*xdata, alpha=alpha)
+                tested.append('Kruskal')
         return tested if debug else None
 
-    # Correlation and Linear Regression
-    elif is_iterable(xdata) and is_iterable(ydata):
+    if ydata is not None:
+        _data = determine_analysis_type(xdata, other=ydata, groups=groups)
+    else:
+        _data = determine_analysis_type(xdata, groups=groups)
+    # xdata = determine_analysis_type(xdata)
+    print(_data)
+
+    # if is_iterable(xdata) and is_iterable(ydata):
+    if is_vector(_data) and not _data.other.empty:
+        # Correlation and Linear Regression
         tested.append('Bivariate')
-        xname = kwargs['xname'] if 'xname' in kwargs else 'Predictor'
-        yname = kwargs['yname'] if 'yname' in kwargs else 'Response'
-        parms['xname'] = xname
-        parms['yname'] = yname
+        # xname = kwargs['xname'] if 'xname' in kwargs else 'Predictor'
+        # yname = kwargs['yname'] if 'yname' in kwargs else 'Response'
 
         # Show the scatter plot, correlation and regression stats
-        GraphScatter(xdata, ydata, **parms)
-        LinearRegression(xdata, ydata, alpha=alpha)
-        Correlation(xdata, ydata, alpha=alpha)
+        GraphScatter(_data, **kwargs)
+        LinearRegression(_data, alpha=alpha)
+        Correlation(_data, alpha=alpha)
         return tested if debug else None
+    elif is_vector(_data) and len(_data.groups) > 1:
+        # Compare Stacked Group Means and Variance
+        tested.append('Stacked Oneway')
 
-    # Histogram and Basic Stats or Categories and Frequencies
-    elif is_iterable(xdata):
-        xdata = determine_analysis_type(xdata)
-        if is_vector(xdata):
+        # Show the box plot and stats
+        GraphBoxplot(_data, **kwargs)
+        GroupStatisticsStacked(_data)
+
+        # group_data = [group for group in DataFrame({'values': xdata, 'groups': ydata}).groupby('groups')]
+        group_data = _data.groups.values()
+        if len(group_data) == 2:
+            norm = NormTest(*group_data, alpha=alpha, display=False)
+            if norm.p_value > alpha:
+                TTest(*group_data)
+                tested.append('TTest')
+            elif len(group_data[0]) > 25 and len(group_data[1]) > 25:
+                MannWhitney(*group_data)
+                tested.append('MannWhitney')
+            else:
+                TwoSampleKSTest(*group_data)
+                tested.append('TwoSampleKSTest')
+        else:
+            e = EqualVariance(*group_data, alpha=alpha)
+            if e.test_type == 'Bartlett' and e.p_value > alpha:
+                Anova(*group_data, alpha=alpha)
+                tested.append('Anova')
+            else:
+                Kruskal(*group_data, alpha=alpha)
+                tested.append('Kruskal')
+        return tested if debug else None
+    else:
+        # Histogram and Basic Stats or Categories and Frequencies
+        # xdata = determine_analysis_type(xdata)
+        if is_vector(_data):
             tested.append('Distribution')
 
             # Show the histogram and stats
-            out_stats = VectorStatistics(xdata, display=False)
+            if 'sample' in kwargs:
+                out_stats = VectorStatistics(_data, sample=kwargs['sample'], display=False)
+            else:
+                out_stats = VectorStatistics(_data, display=False)
             if 'distribution' in kwargs:
                 distro = kwargs['distribution']
                 distro_class = getattr(__import__('scipy.stats',
@@ -194,10 +245,11 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
             else:
                 fit = NormTest(xdata, alpha=alpha, display=False)
                 tested.append('NormTest')
-            GraphHisto(xdata,
-                       mean="{: .4f}".format(out_stats.mean),
-                       std_dev="{: .4f}".format(out_stats.std_dev),
-                       **kwargs)
+            # GraphHisto(_data,
+            #            mean="{: .4f}".format(out_stats.mean),
+            #            std_dev="{: .4f}".format(out_stats.std_dev),
+            #            **kwargs)
+            GraphHisto(_data, mean=out_stats.mean, std_dev=out_stats.std_dev, **kwargs)
             print(out_stats)
             print(fit)
             return tested if debug else None
@@ -205,8 +257,6 @@ def analyze(xdata, ydata=None, groups=None, **kwargs):
             tested.append('Frequencies')
 
             # Show the histogram and stats
-            GraphFrequency(xdata, **kwargs)
+            GraphFrequency(_data, **kwargs)
             CategoricalStatistics(xdata, **kwargs)
             return tested if debug else None
-    else:
-        return xdata, ydata

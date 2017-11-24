@@ -1,13 +1,28 @@
 import unittest
 import numpy as np
+import pandas as pd
 import scipy.stats as st
 from os import path, getcwd
+from warnings import catch_warnings, simplefilter
 
 from ..graphs import GraphBoxplot
-from ..analysis.exc import MinimumSizeError, NoDataError
+from .. data import Vector
+from ..analysis.exc import NoDataError
 
 
-class MyTestCase(unittest.TestCase):
+class TestWarnings(unittest.TestCase):
+    """A TestCase subclass with assertWarns substitute to cover python 2.7 which doesn't have an assertWarns method."""
+
+    def assertWarnsCrossCompatible(self, expected_warning, *args, **kwargs):
+        with catch_warnings(record=True) as warning_list:
+            simplefilter('always')
+            callable_obj = args[0]
+            args = args[1:]
+            callable_obj(*args, **kwargs)
+            self.assertTrue(any(item.category == expected_warning for item in warning_list))
+
+
+class MyTestCase(TestWarnings):
 
     @property
     def save_path(self):
@@ -94,7 +109,7 @@ class MyTestCase(unittest.TestCase):
     def test_108_boxplot_2_size_4(self):
         """Generate a boxplot graph with size 4"""
         np.random.seed(987654321)
-        input_1_array = st.norm.rvs(size=4)
+        input_1_array = st.norm.rvs(1, size=4)
         input_2_array = st.norm.rvs(size=4)
         self.assertTrue(GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
                                      title='Size 4',
@@ -114,7 +129,9 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=1)
         input_2_array = st.norm.rvs(size=2)
-        self.assertRaises(MinimumSizeError, lambda: GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array}))
+        self.assertTrue(GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
+                                     title='Single point',
+                                     save_to='{}test_box_110'.format(self.save_path)))
 
     def test_111_boxplot_2_missing_data(self):
         """Generate a boxplot with missing data"""
@@ -229,6 +246,7 @@ class MyTestCase(unittest.TestCase):
     def test_122_boxplot_4_empty_array(self):
         """Generate a boxplot graph with 1 empty array"""
         np.random.seed(987654321)
+        # TODO: Note in the documentation that if an array is ignored this way, the auto-number isn't skipped now.
         input_1_array = st.norm.rvs(size=2000)
         input_2_array = np.array([])
         input_3_array = st.norm.rvs(2, 0.5, size=2000)
@@ -324,7 +342,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
         self.assertTrue(GraphBoxplot(input_1_array,
-                                     groups=['Group 1'],
+                                     groups=['Group 1'] * 2000,
                                      title='1 Array Groups Set',
                                      save_to='{}test_box_129'.format(self.save_path)))
 
@@ -401,10 +419,14 @@ class MyTestCase(unittest.TestCase):
         input_2_array = st.norm.rvs(size=100)
         input_3_array = st.norm.rvs(size=100)
         input_4_array = st.norm.rvs(size=100)
-        self.assertTrue(GraphBoxplot(input_1_array, input_2_array, input_3_array, input_4_array,
-                                     groups=['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5'],
-                                     title='4 Arrays 5 Groups',
-                                     save_to='{}test_box_136'.format(self.save_path)))
+        self.assertRaises(AttributeError, lambda: GraphBoxplot(
+            input_1_array,
+            input_2_array,
+            input_3_array,
+            input_4_array,
+            groups=['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5'],
+            title='4 Arrays 5 Groups',
+            save_to='{}test_box_136'.format(self.save_path)))
 
     def test_137_boxplot_4_groups_3(self):
         """Generate a boxplot graph with 4 arrays and 3 groups"""
@@ -413,8 +435,113 @@ class MyTestCase(unittest.TestCase):
         input_2_array = st.norm.rvs(size=100)
         input_3_array = st.norm.rvs(size=100)
         input_4_array = st.norm.rvs(size=100)
-        self.assertRaises(IndexError, lambda: GraphBoxplot(input_1_array, input_2_array, input_3_array, input_4_array,
-                                                           groups=['Group 1', 'Group 2', 'Group 3']))
+        self.assertRaises(AttributeError, lambda: GraphBoxplot(input_1_array,
+                                                               input_2_array,
+                                                               input_3_array,
+                                                               input_4_array,
+                                                               groups=['Group 1', 'Group 2', 'Group 3']))
+
+    def test_138_boxplot_vector(self):
+        """Generate a boxplot graph from a Vector object."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        vector = Vector(input_1_array).append(Vector(input_2_array))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     save_to='{}test_box_138'.format(self.save_path)))
+
+    def test_139_boxplot_vector_ignore_groups(self):
+        """Generate a boxplot graph from a Vector object which should ignore the groups kwargs."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        vector = Vector(input_1_array).append(Vector(input_2_array))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     groups=('Group 1', 'Group 2'),
+                                     save_to='{}test_box_139'.format(self.save_path)))
+
+    def test_140_boxplot_vector_with_group_names(self):
+        """Generate a boxplot graph from a Vector object with specified group names."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        vector = (Vector(input_1_array, groups=['Group 1'] * 2000)
+                  .append(Vector(input_2_array, groups=['Group 2'] * 2000)))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     save_to='{}test_box_140'.format(self.save_path)))
+
+    def test_141_boxplot_vector_4_default(self):
+        """Generate a boxplot graph from a vector object with four groups."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        input_3_array = st.norm.rvs(2, 0.5, size=2000)
+        input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        vector = (Vector(input_1_array)
+                  .append(Vector(input_2_array))
+                  .append(Vector(input_3_array))
+                  .append(Vector(input_4_array)))
+        self.assertTrue(GraphBoxplot(vector, save_to='{}test_box_141'.format(self.save_path)))
+
+    def test_142_boxplot_vector_with_groups_4_default(self):
+        """Generate a boxplot graph from a vector object with four groups."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        input_3_array = st.norm.rvs(2, 0.5, size=2000)
+        input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        vector = (Vector(input_1_array, groups=['Group 1'] * 2000)
+                  .append(Vector(input_2_array, groups=['Group 2'] * 2000))
+                  .append(Vector(input_3_array, groups=['Group 3'] * 2000))
+                  .append(Vector(input_4_array, groups=['Group 4'] * 2000)))
+        self.assertTrue(GraphBoxplot(vector, save_to='{}test_box_142'.format(self.save_path)))
+
+    def test_143_boxplot_from_columns_default(self):
+        """Generate a boxplot graph from a single column with group column."""
+        np.random.seed(987654321)
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(size=2000), 'group': ['Group 1'] * 2000})
+        input_2_array = pd.DataFrame({'input': st.norm.rvs(1, size=2000), 'group': ['Group 2'] * 2000})
+        df = pd.concat([input_1_array, input_2_array])
+        self.assertTrue(GraphBoxplot(df['input'], groups=df['group'],
+                                     title='DataFrame Simple Test',
+                                     save_to='{}test_box_143'.format(self.save_path)))
+
+    def test_144_boxplot_from_columns_with_groups_4_default(self):
+        """Generate a boxplot graph from a single column with group column."""
+        np.random.seed(987654321)
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(size=2000), 'group': ['Group 1'] * 2000})
+        input_2_array = pd.DataFrame({'input': st.norm.rvs(1, size=2000), 'group': ['Group 2'] * 2000})
+        input_3_array = pd.DataFrame({'input': st.norm.rvs(2, 0.5, size=2000), 'group': ['Group 3'] * 2000})
+        input_4_array = pd.DataFrame({'input': st.weibull_min.rvs(1.4, size=2000), 'group': ['Group 4'] * 2000})
+        df = pd.concat([input_1_array, input_2_array, input_3_array, input_4_array])
+        self.assertTrue(GraphBoxplot(df['input'], groups=df['group'],
+                                     title='DataFrame 4 Groups',
+                                     save_to='{}test_box_144'.format(self.save_path)))
+
+    def test_145_boxplot_data_column_length_unequal_to_group_column_length(self):
+        """Check the case where the length of the data array doesn't match the length of the group labels array."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        self.assertRaises(AttributeError, lambda: GraphBoxplot(input_1_array, groups=['Group 1']))
+
+    def test_146_boxplot_issues_depricated_warning(self):
+        """Check to make sure a Deprication warnings is raised if passing in multiple arguments."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        self.assertWarnsCrossCompatible(FutureWarning,
+                                        lambda: GraphBoxplot(input_1_array, input_2_array,
+                                                             title='Raise Warning',
+                                                             save_to='{}test_box_146'.format(self.save_path)))
+
+    def test_147_boxplot_scalar(self):
+        """Generate a boxplot from a scalar value."""
+        input_1_array = 3
+        self.assertTrue(GraphBoxplot(input_1_array, title='Scalar Boxplot',
+                                     save_to='{}test_box_147'.format(self.save_path)))
 
 
 if __name__ == '__main__':

@@ -16,6 +16,7 @@ class MyTestCase(unittest.TestCase):
         x_input = st.norm.rvs(*x_parms, size=100)
         y_val = 4.0
         alpha = 0.05
+        exp = TTest(x_input, y_val, display=False)
         output = """
 
 1 Sample T Test
@@ -27,41 +28,13 @@ p value =  0.9379
 
 H0: Means are matched
 """
-        self.assertTrue(TTest(x_input, y_val, display=False).p_value > alpha,
-                        "FAIL: TTest single type I error")
-        self.assertEqual(str(TTest(x_input, y_val, display=False)), output)
-
-    def test_201_TTest_single_matched_test_type(self):
-        """Verify the TTest single test"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_val = 4.0
-        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).test_type, '1_sample',
-                         "FAIL: TTest incorrect test type")
-
-    def test_202_TTest_single_matched_mu(self):
-        """Verify the TTest mu is set"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_val = 4.0
-        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).mu, y_val,
-                         "FAIL: TTest incorrect mu")
-
-    def test_203_TTest_single_matched_t_value(self):
-        """Verify the TTest t value is set"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_val = 4.0
-        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).t_value,
-                        "FAIL: TTest t value not set")
-
-    def test_204_TTest_single_matched_statistic(self):
-        """Verify the TTest statistic is set"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_val = 4.0
-        self.assertTrue(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).statistic,
-                        "FAIL: TTest statistic not set")
+        self.assertGreater(exp.p_value, alpha, "FAIL: TTest single type I error")
+        self.assertEqual(exp.test_type, '1_sample')
+        self.assertEqual(exp.mu, 4.0)
+        self.assertAlmostEqual(exp.statistic, 0.0781, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, 0.0781, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.9379, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_205_TTest_single_unmatched(self):
         """Test the TTest against a given unmatched value"""
@@ -69,97 +42,149 @@ H0: Means are matched
         x_parms = [4, 0.75]
         y_val = 5.0
         alpha = 0.05
-        self.assertFalse(TTest(st.norm.rvs(*x_parms, size=100), y_val, display=False).p_value > alpha,
-                         "FAIL: TTest single type II error")
+        x_input = st.norm.rvs(*x_parms, size=100)
+        exp = TTest(x_input, y_val, display=False)
+        output = """
+
+1 Sample T Test
+---------------
+
+alpha   =  0.0500
+t value = -12.4518
+p value =  0.0000
+
+HA: Means are significantly different
+"""
+        self.assertFalse(exp.p_value > alpha, "FAIL: TTest single type II error")
+        self.assertEqual(exp.mu, 5.0)
+        self.assertEqual(exp.test_type, '1_sample')
+        self.assertAlmostEqual(exp.statistic, -12.4518, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, -12.4518, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_206_TTest_equal_variance_matched(self):
         """Test the TTest with two samples with equal variance and matched means"""
         np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        y_input = st.norm.rvs(*y_parms, size=100)
         alpha = 0.05
-        self.assertGreater(TTest(st.norm.rvs(*x_parms, size=100),
-                                 st.norm.rvs(*y_parms, size=100), display=False).p_value,
-                           alpha, "FAIL: TTest equal variance matched Type I error")
+        exp = TTest(x_input, y_input, display=False)
+        output = """
 
-    def test_207_TTest_equal_variance_matched_test_type(self):
-        """Verify the TTest two sample test"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_parms = [4, 0.75]
-        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100),
-                               st.norm.rvs(*y_parms, size=100), display=False).test_type, 't_test',
-                         "FAIL: TTest incorrect test type")
+T Test
+------
 
-    def test_208_TTest_equal_variance_matched_t_value(self):
-        """Verify the TTest two sample t value"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_parms = [4, 0.75]
-        self.assertAlmostEqual(TTest(st.norm.rvs(*x_parms, size=100),
-                                     st.norm.rvs(*y_parms, size=100), display=False).t_value, -0.2592,
-                               msg="FAIL: TTest equal variance matched t value wrong", delta=0.0001)
+alpha   =  0.0500
+t value = -0.2592
+p value =  0.7957
+
+H0: Means are matched
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: TTest equal variance matched Type I error")
+        self.assertIsNone(exp.mu)
+        self.assertEqual(exp.test_type, 't_test')
+        self.assertAlmostEqual(exp.statistic, -0.2592, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, -0.2592, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.7957, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_209_TTest_equal_variance_unmatched(self):
         """Test the TTest with two samples with equal variance and different means"""
         np.random.seed(987654321)
         x_parms = [4.0, 0.75]
         y_parms = [4.5, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        y_input = st.norm.rvs(*y_parms, size=100)
         alpha = 0.05
-        self.assertLess(TTest(st.norm.rvs(*x_parms, size=100),
-                              st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
-                        "FAIL: TTest equal variance unmatched Type II error")
+        exp = TTest(x_input, y_input, display=False)
+        output = """
+
+T Test
+------
+
+alpha   =  0.0500
+t value = -4.6458
+p value =  0.0000
+
+HA: Means are significantly different
+"""
+        self.assertLess(exp.p_value, alpha, "FAIL: TTest equal variance unmatched Type II error")
+        self.assertEqual(exp.test_type, 't_test')
+        self.assertEqual(str(exp), output)
 
     def test_210_TTest_unequal_variance_matched(self):
         """Test the TTest with two samples with different variances and matched means"""
         np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 1.35]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        y_input = st.norm.rvs(*y_parms, size=100)
         alpha = 0.05
-        self.assertGreater(TTest(st.norm.rvs(*x_parms, size=100),
-                                 st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
-                           "FAIL: TTest different variance matched Type I error")
+        exp = TTest(x_input, y_input, display=False)
+        output = """
+
+Welch's T Test
+--------------
+
+alpha   =  0.0500
+t value = -0.3487
+p value =  0.7278
+
+H0: Means are matched
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: TTest different variance matched Type I error")
+        self.assertEqual(exp.test_type, 'welch_t')
+        self.assertEqual(str(exp), output)
 
     def test_211_TTest_unequal_variance_unmatched(self):
         """Test the TTest with two samples with different variances and different means"""
         np.random.seed(987654321)
         x_parms = [4.0, 0.75]
         y_parms = [4.5, 1.12]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        y_input = st.norm.rvs(*y_parms, size=100)
         alpha = 0.05
-        self.assertLess(TTest(st.norm.rvs(*x_parms, size=100),
-                              st.norm.rvs(*y_parms, size=100), display=False).p_value, alpha,
-                        "FAIL: TTest different variance unmatched Type II error")
+        exp = TTest(x_input, y_input, display=True)
+        output = """
 
-    def test_212_TTest_unequal_variance_unmatched_test_type(self):
-        """Verify the TTest unequal variance test type"""
-        np.random.seed(987654321)
-        x_parms = [4.0, 0.75]
-        y_parms = [4.5, 1.12]
-        self.assertEqual(TTest(st.norm.rvs(*x_parms, size=100),
-                               st.norm.rvs(*y_parms, size=100), display=False).test_type, 'welch_t',
-                         "FAIL: TTest incorrect test type")
+Welch's T Test
+--------------
 
-    # def test_213_TTest_equal_variance_matched_too_many_args(self):
-    #     """Test the TTest with two many arguments"""
-    #     np.random.seed(987654321)
-    #     x_parms = [4, 0.75]
-    #     y_parms = [4, 0.75]
-    #     alpha = 0.05
-    #     self.assertGreater(TTest(st.norm.rvs(*x_parms, size=100),
-    #                              st.norm.rvs(*y_parms, size=100),
-    #                              st.norm.rvs(*y_parms, size=100),
-    #                              display=False).p_value,
-    #                        alpha, "FAIL: TTest equal variance matched ok with too many args")
+alpha   =  0.0500
+t value = -3.7636
+p value =  0.0002
+
+HA: Means are significantly different
+"""
+        self.assertLess(exp.p_value, alpha, "FAIL: TTest different variance unmatched Type II error")
+        self.assertEqual(exp.test_type, 'welch_t')
+        self.assertEqual(str(exp), output)
 
     def test_214_TTest_equal_variance_matched_min_size_above(self):
         """Test the TTest at the minimum size threshold"""
         np.random.seed(987654321)
         x_parms = [4, 0.75]
         y_parms = [4, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=4)
+        y_input = st.norm.rvs(*y_parms, size=4)
         alpha = 0.05
-        self.assertGreater(TTest(st.norm.rvs(*x_parms, size=4),
-                                 st.norm.rvs(*y_parms, size=4), display=False).p_value,
-                           alpha, "FAIL: TTest minimum size fail")
+        exp = TTest(x_input, y_input, display=False)
+        output = """
+
+T Test
+------
+
+alpha   =  0.0500
+t value =  0.9450
+p value =  0.3811
+
+H0: Means are matched
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: TTest minimum size fail")
+        self.assertEqual(str(exp), output)
 
     def test_215_TTest_equal_variance_matched_min_size_below(self):
         """Test the TTest just above the minimum size threshold"""
