@@ -5,7 +5,7 @@ import pandas as pd
 
 # Import from local
 from .data import Data, is_data
-from .data_operations import flatten
+from .data_operations import flatten, is_iterable
 
 
 class NumberOfCategoriesWarning(Warning):
@@ -67,15 +67,20 @@ class Categorical(Data):
             self._summary = sequence.summary
         else:
             self._name = name
-            cat_kwargs = {'dtype': 'category'}
-            if order is not None:
-                cat_kwargs.update(dict(categories=order, ordered=True))
+            # cat_kwargs = {'dtype': 'category'}
             try:
-                self._values = pd.Series(sequence).astype(**cat_kwargs)
+                # self._values = pd.Series(sequence).astype(**cat_kwargs)
+                self._values = pd.Series(sequence).astype('category')
             except TypeError:
-                self._values = pd.Series(flatten(sequence)).astype(**cat_kwargs)
+                # self._values = pd.Series(flatten(sequence)).astype(**cat_kwargs)
+                self._values = pd.Series(flatten(sequence)).astype('category')
             except ValueError:
                 self._values = pd.Series([])
+            if order is not None:
+                if not is_iterable(order):
+                    order = [order]
+                # cat_kwargs.update(dict(categories=order, ordered=True))
+                self._values = self._values.cat.set_categories(order).cat.reorder_categories(order, ordered=True)
             if dropna:
                 self._values = self._values.dropna()
             try:

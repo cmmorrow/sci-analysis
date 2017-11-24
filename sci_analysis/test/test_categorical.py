@@ -351,7 +351,7 @@ class MyTestCase(TestWarnings):
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'c'])
-        self.assertEqual(input_array.order, order)
+        self.assertEqual(input_array.order, [order])
         self.assertDictEqual(input_array.counts.to_dict(), dict([('c', 3), (np.nan, 5)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {np.nan: 1, 'c': 2})
         self.assertDictEqual(input_array.percents.to_dict(), {np.nan: 62.5, 'c': 37.5})
