@@ -318,8 +318,10 @@ class MyTestCase(TestWarnings):
     def test_119_create_categorical_with_extra_order_categories(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['e', 'd', 'c', 'b', 'a']
+        ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
         print(input_array.data)
+        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertListEqual(input_array.categories.tolist(), ['e', 'd', 'c', 'b', 'a'])
@@ -328,14 +330,16 @@ class MyTestCase(TestWarnings):
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 2, 'b': 2, 'c': 3, 'd': 1, 'e': 0})
         self.assertDictEqual(input_array.ranks.to_dict(), {'a': 2, 'b': 2, 'c': 1, 'd': 3, 'e': 4})
         self.assertDictEqual(input_array.percents.to_dict(), {'e': 0.0, 'd': 12.5, 'c': 37.5, 'b': 25.0, 'a': 25.0})
-        self.assertTrue(input_array.data.equals(Series(ref).astype('category')))
+        self.assertTrue(input_array.data.equals(ref_array))
         self.assertFalse(input_array.is_empty())
 
     def test_120_create_categorical_with_invalid_order_categories(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['z', 'y', 'x', 'w']
+        ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
         print(input_array.data)
+        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'z', 'y', 'x', 'w'])
@@ -349,8 +353,10 @@ class MyTestCase(TestWarnings):
     def test_121_create_categorical_with_scalar_order(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = 'c'
+        ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
         print(input_array.data)
+        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'c'])
@@ -365,8 +371,10 @@ class MyTestCase(TestWarnings):
     def test_122_create_categorical_with_empty_list_order(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = []
+        ref_array = Series(ref).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order)
         print(input_array.data)
+        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), [np.nan])
@@ -380,8 +388,10 @@ class MyTestCase(TestWarnings):
     def test_123_create_categorical_drop_all(self):
         ref = ['a', 'b', 'c', 'b', 'a', 'd', 'c', 'c']
         order = ['z', 'y', 'x', 'w']
+        ref_array = Series([]).astype('category').cat.set_categories(order).cat.reorder_categories(order, ordered=True)
         input_array = Categorical(ref, order=order, dropna=True)
         print(input_array.data)
+        print(ref_array)
         self.assertTrue(is_data(input_array))
         self.assertTrue(is_categorical(input_array))
         self.assertEqual(input_array.categories.tolist(), ['z', 'y', 'x', 'w'])
