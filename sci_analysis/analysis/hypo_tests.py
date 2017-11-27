@@ -49,14 +49,6 @@ class Test(Analysis):
                     raise NoDataError("Cannot perform test because there is no numeric data.")
             else:
                 data = d
-        # data = list()
-        # for d in args:
-        #     clean = Vector(d)
-        #     if clean.is_empty():
-        #         continue
-        #     if len(clean) <= self._min_size:
-        #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-        #     data.append(clean)
         if len(data) < 1:
             raise NoDataError("Cannot perform test because there is no numeric data.")
         if len(data) == 1:
@@ -110,18 +102,6 @@ class NormTest(Test):
     _ha = "HA: Data is not normally distributed"
 
     def run(self):
-        # if not is_group(self._data):
-        #     w_value, p_value = shapiro(self.data)
-        # else:
-        #     w_value = list()
-        #     p_value = list()
-        #     for d in self._data:
-        #         _w, _p = shapiro(d.data)
-        #         w_value.append(_w)
-        #         p_value.append(_p)
-        #     min_p = min(p_value)
-        #     w_value = w_value[p_value.index(min_p)]
-        #     p_value = min_p
         w_value = list()
         p_value = list()
         for g, d in self._data.groups.items():
@@ -184,22 +164,27 @@ class TwoSampleKSTest(Test):
     _h0 = "H0: Both samples come from the same distribution"
     _ha = "HA: Samples do not come from the same distribution"
 
-    def __init__(self, a, b, alpha=None, display=True):
+    def __init__(self, a, b=None, alpha=None, display=True):
         """
 
         Parameters
         ----------
-        a : array-like
+        a : array-like or Vector
             One of the two vectors to compare.
-        b : array-like
+        b : array-like or None
             The second vector to be compared against the first.
         alpha : float, optional
             The significance. Default is 0.05.
         display : bool, optional
             Print the results to stdout if True. Default is True.
         """
-        # TODO: Need to make this more efficient by handling vector input
-        super(TwoSampleKSTest, self).__init__(a, b, alpha=alpha, display=display)
+        if b is None:
+            if is_vector(a):
+                super(TwoSampleKSTest, self).__init__(a, alpha=alpha, display=display)
+            else:
+                raise AttributeError('second argument cannot be None.')
+        else:
+            super(TwoSampleKSTest, self).__init__(a, b, alpha=alpha, display=display)
 
     def run(self):
         args = self._data.groups.values()
@@ -224,22 +209,27 @@ class MannWhitney(Test):
     _ha = "HA: Locations are not matched"
     _min_size = 30
 
-    def __init__(self, a, b, alpha=None, display=True):
+    def __init__(self, a, b=None, alpha=None, display=True):
         """
 
         Parameters
         ----------
-        a : array-like
+        a : array-like or Vector
             One of the two vectors to compare.
-        b : array-like
+        b : array-like or None
             The second vector to be compared against the first.
         alpha : float, optional
             The significance. Default is 0.05.
         display : bool, optional
             Print the results to stdout if True. Default is 0.05.
         """
-        # TODO: Need to make this more efficient by handling vector input
-        super(MannWhitney, self).__init__(a, b, alpha=alpha, display=display)
+        if b is None:
+            if is_vector(a):
+                super(MannWhitney, self).__init__(a, alpha=alpha, display=display)
+            else:
+                raise AttributeError('second argument cannot be None.')
+        else:
+            super(MannWhitney, self).__init__(a, b, alpha=alpha, display=display)
 
     def run(self):
         args = self._data.groups.values()
@@ -266,11 +256,15 @@ class TTest(Test):
     _ha = "HA: Means are significantly different"
     _min_size = 3
 
-    def __init__(self, xdata, ydata, alpha=None, display=True):
-        # TODO: Need to make this more efficient by handling vector input
+    def __init__(self, xdata, ydata=None, alpha=None, display=True):
         self._mu = None
         self._test = None
-        if not is_iterable(ydata):
+        if ydata is None:
+            if is_vector(xdata):
+                super(TTest, self).__init__(xdata, alpha=alpha, display=display)
+            else:
+                raise AttributeError('second argument cannot be None.')
+        elif not is_iterable(ydata):
             self._mu = float(ydata)
             super(TTest, self).__init__(xdata, alpha=alpha, display=display)
         else:

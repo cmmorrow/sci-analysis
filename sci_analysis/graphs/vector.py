@@ -29,34 +29,6 @@ class VectorGraph(Graph):
         labels. The default values are "x" and "y".
         """
 
-        # if 'intersect' in kwargs:
-        #     if len(tuple(args)) != 2:
-        #         raise ValueError('x and y vectors must be supplied if intersect is set.')
-        #     x, y = Vector(args[0]), Vector(args[1])
-        #     if x is None or y is None:
-        #         raise NoDataError("Cannot graph because there is no data")
-        #     try:
-        #         x, y = x.data_prep(y)
-        #     except TypeError:
-        #         raise NoDataError("Cannot perform test because there is no data")
-        #     if len(x) <= self._min_size or len(y) <= self._min_size:
-        #         raise MinimumSizeError("Length of data is less than the minimum size {}.".format(self._min_size))
-        #     super(VectorGraph, self).__init__((x, y), **kwargs)
-        # else:
-        #     data = list()
-        #     for d in args:
-        #         clean = d if is_vector(d) else Vector(d)
-        #         if clean is None:
-        #             data.append(None)
-        #             continue
-        #         if len(clean) <= self._min_size:
-        #             raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-        #         data.append(clean)
-        #     if not is_group(data):
-        #         raise NoDataError("Cannot draw graph because there is no data")
-        #     if len(data) == 1:
-        #         data = data[0]
-        #     super(VectorGraph, self).__init__(data, **kwargs)
         if is_vector(sequence):
             super(VectorGraph, self).__init__(sequence, **kwargs)
         else:
@@ -119,14 +91,6 @@ class GraphHisto(VectorGraph):
             name = kwargs['xname']
 
         super(GraphHisto, self).__init__(data, xname=name, yname=yname)
-        # if GraphPreferences.Plot.boxplot != GraphPreferences.Plot.defaults[0]:
-        #    _box_plot = GraphPreferences.Plot.boxplot
-        # else:
-        #    _box_plot = box_plot
-        # if GraphPreferences.Plot.cdf != GraphPreferences.Plot.defaults[2]:
-        #    _cdf = GraphPreferences.Plot.cdf
-        # else:
-        #    _cdf = cdf
 
     def fit_distro(self):
         """
@@ -299,9 +263,6 @@ class GraphScatter(VectorGraph):
         self._points = kwargs['points'] if 'points' in kwargs else True
         self._contours = kwargs['contours'] if 'contours' in kwargs else False
         self._contour_props = (31, 1.1)
-        # self.contour_props = tuple({'num_of_contours': 31, 'contour_width': 1.1}.values())
-        # self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
-        # self._histogram_borders = kwargs['histogram_borders'] if 'histogram_borders' in kwargs else False
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
         self._title = kwargs['title'] if 'title' in kwargs else 'Bivariate'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
@@ -352,8 +313,6 @@ class GraphScatter(VectorGraph):
         y = self._data.other
         p = polyfit(x, y, 1, full=True)
         fit = polyval(p[0], x)
-        # index = argsort(x)
-        # return (x[index[0]], x[index[-1]]), (fit[index[0]], fit[index[-1]])
         return (x.min(), x.max()), (fit.min(), fit.max())
 
     def draw(self):
@@ -487,14 +446,10 @@ class GraphBoxplot(VectorGraph):
 
         if is_vector(args[0]):
             data = args[0]
-            # self._groups = data.values['grp'].unique().astype('str').tolist()
         elif is_dict(args[0]):
             data = Vector()
-            # self._groups = list()
             for g, d in args[0].items():
                 data.append(Vector(d, groups=[g] * len(d)))
-                # self._groups.append(g)
-            # self._groups = data.values['grp'].unique().astype('str').tolist()
         else:
             if is_group(args) and len(args) > 1:
                 future('Graphing boxplots by passing multiple arguments will be removed in a future version. '
@@ -503,26 +458,18 @@ class GraphBoxplot(VectorGraph):
                 if 'groups' in kwargs:
                     if len(kwargs['groups']) != len(args):
                         raise AttributeError('The length of passed groups does not match the number passed data.')
-                    # self._groups = kwargs['groups']
                     for g, d in zip(kwargs['groups'], args):
                         data.append(Vector(d, groups=[g] * len(d)))
                 else:
                     for d in args:
                         data.append(Vector(d))
-                        # self._groups = data.values['grp'].unique().astype('str').tolist()
-                    # self._groups = data.values['grp'].unique().astype('str').tolist()
-                # else:
-                #     self._groups = list(range(1, len(args) + 1))
             else:
                 if 'groups' in kwargs:
                     if len(kwargs['groups']) != len(args[0]):
                         raise AttributeError('The length of passed groups does not match the number passed data.')
                     data = Vector(args[0], groups=kwargs['groups'])
-                    # self._groups = data.values['grp'].unique().astype('str').tolist()
-                    # self._groups = list(data.groups.keys())
                 else:
                     data = Vector(args[0])
-                    # self._groups = []
         super(GraphBoxplot, self).__init__(data, xname=xname, yname=yname, save_to=self._save_to)
 
     def draw(self):
@@ -538,20 +485,6 @@ class GraphBoxplot(VectorGraph):
 
         # Create the quantile plot arrays
         prob = [probplot(v) for v in data]
-        # prob = [probplot(v['ind']) for _, v in self._data.values.groupby('grp')]
-        # prob = list()
-        # if self._nqp:
-        #     new_groups = list()
-        #     if not is_group(self._data):
-        #         prob.append(probplot(self._data))
-        #     else:
-        #         for i, d in enumerate(self._data):
-        #             if d is not None:
-        #                 prob.append(probplot(d))
-        #                 new_groups.append(self._groups[i])
-        #         self._groups = new_groups
-        # if is_group(self._data):
-        #     self._data = [d for d in self._data if d is not None]
 
         # Create the figure and gridspec
         if self._nqp and len(prob) > 0:
@@ -565,17 +498,11 @@ class GraphBoxplot(VectorGraph):
         # Draw the boxplots
         ax1 = subplot(gs[0])
         bp = ax1.boxplot(data, showmeans=True, labels=groups)
-        # bp = ax1.boxplot([v['ind'] for _, v in self._data.values.groupby('grp')], showmeans=True, labels=self._groups)
         setp(bp['boxes'], color='k')
         setp(bp['whiskers'], color='k')
         vp = ax1.violinplot(data, showextrema=False, showmedians=False, showmeans=False)
-        # vp = ax1.violinplot([v['ind'] for _, v in self._data.values.groupby('grp')],
-        #                     showextrema=False, showmedians=False, showmeans=False)
-        # if is_group(self._data):
         for i in range(len(groups)):
             setp(vp['bodies'][i], facecolors=self.get_color(i))
-        # else:
-        #     setp(vp['bodies'][0], facecolors=self.get_color(0))
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)

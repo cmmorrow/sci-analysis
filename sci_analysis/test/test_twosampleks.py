@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
+from ..data import Vector
 from ..analysis import TwoSampleKSTest
 from ..analysis.exc import MinimumSizeError, NoDataError
 
@@ -107,6 +108,37 @@ H0: Both samples come from the same distribution
         y_input = ["one", "two", "three", "four"]
         alpha = 0.05
         self.assertRaises(NoDataError, lambda: TwoSampleKSTest(x_input, y_input, alpha=alpha, display=False))
+
+    def test_two_sample_KS_vector_input(self):
+        """Test the Two Sample KS Test with a Vector object."""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=20)
+        y_input = st.weibull_min.rvs(*y_parms, size=20)
+        vector = Vector(x_input).append(Vector(y_input))
+        alpha = 0.05
+        exp = TwoSampleKSTest(vector, alpha=alpha, display=False)
+        output = """
+
+Two Sample Kolmogorov-Smirnov Test
+----------------------------------
+
+alpha   =  0.0500
+D value =  0.2000
+p value =  0.7710
+
+H0: Both samples come from the same distribution
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: Two Sample KS Test Type I error")
+        self.assertEqual(str(exp), output)
+
+    def test_two_sample_KS_with_missing_second_arg(self):
+        """Test the case where the second argument is None."""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=20)
+        self.assertRaises(AttributeError, lambda: TwoSampleKSTest(x_input))
 
 
 if __name__ == '__main__':

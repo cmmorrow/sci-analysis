@@ -80,30 +80,17 @@ class Numeric(Data):
         if sequence is None:
             super(Numeric, self).__init__(v=pd.DataFrame([], columns=self._col_names), n=name)
             self._type = None
-            # self._auto_groups = False
             self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
         elif is_data(sequence):
             super(Numeric, self).__init__(v=sequence.values, n=name)
             self._type = sequence.data_type
             self._auto_groups = sequence.auto_groups
-        # elif not is_iterable(sequence):
-        #     super(Numeric, self).__init__(v=pd.DataFrame([sequence], columns=self._col_names), n=name)
-        #     self._type = type(sequence)
-        # elif is_iterable(sequence):
-            # if hasattr(sequence, 'shape'):
-            #     if len(sequence.shape) > 1:
-            #         sequence = sequence.flatten()
-            # elif not is_dict(sequence):
-            #     sequence = flatten(sequence)
-            # self._values = pd.to_numeric(pd.Series(sequence), errors='coerce')
-            # self._type = self._values.dtype
         else:
             sequence = pd.to_numeric(self.data_prep(sequence), errors='coerce')
             other = pd.to_numeric(self.data_prep(other), errors='coerce') if other is not None else np.nan
             groups = self.data_prep(groups) if groups is not None else 1
             # TODO: This try block needs some work
             try:
-                # self._values = pd.to_numeric(pd.Series([sequence], index=[0]), errors='coerce')
                 print('dataframe creation')
                 start_time = datetime.datetime.now()
                 self._values = pd.DataFrame([])
@@ -111,12 +98,9 @@ class Numeric(Data):
                 self._values[self._col_names[1]] = other
                 self._values[self._col_names[2]] = groups
                 self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
-                # print(self._values)
                 end_time = datetime.datetime.now()
                 print(end_time - start_time)
-            # except (ValueError, TypeError):
             except ValueError:
-                # self._values = pd.DataFrame([], columns=self._col_names)
                 raise UnequalVectorLengthError('length of data does not match length of other.')
             if any(self._values[self._col_names[1]].notnull()):
                 self._values = self.drop_nan_intersect()
@@ -145,8 +129,6 @@ class Numeric(Data):
         data : np.array
             The enclosed data represented as a numpy array.
         """
-        # if is_dict(seq):
-        #     return [v for v in seq.values()]
         print('preparing')
         start_time = datetime.datetime.now()
         if hasattr(seq, 'shape'):
@@ -169,8 +151,7 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
-        # return self._values.dropna().reset_index(drop=True)
-        return self._values.dropna(how='any', subset=[self._col_names[0]]) # .reset_index(drop=True)
+        return self._values.dropna(how='any', subset=[self._col_names[0]])
 
     def drop_nan_intersect(self):
         """
@@ -182,8 +163,6 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
-        # c = pd.DataFrame({'self': self._values, 'other': seq}).dropna().reset_index(drop=True)
-        # return c['self'], c['other']
         return self._values.dropna(how='any', subset=[self._col_names[0], self._col_names[1]]) # .reset_index(drop=True)
 
     @property
@@ -239,40 +218,6 @@ class Vector(Numeric):
         if not self._values.empty:
             self._values[self._col_names[0]] = self._values[self._col_names[0]].astype('float')
             self._values[self._col_names[1]] = self._values[self._col_names[1]].astype('float')
-            # if self._values.dtype != self._type:
-            #     self._type = self._values.dtype
-
-    # def data_prep(self, other=None):
-    #     """
-    #     Remove all nan values from the encapsulated Array.
-    #
-    #     Parameters
-    #     ----------
-    #     other : array-like, optional
-    #         A secondary array-like object with corresponding NaN values to remove.
-    #
-    #     Returns
-    #     -------
-    #     vector : Vector
-    #         A vector object with all nan values removed.
-    #     """
-    #     if other is not None:
-    #         vector = other if is_vector(other) else Vector(other)
-    #         if len(self.data) != len(vector.data):
-    #             raise UnequalVectorLengthError("x and y data lengths are not equal")
-    #
-    #         x, y = self.drop_nan_intersect(vector)
-    #
-    #         if len(x) == 0 or len(y) == 0:
-    #             return None
-    #         return x, y
-    #     elif not is_iterable(self.data):
-    #         return pd.Series(self.data).astype(float)
-    #     else:
-    #         v = self.drop_nan()
-    #         if len(v) == 0:
-    #             return None
-    #         return v
 
     def is_empty(self):
         """

@@ -2,6 +2,7 @@ import unittest
 import scipy.stats as st
 import numpy as np
 
+from ..data import Vector
 from ..analysis import TTest
 from ..analysis.exc import MinimumSizeError, NoDataError
 
@@ -205,6 +206,42 @@ H0: Means are matched
                                                      ["one", "two", "three", "four"],
                                                      alpha=alpha,
                                                      display=False).p_value)
+
+    def test_217_TTest_with_vector_input(self):
+        """Test the TTest test with a vector object."""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        y_parms = [4, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        y_input = st.norm.rvs(*y_parms, size=100)
+        vector = Vector(x_input).append(Vector(y_input))
+        alpha = 0.05
+        exp = TTest(vector, display=False)
+        output = """
+
+T Test
+------
+
+alpha   =  0.0500
+t value = -0.2592
+p value =  0.7957
+
+H0: Means are matched
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: TTest equal variance matched Type I error")
+        self.assertIsNone(exp.mu)
+        self.assertEqual(exp.test_type, 't_test')
+        self.assertAlmostEqual(exp.statistic, -0.2592, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, -0.2592, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.7957, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_217_TTest_with_missing_second_arg(self):
+        """Test the case where the second argument is None."""
+        np.random.seed(987654321)
+        x_parms = [4, 0.75]
+        x_input = st.norm.rvs(*x_parms, size=100)
+        self.assertRaises(AttributeError, lambda: TTest(x_input))
 
 
 if __name__ == '__main__':

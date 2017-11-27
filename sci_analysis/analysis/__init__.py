@@ -121,12 +121,9 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency
     from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
-    # groups = kwargs['groups'] if 'groups' in kwargs else None
     debug = True if 'debug' in kwargs else False
     tested = list()
 
-    # if len(data) > 2:
-    #     raise ValueError("analyze only accepts 2 arguments max. " + str(len(data)) + "arguments were passed.")
     if xdata is None:
         raise ValueError("xdata was not provided.")
     if not is_iterable(xdata):
@@ -134,7 +131,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     if len(xdata) == 0:
         raise NoDataError("No data was passed to analyze")
 
-     # Compare Group Means and Variance
+    # Compare Group Means and Variance
     if is_group(xdata) or is_dict_group(xdata):
         tested.append('Oneway')
         if is_dict(xdata):
@@ -177,15 +174,11 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         _data = determine_analysis_type(xdata, other=ydata, groups=groups)
     else:
         _data = determine_analysis_type(xdata, groups=groups)
-    # xdata = determine_analysis_type(xdata)
     print(_data)
 
-    # if is_iterable(xdata) and is_iterable(ydata):
     if is_vector(_data) and not _data.other.empty:
         # Correlation and Linear Regression
         tested.append('Bivariate')
-        # xname = kwargs['xname'] if 'xname' in kwargs else 'Predictor'
-        # yname = kwargs['yname'] if 'yname' in kwargs else 'Response'
 
         # Show the scatter plot, correlation and regression stats
         GraphScatter(_data, **kwargs)
@@ -200,7 +193,6 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         GraphBoxplot(_data, **kwargs)
         GroupStatisticsStacked(_data)
 
-        # group_data = [group for group in DataFrame({'values': xdata, 'groups': ydata}).groupby('groups')]
         group_data = _data.groups.values()
         if len(group_data) == 2:
             norm = NormTest(*group_data, alpha=alpha, display=False)
@@ -224,7 +216,6 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         return tested if debug else None
     else:
         # Histogram and Basic Stats or Categories and Frequencies
-        # xdata = determine_analysis_type(xdata)
         if is_vector(_data):
             tested.append('Distribution')
 
@@ -245,10 +236,6 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             else:
                 fit = NormTest(xdata, alpha=alpha, display=False)
                 tested.append('NormTest')
-            # GraphHisto(_data,
-            #            mean="{: .4f}".format(out_stats.mean),
-            #            std_dev="{: .4f}".format(out_stats.std_dev),
-            #            **kwargs)
             GraphHisto(_data, mean=out_stats.mean, std_dev=out_stats.std_dev, **kwargs)
             print(out_stats)
             print(fit)

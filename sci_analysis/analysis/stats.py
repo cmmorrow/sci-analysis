@@ -157,14 +157,6 @@ class GroupStatistics(Analysis):
             _data = dict(zip(groups, args)) if groups else dict(zip(list(range(1, len(args) + 1)), args))
         else:
             _data = None
-        # data = dict()
-        # for g, d in _data.items():
-        #     clean = Vector(d)
-        #     if clean.is_empty():
-        #         continue
-        #     if len(clean) <= self._min_size:
-        #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-        #     data.update({g: clean})
         data = Vector()
         for g, d in _data.items():
             if len(d) == 0:
@@ -235,19 +227,6 @@ class GroupStatisticsStacked(Analysis):
                 raise AttributeError('ydata argument cannot be None.')
         else:
             data = Vector(values, groups=groups)
-        # data = dict()
-        # if not is_iterable(values):
-        #     values = [values]
-        # _data = DataFrame({'values': values, 'groups': groups}).groupby('groups')
-        # for g, d in _data:
-        #     clean = Vector(d['values']).data_prep()
-        #     if clean is None:
-        #         continue
-        #     if len(clean) <= self._min_size:
-        #         raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-        #     data.update({g: clean})
-        # if len(data) < 1:
-        #     raise NoDataError("Cannot perform test because there is no data")
         if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
         super(GroupStatisticsStacked, self).__init__(data, display=display)

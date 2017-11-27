@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
+from ..data import Vector
 from ..analysis import MannWhitney
 from ..analysis.exc import MinimumSizeError, NoDataError
 
@@ -126,6 +127,40 @@ HA: Locations are not matched
         x_input = ['abcdefghijklmnop'[:np.random.randint(1, 17)] for _ in range(50)]
         y_input = ['abcdefghijklmnop'[:np.random.randint(1, 17)] for _ in range(50)]
         self.assertRaises(NoDataError, lambda: MannWhitney(x_input, y_input, display=False))
+
+    def test_MannWhitney_vector_input(self):
+        """Test the case where the input argument is a Vector object."""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        y_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=100)
+        y_input = st.weibull_min.rvs(*y_parms, size=100)
+        vector = Vector(x_input).append(Vector(y_input))
+        alpha = 0.05
+        exp = MannWhitney(vector, alpha=alpha, display=True)
+        output = """
+
+Mann Whitney U Test
+-------------------
+
+alpha   =  0.0500
+u value =  4976.0000
+p value =  0.9542
+
+H0: Locations are matched
+"""
+        self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
+        self.assertAlmostEqual(exp.statistic, 4976.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
+        self.assertAlmostEqual(exp.u_value, 4976.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertEqual(str(exp), output)
+
+    def test_MannWhitney_missing_second_arg(self):
+        """Test the case where the second argument is missing."""
+        np.random.seed(987654321)
+        x_parms = [1.7]
+        x_input = st.weibull_min.rvs(*x_parms, size=100)
+        self.assertRaises(AttributeError, lambda: MannWhitney(x_input))
 
 
 if __name__ == '__main__':

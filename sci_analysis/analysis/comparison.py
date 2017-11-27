@@ -26,10 +26,6 @@ class Comparison(Analysis):
             v = Vector(xdata, other=ydata)
         if v.data.empty or v.other.empty:
             raise NoDataError("Cannot perform test because there is no data")
-        # try:
-        #     x, y = x.data_prep(y)
-        # except TypeError:
-        #     raise NoDataError("Cannot perform test because there is no data")
         if len(v.data) <= self._min_size or len(v.other) <= self._min_size:
             raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
         super(Comparison, self).__init__(v, display=display)
