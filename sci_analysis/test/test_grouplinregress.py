@@ -35,25 +35,30 @@ n             Slope         Intercept     r^2           Std Err       p value   
 100            0.9635        0.1043        0.8181        0.0459        0.0000       4             """
         exp = GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c'], display=False)
         self.assertTupleEqual(exp.counts, ('100', '100', '100', '100'))
-        self.assertTupleEqual(exp.slope,
-                              (-0.005613130406764816, 0.0570354136308546, -0.2521496921022714, 0.9634599098599703))
-        self.assertTupleEqual(exp.intercept,
-                              (0.04775111565537506, -0.1670688836199169, 0.1637132078993005, 0.10434448563066669))
-        self.assertTupleEqual(exp.r_squared,
-                              (3.030239852495909e-05, 0.00366271257512563, 0.05062765121282169, 0.8180520671815105))
-        self.assertTupleEqual(exp.r_value,
-                              (-0.005504761441239674, 0.06052034843856759, -0.2250058915069152, 0.9044623083255103))
-        self.assertTupleEqual(exp.std_err,
-                              (0.1030023210648352, 0.09502400478678666, 0.11029855015697929, 0.04589905033402483))
-        self.assertTupleEqual(exp.p_value,
-                              (0.956651586890106, 0.5497443545114141, 0.024403659194742487, 4.844813765580163e-38))
-        # print(exp.counts)
-        # print(exp.slope)
-        # print(exp.intercept)
-        # print(exp.r_squared)
-        # print(exp.r_value)
-        # print(exp.std_err)
-        # print(exp.p_value)
+        self.assertAlmostEqual(exp.slope[0], -0.005613130406764816)
+        self.assertAlmostEqual(exp.slope[1], 0.0570354136308546)
+        self.assertAlmostEqual(exp.slope[2], -0.2521496921022714)
+        self.assertAlmostEqual(exp.slope[3], 0.9634599098599703)
+        self.assertAlmostEqual(exp.intercept[0], 0.04775111565537506)
+        self.assertAlmostEqual(exp.intercept[1], -0.1670688836199169)
+        self.assertAlmostEqual(exp.intercept[2], 0.1637132078993005)
+        self.assertAlmostEqual(exp.intercept[3], 0.10434448563066669)
+        self.assertAlmostEqual(exp.r_squared[0], 3.030239852495909e-05)
+        self.assertAlmostEqual(exp.r_squared[1], 0.00366271257512563)
+        self.assertAlmostEqual(exp.r_squared[2], 0.05062765121282169)
+        self.assertAlmostEqual(exp.r_squared[3], 0.8180520671815105)
+        self.assertAlmostEqual(exp.r_value[0], -0.005504761441239674)
+        self.assertAlmostEqual(exp.r_value[1], 0.06052034843856759)
+        self.assertAlmostEqual(exp.r_value[2], -0.2250058915069152)
+        self.assertAlmostEqual(exp.r_value[3], 0.9044623083255103)
+        self.assertAlmostEqual(exp.std_err[0], 0.1030023210648352)
+        self.assertAlmostEqual(exp.std_err[1], 0.09502400478678666)
+        self.assertAlmostEqual(exp.std_err[2], 0.11029855015697929)
+        self.assertAlmostEqual(exp.std_err[3], 0.04589905033402483)
+        self.assertAlmostEqual(exp.p_value[0], 0.956651586890106)
+        self.assertAlmostEqual(exp.p_value[1], 0.5497443545114141)
+        self.assertAlmostEqual(exp.p_value[2], 0.024403659194742487)
+        self.assertAlmostEqual(exp.p_value[3], 4.844813765580163e-38)
         self.assertEqual(str(exp), output)
 
     def test_linregress_four_groups_string(self):
@@ -81,25 +86,30 @@ n             Slope         Intercept     r^2           Std Err       p value   
 100            0.9635        0.1043        0.8181        0.0459        0.0000       d             """
         exp = GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c'], display=False)
         self.assertTupleEqual(exp.counts, ('100', '100', '100', '100'))
-        self.assertTupleEqual(exp.slope,
-                              (-0.005613130406764816, 0.0570354136308546, -0.2521496921022714, 0.9634599098599703))
-        self.assertTupleEqual(exp.intercept,
-                              (0.04775111565537506, -0.1670688836199169, 0.1637132078993005, 0.10434448563066669))
-        self.assertTupleEqual(exp.r_squared,
-                              (3.030239852495909e-05, 0.00366271257512563, 0.05062765121282169, 0.8180520671815105))
-        self.assertTupleEqual(exp.r_value,
-                              (-0.005504761441239674, 0.06052034843856759, -0.2250058915069152, 0.9044623083255103))
-        self.assertTupleEqual(exp.std_err,
-                              (0.1030023210648352, 0.09502400478678666, 0.11029855015697929, 0.04589905033402483))
-        self.assertTupleEqual(exp.p_value,
-                              (0.956651586890106, 0.5497443545114141, 0.024403659194742487, 4.844813765580163e-38))
-        # print(exp.counts)
-        # print(exp.slope)
-        # print(exp.intercept)
-        # print(exp.r_squared)
-        # print(exp.r_value)
-        # print(exp.std_err)
-        # print(exp.p_value)
+        self.assertAlmostEqual(exp.slope[0], -0.005613130406764816)
+        self.assertAlmostEqual(exp.slope[1], 0.0570354136308546)
+        self.assertAlmostEqual(exp.slope[2], -0.2521496921022714)
+        self.assertAlmostEqual(exp.slope[3], 0.9634599098599703)
+        self.assertAlmostEqual(exp.intercept[0], 0.04775111565537506)
+        self.assertAlmostEqual(exp.intercept[1], -0.1670688836199169)
+        self.assertAlmostEqual(exp.intercept[2], 0.1637132078993005)
+        self.assertAlmostEqual(exp.intercept[3], 0.10434448563066669)
+        self.assertAlmostEqual(exp.r_squared[0], 3.030239852495909e-05)
+        self.assertAlmostEqual(exp.r_squared[1], 0.00366271257512563)
+        self.assertAlmostEqual(exp.r_squared[2], 0.05062765121282169)
+        self.assertAlmostEqual(exp.r_squared[3], 0.8180520671815105)
+        self.assertAlmostEqual(exp.r_value[0], -0.005504761441239674)
+        self.assertAlmostEqual(exp.r_value[1], 0.06052034843856759)
+        self.assertAlmostEqual(exp.r_value[2], -0.2250058915069152)
+        self.assertAlmostEqual(exp.r_value[3], 0.9044623083255103)
+        self.assertAlmostEqual(exp.std_err[0], 0.1030023210648352)
+        self.assertAlmostEqual(exp.std_err[1], 0.09502400478678666)
+        self.assertAlmostEqual(exp.std_err[2], 0.11029855015697929)
+        self.assertAlmostEqual(exp.std_err[3], 0.04589905033402483)
+        self.assertAlmostEqual(exp.p_value[0], 0.956651586890106)
+        self.assertAlmostEqual(exp.p_value[1], 0.5497443545114141)
+        self.assertAlmostEqual(exp.p_value[2], 0.024403659194742487)
+        self.assertAlmostEqual(exp.p_value[3], 4.844813765580163e-38)
         self.assertEqual(str(exp), output)
 
     def test_no_data(self):
@@ -200,18 +210,30 @@ n             Slope         Intercept     r^2           Std Err       p value   
 100            0.9635        0.1043        0.8181        0.0459        0.0000       4             """
         exp = GroupLinearRegression(input_array, display=False)
         self.assertTupleEqual(exp.counts, ('100', '100', '100', '100'))
-        self.assertTupleEqual(exp.slope,
-                              (-0.005613130406764816, 0.0570354136308546, -0.2521496921022714, 0.9634599098599703))
-        self.assertTupleEqual(exp.intercept,
-                              (0.04775111565537506, -0.1670688836199169, 0.1637132078993005, 0.10434448563066669))
-        self.assertTupleEqual(exp.r_squared,
-                              (3.030239852495909e-05, 0.00366271257512563, 0.05062765121282169, 0.8180520671815105))
-        self.assertTupleEqual(exp.r_value,
-                              (-0.005504761441239674, 0.06052034843856759, -0.2250058915069152, 0.9044623083255103))
-        self.assertTupleEqual(exp.std_err,
-                              (0.1030023210648352, 0.09502400478678666, 0.11029855015697929, 0.04589905033402483))
-        self.assertTupleEqual(exp.p_value,
-                              (0.956651586890106, 0.5497443545114141, 0.024403659194742487, 4.844813765580163e-38))
+        self.assertAlmostEqual(exp.slope[0], -0.005613130406764816)
+        self.assertAlmostEqual(exp.slope[1], 0.0570354136308546)
+        self.assertAlmostEqual(exp.slope[2], -0.2521496921022714)
+        self.assertAlmostEqual(exp.slope[3], 0.9634599098599703)
+        self.assertAlmostEqual(exp.intercept[0], 0.04775111565537506)
+        self.assertAlmostEqual(exp.intercept[1], -0.1670688836199169)
+        self.assertAlmostEqual(exp.intercept[2], 0.1637132078993005)
+        self.assertAlmostEqual(exp.intercept[3], 0.10434448563066669)
+        self.assertAlmostEqual(exp.r_squared[0], 3.030239852495909e-05)
+        self.assertAlmostEqual(exp.r_squared[1], 0.00366271257512563)
+        self.assertAlmostEqual(exp.r_squared[2], 0.05062765121282169)
+        self.assertAlmostEqual(exp.r_squared[3], 0.8180520671815105)
+        self.assertAlmostEqual(exp.r_value[0], -0.005504761441239674)
+        self.assertAlmostEqual(exp.r_value[1], 0.06052034843856759)
+        self.assertAlmostEqual(exp.r_value[2], -0.2250058915069152)
+        self.assertAlmostEqual(exp.r_value[3], 0.9044623083255103)
+        self.assertAlmostEqual(exp.std_err[0], 0.1030023210648352)
+        self.assertAlmostEqual(exp.std_err[1], 0.09502400478678666)
+        self.assertAlmostEqual(exp.std_err[2], 0.11029855015697929)
+        self.assertAlmostEqual(exp.std_err[3], 0.04589905033402483)
+        self.assertAlmostEqual(exp.p_value[0], 0.956651586890106)
+        self.assertAlmostEqual(exp.p_value[1], 0.5497443545114141)
+        self.assertAlmostEqual(exp.p_value[2], 0.024403659194742487)
+        self.assertAlmostEqual(exp.p_value[3], 4.844813765580163e-38)
         self.assertEqual(str(exp), output)
 
     def test_linregress_missing_data(self):

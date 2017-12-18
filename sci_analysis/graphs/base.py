@@ -86,14 +86,17 @@ class Graph(object):
         self._data = data
 
     def get_color_by_name(self, color='black'):
-        """
+        """Return a color array based on the string color passed.
 
         Parameters
         ----------
-        color
+        color : str
+            A string color name.
 
         Returns
         -------
+        color : tuple
+            A color tuple that corresponds to the passed color string.
 
         """
         return self.get_color(_color_names.index(color))
@@ -112,17 +115,6 @@ class Graph(object):
         color : tuple
             A color tuple calculated from the num argument.
         """
-        # colors = ((0.0, 0.3, 0.7, 1.0),     # blue
-        #           (1.0, 0.1, 0.1, 1.0),     # red
-        #           (0.0, 0.7, 0.3, 1.0),     # green
-        #           (1.0, 0.5, 0.0, 1.0),     # orange
-        #           (0.1, 1.0, 1.0, 1.0),     # cyan
-        #           (1.0, 1.0, 0.0, 1.0),     # yellow
-        #           (1.0, 0.0, 1.0, 1.0),     # magenta
-        #           (0.5, 0.0, 1.0, 1.0),     # purple
-        #           (0.5, 1.0, 0.0, 1.0),     # light green
-        #           (0.0, 0.0, 0.0, 1.0)      # black
-        #           )
         desired_color = []
         if num < 0:
             num *= -1
