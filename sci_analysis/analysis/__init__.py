@@ -4,7 +4,7 @@ Modules:
 """
 
 from .hypo_tests import NormTest, KSTest, TwoSampleKSTest, MannWhitney, TTest, Anova, Kruskal, EqualVariance
-from .comparison import LinearRegression, Correlation
+from .comparison import LinearRegression, Correlation, GroupCorrelation, GroupLinearRegression
 from .stats import VectorStatistics, GroupStatistics, GroupStatisticsStacked, CategoricalStatistics
 
 

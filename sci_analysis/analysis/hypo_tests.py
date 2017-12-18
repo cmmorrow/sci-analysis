@@ -101,6 +101,8 @@ class NormTest(Test):
     _h0 = "H0: Data is normally distributed"
     _ha = "HA: Data is not normally distributed"
 
+    # TODO: Need to figure out how to perform the NormTest without generating a ton of new Vector objects.
+
     def run(self):
         w_value = list()
         p_value = list()

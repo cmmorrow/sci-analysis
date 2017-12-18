@@ -184,6 +184,11 @@ class Numeric(Data):
                 if not seq.empty}
 
     @property
+    def paired_groups(self):
+        return {grp: (df[self._col_names[0]], df[self._col_names[1]])
+                for grp, df in self._values.groupby(self._col_names[2]) if not df.empty}
+
+    @property
     def values(self):
         return self._values
 
@@ -227,6 +232,14 @@ class Vector(Numeric):
         -------
         test_result : bool
             The result of whether the length of the Vector object is 0 or not.
+
+        Examples
+        --------
+        >>> Vector([1, 2, 3, 4, 5]).is_empty()
+        False
+
+        >>> Vector([]).is_empty()
+        True
         """
         return self._values.empty
 
@@ -243,6 +256,11 @@ class Vector(Numeric):
         -------
         vector : Vector
             The original Vector object with new values.
+
+        Examples
+        --------
+        >>> Vector([1, 2, 3]).append(Vector([4, 5, 6])).data
+        pandas.Series([1., 2., 3., 4., 5., 6.])
         """
         if not is_vector(other):
             raise ValueError("Vector object cannot be added to a non-vector object.")
@@ -255,3 +273,18 @@ class Vector(Numeric):
         self._values.reset_index(inplace=True, drop=True)
         self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
         return self
+
+    def flatten(self):
+        """
+        Disassociates independent and dependent data into individual groups.
+
+        Returns
+        -------
+        data : tuple(Series)
+            A tuple of pandas Series.
+        """
+        if not self.other.empty:
+            return (tuple(data[self._col_names[0]] for grp, data in self.values.groupby(self._col_names[2])) +
+                    tuple(data[self._col_names[1]] for grp, data in self.values.groupby(self._col_names[2])))
+        else:
+            return tuple(data[self._col_names[0]] for grp, data in self.values.groupby(self._col_names[2]))

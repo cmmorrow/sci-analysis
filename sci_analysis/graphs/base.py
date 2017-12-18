@@ -11,6 +11,33 @@ Classes:
 # from six.moves import range
 
 
+_colors = (
+    (0.0, 0.3, 0.7),    # blue
+    (1.0, 0.1, 0.1),    # red
+    (0.0, 0.7, 0.3),    # green
+    (1.0, 0.5, 0.0),    # orange
+    (0.1, 1.0, 1.0),    # cyan
+    (1.0, 1.0, 0.0),    # yellow
+    (1.0, 0.0, 1.0),    # magenta
+    (0.5, 0.0, 1.0),    # purple
+    (0.5, 1.0, 0.0),    # light green
+    (0.0, 0.0, 0.0)     # black
+)
+
+_color_names = (
+    'blue',
+    'red',
+    'green',
+    'orange',
+    'cyan',
+    'yellow',
+    'magenta',
+    'purple',
+    'light green',
+    'black'
+)
+
+
 class Graph(object):
     """The super class all other sci_analysis graphing classes descend from.
     Classes that descend from Graph should implement the draw method at bare minimum.
@@ -58,6 +85,19 @@ class Graph(object):
         self._yname = kwargs['yname'] if 'yname' in kwargs else 'y'
         self._data = data
 
+    def get_color_by_name(self, color='black'):
+        """
+
+        Parameters
+        ----------
+        color
+
+        Returns
+        -------
+
+        """
+        return self.get_color(_color_names.index(color))
+
     @staticmethod
     def get_color(num):
         """Return a color based on the given num argument.
@@ -72,23 +112,23 @@ class Graph(object):
         color : tuple
             A color tuple calculated from the num argument.
         """
-        colors = [(0.0, 0.3, 0.7, 1.0),     # blue
-                  (1.0, 0.1, 0.1, 1.0),     # red
-                  (0.0, 0.7, 0.3, 1.0),     # green
-                  (1.0, 0.5, 0.0, 1.0),     # orange
-                  (0.1, 1.0, 1.0, 1.0),     # cyan
-                  (1.0, 1.0, 0.0, 1.0),     # yellow
-                  (1.0, 0.0, 1.0, 1.0),     # magenta
-                  (0.5, 0.0, 1.0, 1.0),     # purple
-                  (0.5, 1.0, 0.0, 1.0),     # light green
-                  (0.0, 0.0, 0.0, 1.0)      # black
-                  ]
+        # colors = ((0.0, 0.3, 0.7, 1.0),     # blue
+        #           (1.0, 0.1, 0.1, 1.0),     # red
+        #           (0.0, 0.7, 0.3, 1.0),     # green
+        #           (1.0, 0.5, 0.0, 1.0),     # orange
+        #           (0.1, 1.0, 1.0, 1.0),     # cyan
+        #           (1.0, 1.0, 0.0, 1.0),     # yellow
+        #           (1.0, 0.0, 1.0, 1.0),     # magenta
+        #           (0.5, 0.0, 1.0, 1.0),     # purple
+        #           (0.5, 1.0, 0.0, 1.0),     # light green
+        #           (0.0, 0.0, 0.0, 1.0)      # black
+        #           )
         desired_color = []
         if num < 0:
             num *= -1
-        floor = int(num) // len(colors)
-        remainder = int(num) % len(colors)
-        selected = colors[remainder]
+        floor = int(num) // len(_colors)
+        remainder = int(num) % len(_colors)
+        selected = _colors[remainder]
         if floor > 0:
             for value in selected:
                 desired_color.append(value / (2.0 * floor) + 0.4)

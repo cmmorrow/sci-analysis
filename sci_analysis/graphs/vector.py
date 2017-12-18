@@ -334,7 +334,7 @@ class GraphScatter(VectorGraph):
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
             self._xsize, self._ysize = 8.5, 7.5
-            h_ratio, w_ratio = [2, 5], [5, 2]
+            h_ratio, w_ratio = (2, 5), (5, 2)
             main_plot = 2
         else:
             main_plot = 0
@@ -368,6 +368,164 @@ class GraphScatter(VectorGraph):
         if self._fit:
             fit_x, fit_y = self.calc_fit()
             ax2.plot(fit_x, fit_y, 'r--', linewidth=2, zorder=3)
+
+        # Draw the grid lines and labels
+        ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        xlabel(self._xname)
+        ylabel(self._yname)
+
+        # Draw the boxplot borders
+        if self._boxplot_borders:
+            ax1 = subplot(gs[0], sharex=ax2)
+            ax3 = subplot(gs[3], sharey=ax2)
+            bpx = ax1.boxplot(x, vert=False, showmeans=True)
+            bpy = ax3.boxplot(y, vert=True, showmeans=True)
+            setp(bpx['boxes'], color='k')
+            setp(bpx['whiskers'], color='k')
+            setp(bpy['boxes'], color='k')
+            setp(bpy['whiskers'], color='k')
+            vpx = ax1.violinplot(x, vert=False, showmedians=False, showmeans=False, showextrema=False)
+            vpy = ax3.violinplot(y, vert=True, showmedians=False, showmeans=False, showextrema=False)
+            setp(vpx['bodies'], facecolors=self.get_color(0))
+            setp(vpy['bodies'], facecolors=self.get_color(0))
+            ax1.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()],
+                 visible=False)
+
+        # Save the figure to disk or display
+        if self._save_to:
+            savefig(self._save_to)
+            close(f)
+        else:
+            show()
+        pass
+
+
+class GraphGroupScatter(VectorGraph):
+    """Draws an x-by-y scatter plot with more than a single group.
+
+    Unique class members are fit and style. The fit member is a boolean flag for
+    whether to draw the linear best fit line. The style member is a tuple of
+    formatted strings that set the matplotlib point style and line style. It is
+    also worth noting that the vector member for the GraphScatter class is a
+    tuple of xdata and ydata.
+    """
+
+    _nrows = 1
+    _ncols = 1
+    _xsize = 8
+    _ysize = 7
+
+    def __init__(self, xdata, ydata=None, groups=None, **kwargs):
+        """GraphScatter constructor.
+
+        :param xdata: The x-axis data.
+        :param ydata: The y-axis data.
+        :param _fit: Display the optional line fit.
+        :param _points: Display the scatter points.
+        :param _contours: Display the density contours
+        :param _boxplot_borders: Display the boxplot borders
+        :param _title: The title of the graph.
+        :param _save_to: Save the graph to the specified path.
+        :return: pass
+        """
+        self._fit = kwargs['fit'] if 'fit' in kwargs else True
+        self._points = kwargs['points'] if 'points' in kwargs else True
+        self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
+        self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else True
+        self._title = kwargs['title'] if 'title' in kwargs else 'Group Bivariate'
+        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
+        xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
+        if ydata is None:
+            if is_vector(xdata):
+                super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)
+            else:
+                raise AttributeError('ydata argument cannot be None.')
+        else:
+            super(GraphGroupScatter, self).__init__(Vector(xdata, other=ydata, groups=groups), xname=xname, yname=yname)
+
+    @staticmethod
+    def calc_fit(x, y):
+        """
+        Calculates the best fit line using sum of squares.
+
+        Returns
+        -------
+        fit_coordinates : list
+            A list of the min and max fit points.
+        """
+        p = polyfit(x, y, 1, full=True)
+        fit = polyval(p[0], x)
+        return (x.min(), x.max()), (fit.min(), fit.max())
+
+    def draw(self):
+        """
+        Draws the scatter plot based on the set parameters.
+
+        Returns
+        -------
+        pass
+        """
+
+        # Setup the grid variables
+        x = self._data.data
+        y = self._data.other
+        groups = sorted(self._data.groups.keys())
+        h_ratio = [1, 1]
+        w_ratio = [1, 1]
+
+        # Setup the figure and gridspec
+        if self._boxplot_borders:
+            self._nrows, self._ncols = 2, 2
+            self._xsize, self._ysize = 8.5, 7.5
+            h_ratio, w_ratio = (2, 5), (5, 2)
+            main_plot = 2
+        else:
+            main_plot = 0
+
+        # Setup the figure
+        f = figure(figsize=(self._xsize, self._ysize))
+        f.suptitle(self._title, fontsize=14)
+        if self._boxplot_borders:
+            gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
+        else:
+            gs = GridSpec(self._nrows, self._ncols)
+
+        # Draw the main graph
+        ax2 = subplot(gs[main_plot])
+
+        for grp, (grp_x, grp_y) in self._data.paired_groups.items():
+            i = groups.index(grp)
+            alpha_trans = 0.6
+            if self._highlight is not None:
+                try:
+                    if grp in self._highlight:
+                        alpha_trans = 0.6
+                    else:
+                        alpha_trans = 0.2
+                except TypeError:
+                    alpha_trans = 0.6
+
+            # Draw the points
+            if self._points:
+                # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
+                color = (self.get_color(i),)
+                ax2.scatter(grp_x, grp_y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1, label=grp)
+
+            # Draw the fit line
+            if self._fit:
+                fit_x, fit_y = self.calc_fit(grp_x, grp_y)
+                if self._points:
+                    ax2.plot(fit_x, fit_y, linestyle='--', color=self.get_color(i), linewidth=2, zorder=2)
+                else:
+                    ax2.plot(fit_x, fit_y, linestyle='--', color=self.get_color(i), linewidth=2, zorder=2, label=grp)
+
+        # Draw the legend
+        if (self._fit or self._points) and len(groups) > 1:
+            ax2.legend(loc='best')
 
         # Draw the grid lines and labels
         ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)

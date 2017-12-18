@@ -77,6 +77,9 @@ def flatten(seq):
 
     >>> flatten(list(zip([1, 2, 3], [4, 5, 6])))
     array([1, 4, 2, 5, 3, 6])
+
+    >>> flatten([(1, 2), (3, 4), (5, 6), (7, 8)])
+    array([1, 2, 3, 4, 5, 6, 7, 8])
     """
     return np.array(seq).flatten()
 

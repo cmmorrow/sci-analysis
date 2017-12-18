@@ -174,13 +174,13 @@ class GroupStatistics(Analysis):
     def logic(self):
         if not self._data:
             pass
-        self._results = list()
+        self._results = []
         self.run()
         if self._display:
             print(self)
 
     def run(self):
-        out = list()
+        out = []
         for group, vector in self._data.groups.items():
             row_result = {self._group: str(group),
                           self._n: len(vector),
@@ -194,7 +194,7 @@ class GroupStatistics(Analysis):
         self._results = DataFrame(out).sort_values(self._group).to_dict(orient='records')
 
     def __str__(self):
-        order = [
+        order = (
             self._n,
             self._mean,
             self._std,
@@ -202,7 +202,7 @@ class GroupStatistics(Analysis):
             self._q2,
             self._max,
             self._group,
-        ]
+        )
         return std_output(self._name, self._results, order=order)
 
 
@@ -241,7 +241,7 @@ class GroupStatisticsStacked(Analysis):
             print(self)
 
     def run(self):
-        out = list()
+        out = []
         for group, vector in self._data.groups.items():
             if len(vector) <= self._min_size:
                 raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))

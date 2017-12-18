@@ -286,6 +286,56 @@ class MyTestCase(unittest.TestCase):
         input_array = [1, 2, 3, 4, 5]
         self.assertTrue(Vector(input_array).append(Vector(None)).data.equals(pd.Series(input_array).astype('float')))
 
+    def test_149_vector_paired_groups(self):
+        """Test paired groups."""
+        ind_x_1 = [0, 1, 2, 3, 4]
+        ind_y_1 = [5, 6, 7, 8, 9]
+        ind_x_2 = [10, 11, 12, 13, 14]
+        ind_y_2 = [15, 16, 17, 18, 19]
+        input1 = Vector(ind_x_1, other=ind_y_1)
+        input2 = Vector(ind_x_2, other=ind_y_2)
+        new_input = input1.append(input2)
+        groups = new_input.paired_groups
+        self.assertTrue(groups[1][0].equals(pd.Series([0., 1., 2., 3., 4.])))
+        self.assertTrue(groups[1][1].equals(pd.Series([5., 6., 7., 8., 9.])))
+        self.assertTrue(groups[2][0].equals(pd.Series([10., 11., 12., 13., 14.], index=[5, 6, 7, 8, 9])))
+        self.assertTrue(groups[2][1].equals(pd.Series([15., 16., 17., 18., 19.], index=[5, 6, 7, 8, 9])))
+        self.assertListEqual([1, 2], list(groups.keys()))
+
+    def test_150_vector_flatten_singled(self):
+        """Test the Vector flatten method on a single vector."""
+        np.random.seed(987654321)
+        input_array = Vector(st.norm.rvs(size=100))
+        self.assertEqual(len(input_array.flatten()), 1)
+        self.assertTrue(input_array.data.equals(input_array.flatten()[0]))
+
+    def test_151_vector_flatten_several_groups(self):
+        """Test the Vector flatten method on a a single vector with multiple groups."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        input_array_3 = st.norm.rvs(size=100)
+        input_array = Vector(input_array_1).append(Vector(input_array_2)).append(Vector(input_array_3))
+        self.assertEqual(len(input_array.flatten()), 3)
+        self.assertEqual(type(input_array.flatten()), tuple)
+        self.assertTrue(input_array.groups[1].equals(input_array.flatten()[0]))
+        self.assertTrue(input_array.groups[2].equals(input_array.flatten()[1]))
+        self.assertTrue(input_array.groups[3].equals(input_array.flatten()[2]))
+
+    def test_152_vector_flatten_several_paired_groups(self):
+        """Test the Vector flatten method on a paired vector with multiple groups."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        input_array_3 = st.norm.rvs(size=100)
+        input_array_4 = st.norm.rvs(size=100)
+        input_array = Vector(input_array_1, other=input_array_2).append(Vector(input_array_3, other=input_array_4))
+        self.assertEqual(len(input_array.flatten()), 4)
+        self.assertTrue(input_array.groups[1].equals(input_array.flatten()[0]))
+        self.assertTrue(input_array.groups[2].equals(input_array.flatten()[1]))
+        self.assertTrue(input_array.paired_groups[1][1].equals(input_array.flatten()[2]))
+        self.assertTrue(input_array.paired_groups[2][1].equals(input_array.flatten()[3]))
+
 
 if __name__ == '__main__':
     unittest.main()
