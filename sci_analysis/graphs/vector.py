@@ -352,11 +352,9 @@ class GraphScatter(VectorGraph):
 
         # Draw the points
         if self._points:
-            # This case was added to cover a matplotlib issue where 4 arguments get interpreted as color
-            if len(x) == 4:
-                ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.6, zorder=1)
-            else:
-                ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.6, zorder=1)
+            # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
+            color = (self.get_color(0),)
+            ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=0.6, zorder=1)
 
         # Draw the contours
         if self._contours:

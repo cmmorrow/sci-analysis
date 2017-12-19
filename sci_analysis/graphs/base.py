@@ -116,8 +116,6 @@ class Graph(object):
             A color tuple calculated from the num argument.
         """
         desired_color = []
-        if num < 0:
-            num *= -1
         floor = int(num) // len(_colors)
         remainder = int(num) % len(_colors)
         selected = _colors[remainder]

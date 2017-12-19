@@ -118,7 +118,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
 
     """
-    from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency
+    from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency, GraphGroupScatter
     from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
     debug = True if 'debug' in kwargs else False
@@ -174,17 +174,25 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         _data = determine_analysis_type(xdata, other=ydata, groups=groups)
     else:
         _data = determine_analysis_type(xdata, groups=groups)
-    print(_data)
 
     if is_vector(_data) and not _data.other.empty:
         # Correlation and Linear Regression
-        tested.append('Bivariate')
+        if len(_data.groups) > 1:
+            tested.append('Group Bivariate')
 
-        # Show the scatter plot, correlation and regression stats
-        GraphScatter(_data, **kwargs)
-        LinearRegression(_data, alpha=alpha)
-        Correlation(_data, alpha=alpha)
-        return tested if debug else None
+            # Show the scatter plot, correlation and regression stats
+            GraphGroupScatter(_data, **kwargs)
+            GroupLinearRegression(_data, alpha=alpha)
+            GroupCorrelation(_data, alpha=alpha)
+            return tested if debug else None
+        else:
+            tested.append('Bivariate')
+
+            # Show the scatter plot, correlation and regression stats
+            GraphScatter(_data, **kwargs)
+            LinearRegression(_data, alpha=alpha)
+            Correlation(_data, alpha=alpha)
+            return tested if debug else None
     elif is_vector(_data) and len(_data.groups) > 1:
         # Compare Stacked Group Means and Variance
         tested.append('Stacked Oneway')
@@ -193,7 +201,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         GraphBoxplot(_data, **kwargs)
         GroupStatisticsStacked(_data)
 
-        group_data = _data.groups.values()
+        group_data = tuple(_data.groups.values())
         if len(group_data) == 2:
             norm = NormTest(*group_data, alpha=alpha, display=False)
             if norm.p_value > alpha:

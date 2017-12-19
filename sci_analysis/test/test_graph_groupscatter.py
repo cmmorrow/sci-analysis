@@ -344,6 +344,8 @@ class MyTestCase(unittest.TestCase):
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
         self.assertRaises(AttributeError, lambda: GraphGroupScatter(input_array['a'], groups=input_array['c']))
 
+    # TODO: Test with long group names
+
 
 if __name__ == '__main__':
     unittest.main()

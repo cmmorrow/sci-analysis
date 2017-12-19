@@ -12,13 +12,16 @@ class MyTestCase(unittest.TestCase):
 
     _seed = 987654321
 
-
-
     @property
     def save_path(self):
         if getcwd().split('/')[-1] == 'test':
             return './images/'
         elif getcwd().split('/')[-1] == 'sci_analysis':
+            if path.exists('./setup.py'):
+                return './sci_analysis/test/images/'
+            else:
+                return './test/images/'
+        elif getcwd().split('/')[-1] == 'sci-analysis':
             if path.exists('./setup.py'):
                 return './sci_analysis/test/images/'
             else:
@@ -367,14 +370,89 @@ class MyTestCase(unittest.TestCase):
                                  save_to='{}test_analyze_132'.format(self.save_path)),
                          ['Stacked Oneway', 'TTest'])
 
-    # def test_104_ttest_large_default(self):
-    #     """Perform an analysis on a large sample using the ttest"""
-    #     np.random.seed(self._seed)
-    #     input_1_array = st.norm.rvs(size=100)
-    #     input_2_array = st.norm.rvs(size=100)
-    #     self.assertEqual(analyze([input_1_array, input_2_array], debug=True,
-    #                              save_to='{}test_analyze_104'.format(self.save_path)),
-    #                      ['Oneway', 'TTest'])
+    def test_133_two_group_bivariate(self):
+        """Perform a correlation with two groups."""
+        np.random.seed(self._seed)
+        input_1_x = st.norm.rvs(size=100)
+        input_1_y = [x + st.norm.rvs(0, 0.5, size=1)[0] for x in input_1_x]
+        input_2_x = st.norm.rvs(size=100)
+        input_2_y = [(x / 2) + st.norm.rvs(0, 0.2, size=1)[0] for x in input_2_x]
+        grp = [1] * 100 + [2] * 100
+        cs_x = np.concatenate((input_1_x, input_2_x))
+        cs_y = np.concatenate((input_1_y, input_2_y))
+        input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
+        self.assertEqual(analyze(input_array['a'], input_array['b'], groups=input_array['c'],
+                                 debug=True,
+                                 save_to='{}test_analyze_133'.format(self.save_path)),
+                         ['Group Bivariate'])
+
+    def test_134_three_group_bivariate(self):
+        """Perform a correlation with three groups."""
+        np.random.seed(self._seed)
+        size = 100
+        input_1_x = st.norm.rvs(size=size)
+        input_1_y = [x + st.norm.rvs(0, 0.5, size=1)[0] for x in input_1_x]
+        input_2_x = st.norm.rvs(size=size)
+        input_2_y = [(x / 2) + st.norm.rvs(0, 0.2, size=1)[0] for x in input_2_x]
+        input_3_x = st.norm.rvs(size=size)
+        input_3_y = np.array([(x * 1.5) + st.norm.rvs(size=1)[0] for x in input_3_x]) - 0.5
+        grp = [1] * size + [2] * size + [3] * size
+        cs_x = np.concatenate((input_1_x, input_2_x, input_3_x))
+        cs_y = np.concatenate((input_1_y, input_2_y, input_3_y))
+        input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
+        self.assertEqual(analyze(input_array['a'], input_array['b'], groups=input_array['c'],
+                                 debug=True,
+                                 save_to='{}test_analyze_134'.format(self.save_path)),
+                         ['Group Bivariate'])
+
+    def test_135_stacked_manwhitney_default(self):
+        np.random.seed(self._seed)
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(size=2000), 'group': ['Group 1'] * 2000})
+        input_2_array = pd.DataFrame({'input': st.weibull_min.rvs(1.2, size=2000), 'group': ['Group 2'] * 2000})
+        df = pd.concat([input_1_array, input_2_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_135'.format(self.save_path)),
+                         ['Stacked Oneway', 'MannWhitney'])
+
+    def test_136_stacked_twosampleks_default(self):
+        np.random.seed(self._seed)
+        size = 10
+        input_1_array = pd.DataFrame({'input': np.append(st.norm.rvs(0, 1, size=size), st.norm.rvs(10, 1, size=size)),
+                                      'group': ['Group 1'] * size * 2})
+        input_2_array = pd.DataFrame({'input': np.append(st.norm.rvs(0, 1, size=size), st.norm.rvs(10, 1, size=size)),
+                                      'group': ['Group 2'] * size * 2})
+        df = pd.concat([input_1_array, input_2_array])
+        self.assertListEqual(analyze(df['input'], groups=df['group'],
+                                     debug=True,
+                                     save_to='{}test_analyze_136'.format(self.save_path)),
+                             ['Stacked Oneway', 'TwoSampleKSTest'])
+
+    def test_137_stacked_anova_default(self):
+        np.random.seed(self._seed)
+        size = 100
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(size=size), 'group': ['Group 1'] * size})
+        input_2_array = pd.DataFrame({'input': st.norm.rvs(size=size), 'group': ['Group 2'] * size})
+        input_3_array = pd.DataFrame({'input': st.norm.rvs(0.5, size=size), 'group': ['Group 3'] * size})
+        input_4_array = pd.DataFrame({'input': st.norm.rvs(size=size), 'group': ['Group 4'] * size})
+        df = pd.concat([input_1_array, input_2_array, input_3_array, input_4_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_137'.format(self.save_path)),
+                         ['Stacked Oneway', 'Anova'])
+
+    def test_138_stacked_kw_default(self):
+        np.random.seed(self._seed)
+        size = 100
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(0, 0.75, size=size), 'group': ['Group 1'] * size})
+        input_2_array = pd.DataFrame({'input': st.norm.rvs(size=size), 'group': ['Group 2'] * size})
+        input_3_array = pd.DataFrame({'input': st.norm.rvs(0.5, size=size), 'group': ['Group 3'] * size})
+        input_4_array = pd.DataFrame({'input': st.norm.rvs(size=size), 'group': ['Group 4'] * size})
+        df = pd.concat([input_1_array, input_2_array, input_3_array, input_4_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_138'.format(self.save_path)),
+                         ['Stacked Oneway', 'Kruskal'])
 
 
 if __name__ == '__main__':
