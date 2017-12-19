@@ -21,11 +21,11 @@ class MyTestCase(unittest.TestCase):
                 return './sci_analysis/test/images/'
             else:
                 return './test/images/'
-        elif getcwd().split('/')[-1] == 'sci-analysis':
-            if path.exists('./setup.py'):
-                return './sci_analysis/test/images/'
-            else:
-                return './test/images/'
+        # elif getcwd().split('/')[-1] == 'sci-analysis':
+        #     if path.exists('./setup.py'):
+        #         return './sci_analysis/test/images/'
+        #     else:
+        #         return './test/images/'
         else:
             './'
 
