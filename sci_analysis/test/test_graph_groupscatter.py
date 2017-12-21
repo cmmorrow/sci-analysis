@@ -344,7 +344,20 @@ class MyTestCase(unittest.TestCase):
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
         self.assertRaises(AttributeError, lambda: GraphGroupScatter(input_array['a'], groups=input_array['c']))
 
-    # TODO: Test with long group names
+    def test_26_scatter_three_groups_long_group_names(self):
+        np.random.seed(987654321)
+        input_1_x = st.norm.rvs(size=100)
+        input_1_y = [x + st.norm.rvs(0, 0.5, size=1)[0] for x in input_1_x]
+        input_2_x = st.norm.rvs(size=100)
+        input_2_y = [(x / 2) + st.norm.rvs(0, 0.2, size=1)[0] for x in input_2_x]
+        input_3_x = st.norm.rvs(size=100)
+        input_3_y = np.array([(x * 1.5) + st.norm.rvs(size=100)[0] for x in input_3_x]) - 0.5
+        grp = ['11111111111111111111'] * 100 + ['222222222222222222222'] * 100 + ['3333333333333333333333'] * 100
+        cs_x = np.concatenate((input_1_x, input_2_x, input_3_x))
+        cs_y = np.concatenate((input_1_y, input_2_y, input_3_y))
+        input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
+        self.assertTrue(GraphGroupScatter(input_array['a'], input_array['b'], groups=input_array['c'],
+                                          save_to='{}test_group_scatter_26'.format(self.save_path)))
 
 
 if __name__ == '__main__':

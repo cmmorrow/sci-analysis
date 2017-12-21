@@ -1,4 +1,5 @@
 import warnings
+import six
 
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \
@@ -506,6 +507,8 @@ class GraphGroupScatter(VectorGraph):
                         alpha_trans = 0.2
                 except TypeError:
                     alpha_trans = 0.6
+            if isinstance(grp, six.string_types) and len(grp) > 20:
+                grp = grp[0:21] + '...'
 
             # Draw the points
             if self._points:
