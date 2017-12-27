@@ -1,26 +1,39 @@
 # sci-analysis
-An easy to use python based data exploration and analysis tool by Chris Morrow
+An easy to use and powerful python-based data exploration and analysis tool
 
 ## Current Version:
-1.4 --- Released August 19, 2016
+2.0 --- Released December 27, 2017
 
 [![PyPI](https://img.shields.io/pypi/v/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
 [![PyPI](https://img.shields.io/pypi/format/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
 [![PyPI](https://img.shields.io/pypi/pyversions/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
-[![Build Status](https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=master)](https://travis-ci.org/cmmorrow/sci-analysis)
-[![Coverage Status](https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=2.0.0)](https://coveralls.io/github/cmmorrow/sci-analysis?branch=2.0.0)
+[![Build Status](https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=2.0.0)](https://travis-ci.org/cmmorrow/sci-analysis)
+[![Coverage Status](https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=2.0.0)](https://coveralls.io/github/cmmorrow/sci-analysis?branch=master)
 
 ### What is sci-analysis?
 sci-analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as how the data is distributed.
 
-Currently, sci-analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and one-way ANOVA.
+The types of analysis that can be performed are histograms of numeric or categorical data, bivariate analysis of two numeric vectors, and one-way analysis of variance.
 
-### What's new in sci-analysis version 1.4?
+### What's new in sci-analysis version 2.0?
 
-In version 1.4, sci-analysis was re-written to be more pythonic and to support python 3. A ton of new graphing options have been added histograms, scatter plots and oneway plots. Histograms can now display an accompanying cumulative distribution plot and fit lines to a specified distribution can be displayed on both the histogram and cumulative distribution plot. Scatter plots can now overlay density contour lines and display boxplot borders. Boxplots have been revamped and are now overlayed on top of a kernel density estimation, which provides a much better representation of distribution density. New tests have been added for comparing two distributions -- Student's T Test for normally distributed data, the Mann Whitney U Test for non-parametric data and the two-sample Kolmogorov-Smirnov Test for small non-parametric samples. The Kolmogorov-Smirnov Test has been added for determining goodness-of-fit to a specified distribution as well. 
+* In version 2.0, the code base was re-factored to use pandas as the internal data structure instead of numpy. This change shouldn't have a noticeable effect, but should lead to faster releases moving forward. 
+* Categorical data is now supported by passing in a single array of string values to the ```analyze``` function. 
+* Multiple scatter plots can now be shown on the same graph by passing in a *groups* argument.
+* Oneway analysis can now be performed on stacked data by passing in all the data to the ```analyze``` function and an array of the corresponding groups using the *groups* argument.
+* The function ```analyse``` was added as an alias to ```analyze```.
 
 ### Getting started with sci-analysis
 The documentation on how to install and use sci-analysis can be found here:
 
-http://sci-analysis.readthedocs.io/en/latest/
+[http://sci-analysis.readthedocs.io/en/latest/](http://sci-analysis.readthedocs.io/en/latest/)
+
+
+### Requirements
+* Packages: pandas, numpy, scipy, matplotlib, six
+* Supports python 2.7, 3.5 and 3.6
+
+Bugs can be reported here:
+
+[https://github.com/cmmorrow/sci-analysis/issues](https://github.com/cmmorrow/sci-analysis/issues)
 

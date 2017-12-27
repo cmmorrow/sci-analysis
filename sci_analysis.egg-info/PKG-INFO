@@ -1,7 +1,7 @@
 Metadata-Version: 1.1
 Name: sci-analysis
-Version: 1.4.6
-Summary: A light weight python data exploration and analysis tool
+Version: 2.0.0
+Summary: An easy to use but powerful, python based data exploration and analysis tool
 Home-page: https://github.com/cmmorrow/sci-analysis
 Author: chris morrow
 Author-email: cmmorrow@gmail.com
@@ -9,7 +9,7 @@ License: MIT License
 Description: UNKNOWN
 Keywords: statistics data EDA graphing visualization analysis scientific
 Platform: UNKNOWN
-Classifier: Development Status :: 4 - Beta
+Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: Science/Research
 Classifier: Intended Audience :: Manufacturing
@@ -24,3 +24,4 @@ Classifier: Programming Language :: Python :: 2
 Classifier: Programming Language :: Python :: 2.7
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
