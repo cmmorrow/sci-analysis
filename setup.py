@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sci_analysis',
-    version='2.0.0',
+    version='2.0.0rc1',
     packages=find_packages(),
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
@@ -29,4 +29,5 @@ setup(
     keywords='statistics data EDA graphing visualization analysis scientific',
     description='An easy to use and powerful python-based data exploration and analysis tool',
     install_requires=['numpy', 'scipy', 'pandas', 'matplotlib', 'six'],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, >=3.5',
 )
