@@ -75,7 +75,6 @@ class Numeric(Data):
         name : str, optional
             The name of the Numeric object
         """
-        print('starting')
         self._auto_groups = True if groups is None else False
         if sequence is None:
             super(Numeric, self).__init__(v=pd.DataFrame([], columns=self._col_names), n=name)
@@ -91,26 +90,19 @@ class Numeric(Data):
             groups = self.data_prep(groups) if groups is not None else 1
             # TODO: This try block needs some work
             try:
-                print('dataframe creation')
-                start_time = datetime.datetime.now()
                 self._values = pd.DataFrame([])
                 self._values[self._col_names[0]] = sequence
                 self._values[self._col_names[1]] = other
                 self._values[self._col_names[2]] = groups
                 self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
-                end_time = datetime.datetime.now()
-                print(end_time - start_time)
             except ValueError:
                 raise UnequalVectorLengthError('length of data does not match length of other.')
             if any(self._values[self._col_names[1]].notnull()):
                 self._values = self.drop_nan_intersect()
             else:
-                print('starting drop_nan')
                 start_time = datetime.datetime.now()
                 self._values = self.drop_nan()
                 end_time = datetime.datetime.now()
-                print(end_time - start_time)
-            print(self._values)
             self._type = self._values[self._col_names[0]].dtype
             self._name = name
 
@@ -129,14 +121,10 @@ class Numeric(Data):
         data : np.array
             The enclosed data represented as a numpy array.
         """
-        print('preparing')
-        start_time = datetime.datetime.now()
         if hasattr(seq, 'shape'):
             if len(seq.shape) > 1:
                 return flatten(seq)
             else:
-                end_time = datetime.datetime.now()
-                print(end_time - start_time)
                 return seq
         else:
             return flatten(seq)
