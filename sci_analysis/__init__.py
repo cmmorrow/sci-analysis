@@ -17,6 +17,6 @@ clean and strip.
 # from sci_analysis.graphs import graph
 # from sci_analysis.data import data
 __all__ = ["data", "analysis", "graph"]
-from .analysis import analyze
+from .analysis import analyze, analyse
 # from .analysis.analysis import Comparison, NormTest, TTest, LinearRegression,\
 #     Correlation, Anova, Kruskal, EqualVariance, VectorStatistics, GroupStatistics

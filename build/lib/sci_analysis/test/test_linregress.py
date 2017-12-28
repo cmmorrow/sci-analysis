@@ -2,8 +2,9 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import LinearRegression, MinimumSizeError, NoDataError
-from ..data.data import UnequalVectorLengthError
+from ..analysis import LinearRegression
+from ..analysis.exc import MinimumSizeError, NoDataError
+from ..data import UnequalVectorLengthError, Vector
 
 
 class MyTestCase(unittest.TestCase):
@@ -13,8 +14,24 @@ class MyTestCase(unittest.TestCase):
         x_input_array = range(1, 101)
         y_input_array = [x * 3 for x in x_input_array]
         alpha = 0.05
+        output = """
+
+Linear Regression
+-----------------
+
+Count     =  100
+Slope     =  3.0000
+Intercept =  0.0000
+r         =  1.0000
+r^2       =  1.0000
+Std Err   =  0.0000
+p value   =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
         self.assertLess(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
                         "FAIL: Linear Regression Type II error")
+        self.assertEqual(str(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False)), output)
 
     def test_351_LinRegress_no_corr(self):
         """Test the Linear Regression class for uncorrelated data"""
@@ -138,6 +155,37 @@ class MyTestCase(unittest.TestCase):
                                                 alpha=alpha,
                                                 display=False).statistic, 0.0105, delta=0.0001,
                                msg="FAIL: Linear Regression statistic")
+
+    def test_363_LinRegress_vector(self):
+        """Test the Linear Regression class with an input Vector."""
+        np.random.seed(987654321)
+        x_input_array = range(1, 101)
+        y_input_array = [x * 3 for x in x_input_array]
+        alpha = 0.05
+        output = """
+
+Linear Regression
+-----------------
+
+Count     =  100
+Slope     =  3.0000
+Intercept =  0.0000
+r         =  1.0000
+r^2       =  1.0000
+Std Err   =  0.0000
+p value   =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        exp = LinearRegression(Vector(x_input_array, other=y_input_array), alpha=alpha, display=False)
+        self.assertLess(exp.p_value, alpha, "FAIL: Linear Regression Type II error")
+        self.assertEqual(str(exp), output)
+
+    def test_364_LinRegress_missing_ydata(self):
+        """Test the case where no ydata is given."""
+        np.random.seed(987654321)
+        x_input_array = range(1, 101)
+        self.assertRaises(AttributeError, lambda: LinearRegression(x_input_array))
 
 
 if __name__ == '__main__':
