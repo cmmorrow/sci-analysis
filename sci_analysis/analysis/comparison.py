@@ -87,9 +87,7 @@ class LinearRegression(Comparison):
     """Performs a linear regression between two vectors."""
 
     _name = "Linear Regression"
-    _h0 = "H0: There is no significant relationship between predictor and response"
-    _ha = "HA: There is a significant relationship between predictor and response"
-    _n = 'Count'
+    _n = 'n'
     _slope = 'Slope'
     _intercept = 'Intercept'
     _r_value = 'r'
@@ -151,8 +149,6 @@ class LinearRegression(Comparison):
             self._p_value
         ]
         out.append(std_output(self._name, self._results, order=order))
-        out.append('')
-        out.append(self._h0 if self.p_value > self._alpha else self._ha)
         out.append('')
         return '\n'.join(out)
 

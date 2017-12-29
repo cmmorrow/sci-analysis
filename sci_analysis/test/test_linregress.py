@@ -19,15 +19,13 @@ class MyTestCase(unittest.TestCase):
 Linear Regression
 -----------------
 
-Count     =  100
+n         =  100
 Slope     =  3.0000
 Intercept =  0.0000
 r         =  1.0000
 r^2       =  1.0000
 Std Err   =  0.0000
 p value   =  0.0000
-
-HA: There is a significant relationship between predictor and response
 """
         self.assertLess(LinearRegression(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
                         "FAIL: Linear Regression Type II error")
@@ -167,15 +165,13 @@ HA: There is a significant relationship between predictor and response
 Linear Regression
 -----------------
 
-Count     =  100
+n         =  100
 Slope     =  3.0000
 Intercept =  0.0000
 r         =  1.0000
 r^2       =  1.0000
 Std Err   =  0.0000
 p value   =  0.0000
-
-HA: There is a significant relationship between predictor and response
 """
         exp = LinearRegression(Vector(x_input_array, other=y_input_array), alpha=alpha, display=False)
         self.assertLess(exp.p_value, alpha, "FAIL: Linear Regression Type II error")

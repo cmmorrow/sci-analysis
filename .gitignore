@@ -65,3 +65,4 @@ build/lib/sci_analysis/test/test_statistics.py
 build/lib/sci_analysis/test/test_ttest.py
 build/lib/sci_analysis/test/test_twosampleks.py
 build/lib/sci_analysis/test/test_vector.py
+.DS_Store
