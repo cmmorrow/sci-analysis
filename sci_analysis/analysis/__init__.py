@@ -139,7 +139,6 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             xdata = list(xdata.values())
 
         # Show the box plot and stats
-        print(groups)
         if groups is not None:
             GraphBoxplot(*xdata, groups=groups, **kwargs)
         else:
