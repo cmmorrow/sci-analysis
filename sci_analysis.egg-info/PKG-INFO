@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: sci-analysis
-Version: 2.0.0rc2
+Version: 2.0.0
 Summary: An easy to use and powerful python-based data exploration and analysis tool
 Home-page: https://github.com/cmmorrow/sci-analysis
 Author: chris morrow
@@ -17,13 +17,18 @@ Description: ============
         Current Version
         ---------------
         
-        2.0 --- Released December 27, 2017
+        2.0 --- Released December 31, 2017
         
-        .. image:: https://img.shields.io/pypi/v/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
-        .. image:: https://img.shields.io/pypi/format/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
-        .. image:: https://img.shields.io/pypi/pyversions/sci_analysis.svg   :target: https://pypi.python.org/pypi/sci_analysis
-        .. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=2.0.0   :target: https://travis-ci.org/cmmorrow/sci-analysis
-        .. image:: https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=2.0.0   :target: https://coveralls.io/github/cmmorrow/sci-analysis?branch=2.0.0
+        .. image:: https://img.shields.io/pypi/v/sci_analysis.svg
+           :target: https://pypi.python.org/pypi/sci_analysis
+        .. image:: https://img.shields.io/pypi/format/sci_analysis.svg
+           :target: https://pypi.python.org/pypi/sci_analysis
+        .. image:: https://img.shields.io/pypi/pyversions/sci_analysis.svg
+           :target: https://pypi.python.org/pypi/sci_analysis
+        .. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=2.0.0   
+           :target: https://travis-ci.org/cmmorrow/sci-analysis
+        .. image:: https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=2.0.0
+           :target: https://coveralls.io/github/cmmorrow/sci-analysis?branch=2.0.0
         
         What is sci-analysis?
         ---------------------

@@ -4,12 +4,24 @@
    contain the root `toctree` directive.
 
 
+============
+sci-analysis
+============
+
+An easy to use and powerful python-based data exploration and analysis tool
+
+---------------
+Current Version
+---------------
+
+2.0 --- Released December 31, 2017
+
 What is sci_analysis?
 =====================
 
-sci_analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data and also performs the statistical analysis. sci_analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data or number of arguments you provide, as well as how the data is distributed.
+sci_analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as performs the statistical analysis. sci_analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data or number of arguments you provide, as well as how the data is distributed.
 
-Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.
+The types of analysis that can be performed are histograms of numeric or categorical data, bivariate analysis of two numeric data vectors, and one-way analysis of variance.
 
 What's new in sci_analysis version 2.0?
 =======================================
@@ -70,6 +82,8 @@ From the python interpreter or in the first cell of a Jupyter notebook, type:
 
 This will tell python to import the sci_analysis function ``analyze``.
 
+.. note:: Alternatively, the function ``analyse`` can be imported instead, as it is an alias for ``analyze``. For the case of this documentation, ``analyze`` will be used for consistency.
+
 If you are using the Jupyter notebook, you may also need to use the following code instead to enable inline plots:
 
 ::
@@ -89,7 +103,7 @@ Now, sci_analysis should be ready to use. Try the following code:
 
 A histogram and box plot of the data should appear, as well as printed output similar to that below:
 
-.. image:: ../img/histo1.png
+.. image:: ../img/histo1_2.png
 
 ::
 
@@ -119,9 +133,33 @@ A histogram and box plot of the data should appear, as well as printed output si
  
     H0: Data is normally distributed
 
-If ``data`` contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.
+If ``data`` contains missing values, they will be ignored when generating the statistics and graphing the histogram.
 
 .. note:: numpy and scipy.stats were only imported for the purpose of the above example. sci_analysis uses numpy and scipy internally, so it isn't necessary to import them unless you want to explicitly use them. 
+
+A histogram and statistics for categorical data can be performed with the following command:
+
+::
+    
+    pets = ['dog', 'cat', 'rat', 'cat', 'rabbit', 'dog', 'hampster', 'cat', 'rabbit', 'dog', 'dog']
+    analyze(pets)
+
+A histogram and printed output similar to that below should be shown:
+
+.. image:: ../img/cat1.png
+
+::
+    
+    Statistics
+    ----------
+    
+    Rank          Frequency     Percent       Category      
+    --------------------------------------------------------
+    1             4              36.3636      dog           
+    2             3              27.2727      cat           
+    3             2              18.1818      rabbit        
+    4             1              9.0909       hampster      
+    4             1              9.0909       rat           
 
 Let's examine the ``analyze`` function in more detail. Here's the signature for the ``analyze`` function:
 
@@ -141,41 +179,40 @@ Let's examine the ``analyze`` function in more detail. Here's the signature for 
 
 ``analyze`` will detect the desired type of data analysis to perform based on whether the ``ydata`` argument is supplied, and whether the ``xdata`` argument is a two-dimensional array-like object. 
 
-The ``xdata`` and ``ydata`` arguments can accept most python array-like objects, with the exception of strings. For example, ``xdata`` will accept a python list, tuple, numpy array, or a pandas Series object. Internally, iterable objects are converted to a Vector object, which is a numpy array of type ``float64``.
+The ``xdata`` and ``ydata`` arguments can accept most python array-like objects, with the exception of strings. For example, ``xdata`` will accept a python list, tuple, numpy array, or a pandas Series object. Internally, iterable objects are converted to a Vector object, which is a pandas Series of type ``float64``.
 
-If only the ``xdata`` argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.
+If only the ``xdata`` argument is passed and it is a one-dimensional vector of numeric values, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector. If only the ``xdata`` argument is passed and it is a one-dimensional vector of categorical (string) values, the analysis performed will be a histogram of categories with rank, frequencies and percentages displayed.
 
-If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
+If ``xdata`` and ``ydata`` are supplied and are both one-dimensional vectors of numeric data, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:
 
 ::
 
-    example1 = [0.2, 0.25, 0.27, "nan", 0.32, 0.38, 0.39, "nan", 0.42, 0.43, 0.47, 0.51, 0.52, 0.56, 0.6]
-    example2 = [0.23, 0.27, 0.29, "nan", 0.33, 0.35, 0.39, 0.42, "nan", 0.46, 0.48, 0.49, "nan", 0.5, 0.58]
+    example1 = [0.2, 0.25, 0.27, np.nan, 0.32, 0.38, 0.39, np.nan, 0.42, 0.43, 0.47, 0.51, 0.52, 0.56, 0.6]
+    example2 = [0.23, 0.27, 0.29, np.nan, 0.33, 0.35, 0.39, 0.42, np.nan, 0.46, 0.48, 0.49, np.nan, 0.5, 0.58]
     analyze(example1, example2)
 
-.. image:: ../img/corr1.png
+.. image:: ../img/corr1_2.png
 
 ::
     
     Linear Regression
     -----------------
 
-    count     = 11
-    slope     = 0.8467
-    intercept = 0.0601
-    R^2       = 0.9836
-    std err   = 0.0518
+    n         = 11
+    Slope     = 0.8467
+    Intercept = 0.0601
+    r         = 0.9836
+    r^2       = 0.9674
+    Std Err   = 0.0518
     p value   = 0.0000
 
-    HA: There is a significant relationship between predictor and response
 
+    Pearson Correlation Coefficient
+    -------------------------------
 
-    Correlation
-    -----------
-
-    Pearson Coeff:
-    r = 0.9836
-    p = 0.0000
+    alpha   =  0.0500
+    r value =  0.9836
+    p value =  0.0000
 
     HA: There is a significant relationship between predictor and response
 
@@ -196,23 +233,25 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
     group_d = st.norm.rvs(size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
     
-.. image:: ../img/comp4.png
+.. image:: ../img/comp4_2.png
 
 ::
     
     Group Statistics
+    ----------------
  
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
     25             0.2403        0.9181       -1.8853        0.3791        1.6715       Group B       
     30            -0.1282        1.0652       -2.4718       -0.0266        1.7617       Group C       
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
+    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
  
  
     Bartlett Test
     -------------
  
+    alpha   =  0.0500
     T value =  1.8588
     p value =  0.6022
  
@@ -222,6 +261,7 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
     Oneway ANOVA
     ------------
  
+    alpha   =  0.0500
     f value =  1.0813
     p value =  0.3591
  
@@ -238,35 +278,39 @@ In the example above, sci_analysis is telling us the four groups are normally di
     group_d = st.norm.rvs(0.0, 1, size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
 
-.. image:: ../img/comp5.png
+.. image:: ../img/comp5_2.png
 
 ::
     
     Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    ----------------
+
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
     25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B       
     30            -0.0282        1.0652       -2.3718        0.0734        1.8617       Group C       
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
- 
- 
+    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
+
+
     Bartlett Test
     -------------
- 
+
+    alpha   =  0.0500
     T value =  42.7597
     p value =  0.0000
- 
+
     HA: Variances are not equal
- 
- 
+
+
+
     Kruskal-Wallis
     --------------
- 
-    p value =  0.0660
+
+    alpha   =  0.0500
     h value =  7.1942
- 
+    p value =  0.0660
+
     H0: Group means are matched
 
 In the example above, group B has a standard deviation of 2.75 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance. Also, the Kruskal-Wallis test was used instead of the Oneway ANOVA because the pre-requisite of equal variance was not met.
@@ -282,87 +326,47 @@ In another example, let's compare groups that have different distibutions and di
     group_d = st.norm.rvs(0.0, 1, size=40)
     analyze({"Group A": group_a, "Group B": group_b, "Group C": group_c, "Group D": group_d})
 
-.. image:: ../img/comp6.png
+.. image:: ../img/comp6_2.png
 
 ::
     
     Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    ----------------
+
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D       
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
     25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B       
     30            -1.0340        0.8029       -2.7632       -0.7856       -0.0606       Group C       
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
- 
- 
+    40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D       
+
+
     Levene Test
     -----------
- 
+
+    alpha   =  0.0500
     W value =  10.1675
     p value =  0.0000
- 
+
     HA: Variances are not equal
- 
- 
+
+
+
     Kruskal-Wallis
     --------------
- 
-    p value =  0.0000
-    h value =  23.8694
- 
-    HA: Group means are not matched
 
-.. note:: If a dict is passed to the analyze function, the groups are reported in arbitrary order. This will be fixed in a future release.
+    alpha   =  0.0500
+    h value =  23.8694
+    p value =  0.0000
+
+    HA: Group means are not matched
 
 The above example models group C as a Weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the one-sided tail on the group C boxplot, and the curved shape of group C on the quantile plot. Group B has the highest mean at 0.72, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.
-
-Alternatively, the above example can be repeated where the groups are in the specified order by setting ``xdata`` as a list and the ``groups`` argument as a list of the group names.
-
-::
-
-    np.random.seed(987654321)
-    group_a = st.norm.rvs(0.0, 1, size=50)
-    group_b = st.norm.rvs(0.0, 3, size=25)
-    group_c = st.weibull_max.rvs(1.2, size=30)
-    group_d = st.norm.rvs(0.0, 1, size=40)
-    analyze([group_a, group_b, group_c, group_d], groups=['Group A', 'Group B', 'Group C', 'Group D'])
-
-.. image:: ../img/comp7.png
-
-::
-
-    Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
-    --------------------------------------------------------------------------------------------------
-    40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D       
-    25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B       
-    30            -1.0340        0.8029       -2.7632       -0.7856       -0.0606       Group C       
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
- 
- 
-    Levene Test
-    -----------
- 
-    W value =  10.1675
-    p value =  0.0000
- 
-    HA: Variances are not equal
- 
- 
-    Kruskal-Wallis
-    --------------
- 
-    p value =  0.0000
-    h value =  23.8694
- 
-    HA: Group means are not matched
 
 Using sci_analysis with pandas
 ==============================
 
-Pandas is a python package that simplifies working with tabular or relational data. Sci_analysis does not depend on or installs pandas, but the two packages work well together. Because columns and rows of data in a pandas DataFrame are naturally array-like, using pandas with sci_analysis is the prefered way to use sci_analysis.
+Pandas is a python package that simplifies working with tabular or relational data. Because columns and rows of data in a pandas DataFrame are naturally array-like, using pandas with sci_analysis is the prefered way to use sci_analysis.
 
 Let's create a pandas DataFrame to use for analysis:
 
@@ -386,14 +390,14 @@ This will create a table (pandas DataFrame object) with 6 columns and an index w
             name='Column One', 
             title='Distribution from pandas')
 
-.. image:: ../img/histo2.png
+.. image:: ../img/histo2_2.png
 
 ::
 
     Statistics
     ----------
  
-    Count     =  60
+    n         =  60
     Mean      = -0.0562
     Std Dev   =  1.0779
     Std Error =  0.1392
@@ -411,295 +415,202 @@ This will create a table (pandas DataFrame object) with 6 columns and an index w
     Shapiro-Wilk test for normality
     -------------------------------
  
+    alpha   =  0.0500
     W value =  0.9796
     p value =  0.4131
  
     H0: Data is normally distributed
 
-The following command can be used to analyze the correlation between columns 'One' and 'Three':
+Anywhere you use a python list or numpy Array in sci_analysis, you can use a column or row of a pandas DataFrame (known in pandas terms as a Series). This is because a pandas Series has much of the same behavior as a numpy Array, causing sci_analysis to handle a pandas Series as if it were a numpy Array.
+
+By passing two array-like arguments to the ``analyze`` function, the correlation can be determined between the two array-like arguments. The following command can be used to analyze the correlation between columns 'One' and 'Three':
 
 ::
 
     analyze(df['One'], df['Three'], 
             xname='Column One', 
             yname='Column Three', 
-            title='Bivariate from pandas')
+            title='Bivariate Analysis between Column One and Column Three')
 
-.. image:: ../img/corr2.png
+.. image:: ../img/corr2_2.png
 
 ::
 
     Linear Regression
     -----------------
  
-    Count     =  60
+    n         =  60
     Slope     = -0.1807
     Intercept = -0.9249
-    R^2       = -0.2742
+    r         = -0.2742
+    r^2       =  0.0752
     Std Err   =  0.0832
     p value   =  0.0340
- 
-    HA: There is a significant relationship between predictor and response
- 
- 
+
+
+
     Spearman Correlation Coefficient
     --------------------------------
- 
-    p value =  0.0785
+
+    alpha   =  0.0500
     r value = -0.2289
- 
+    p value =  0.0785
+
     H0: There is no significant relationship between predictor and response
 
-Anywhere you use a python list or numpy Array in sci_analysis, you can use a column or row of a pandas DataFrame (known in pandas terms as a Series). This is because a pandas Series has much of the same behavior as a numpy Array, causing sci_analysis to handle a pandas Series as if it were a numpy Array.
-
-Performing a Oneway analysis on data in a pandas DataFrame requires some explanation. The simplist way to perform a Oneway analysis is to iterate over a pandas groupby object in a list comprehension. You can find a great explanation of what list comprehensions are and how to use them here:
-
-`<http://treyhunner.com/2015/12/python-list-comprehensions-now-in-color/>`_
-
-Let's start with an example. The following code will perform a Oneway analysis using each of the four values in the 'Conditions' column:
+To check whether an individual Condition correlates between Column One and Column Three, the same analysis can be done, but this time by passing the Condition column to the groups argument. For example:
 
 ::
 
-    analyze([group['Two'] for name, group in df.groupby(df['Condition'])], 
-             groups=['Group A', 'Group B', 'Group C', 'Group D'],
-             categories='Groups',
-             name='Column Two',
-             title='Oneway from pandas')
+    analyze(df['One'], df['Three'],
+            xname='Column One',
+            yname='Column Three',
+            groups=df['Condition'],
+            title='Bivariate Analysis between Column One and Column Three')
 
-.. image:: ../img/comp8.png
+.. image:: ../img/corr3_2.png
+
+::
+
+    Linear Regression
+    -----------------
+
+    n             Slope         Intercept     r^2           Std Err       p value       Group         
+    --------------------------------------------------------------------------------------------------
+    15            -0.2738       -0.8880        0.1246        0.2012        0.1968       Group A       
+    15             0.0303       -0.8172        0.0020        0.1883        0.8745       Group B       
+    15            -0.2615       -1.0552        0.2950        0.1121        0.0364       Group C       
+    15            -0.1697       -0.8938        0.0578        0.1900        0.3879       Group D       
+
+
+    Spearman Correlation Coefficient
+    --------------------------------
+
+    n             r value       p value       Group         
+    --------------------------------------------------------
+    15            -0.4107        0.1283       Group A       
+    15             0.1857        0.5075       Group B       
+    15            -0.4500        0.0924       Group C       
+    15            -0.1679        0.5499       Group D       
+
+The borders of the graph have boxplots for all the data points on the x-axis and y-axis, regardless of which group they belong to. The borders can be removed by adding the argument ``boxplot_borders=False``.
+
+According to the Spearman Correlation, there is no significant correlation among the groups. Group C appears to be the closest to showing a significant correlation, but it can be difficult to see the data points for Group C with so many colors on the graph. The Group C data points can be highlighted by using the argument ``highlight=['Group C']``. In fact, any number of groups can be highlighted by passing a list of the group names using the ``highlight`` argument.
+
+::
+
+    analyze(df['One'], df['Three'],
+            xname='Column One',
+            yname='Column Three',
+            groups=df['Condition'],
+            boxplot_borders=False,
+            highlight=['Group C'],
+            title='Bivariate Analysis between Column One and Column Three')
+
+.. image:: ../img/corr4_2.png
+
+Performing a Oneway analysis on data in a pandas DataFrame requires some explanation. A Oneway analysis can be performed with stacked or unstacked data. One method will be easier than the other depending on how the data to be analyzed is stored. In the example DataFrame used so far, to perform a Oneway analysis between the groups in the 'Condition' column, the stacked method will be easier to use. 
+
+Let's start with an example. The following code will perform a Oneway analysis using each of the four values in the 'Condition' column:
+
+::
+
+    analyze(df['Two'], 
+            groups=df['Condition'],
+            categories='Condition',
+            name='Column Two',
+            title='Oneway from pandas')
+
+.. image:: ../img/comp1_2.png
 
 ::
 
     Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    ----------------
+
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    15            -0.1906        2.6335       -5.6558        0.2217        3.5229       Group D       
+    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A       
     15             0.7406        2.4806       -3.0538        0.9879        5.6546       Group B       
     15             0.9334        3.9554       -5.9492       -0.0510        5.2850       Group C       
-    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A       
- 
- 
-    Bartlett Test
-    -------------
- 
-    T value =  3.7931
-    p value =  0.2847
- 
-    H0: Variances are equal
- 
- 
-    Oneway ANOVA
-    ------------
- 
-    f value =  0.6628
-    p value =  0.5784
- 
-    H0: Group means are matched
-
-From the graph, there are four groups: Group A, Group B, Group C and Group D. The data being analyzed is from column 'Two', the variances are equal and there is no significant difference in the means. So how does this work? The argument is a single list comprehension with group names passed to the ``groups`` argument. The list comprehension can be thought of this way:
-
-"For each unique value in the DataFrame's 'Condition' column, make a new list containing the values in column 'Two' where all the values in the 'Condition' column are the same".
-
-Let's start by working from right to left. ``df.groupby(df['Condition'])`` splits the DataFrame ``df`` into four parts, where each part has all the rows where the 'Condition' column is 'Group A', 'Group B', 'Group C' and 'Group D'. ``for name, group in`` loops over each part where 'name' is 'Group A', 'Group B', 'Group C' and 'Group D' and 'group' is the part of ``df`` that corresponds to 'name'. Note that 'name' is not used in this example. A little more on this later. Last, ``group['Two']`` returns just column 'Two' for each part. Running the list comprehension by itself shows that it's a list with four lists, where each inner list is the column 'Two' for each group.
-
-::
-
-    [group['Two'] for name, group in df.groupby(df['Condition'])]
-
-One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:
-
-::
-
-    analyze({name: group['Two'] for name, group in df.groupby(df['Condition'])}, 
-             categories='Groups from Dictionary',
-             name='Column Two',
-             title='Oneway from pandas')
-
-.. image:: ../img/corr9.png
-
-::
-
-    Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
-    --------------------------------------------------------------------------------------------------
     15            -0.1906        2.6335       -5.6558        0.2217        3.5229       Group D       
-    15             0.7406        2.4806       -3.0538        0.9879        5.6546       Group B       
-    15             0.9334        3.9554       -5.9492       -0.0510        5.2850       Group C       
-    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A       
- 
- 
+
+
     Bartlett Test
     -------------
- 
+
+    alpha   =  0.0500
     T value =  3.7931
     p value =  0.2847
- 
+
     H0: Variances are equal
- 
- 
+
+
+
     Oneway ANOVA
     ------------
- 
+
+    alpha   =  0.0500
     f value =  0.6628
     p value =  0.5784
- 
+
     H0: Group means are matched
 
-Notice that the dictionary comprehension produces the same results but in a different order, and did not require the 'groups' argument to be set. In this situation, 'name' in the dictionary comprehension represents the group names to be used, making the 'groups' argument unnecessary to set. Using a dictionary comprehension is fine when the groups are unknown, but not ideal if the boxplots should be shown in a particular order.
+From the graph, there are four groups: Group A, Group B, Group C and Group D in Column Two. The analysis shows that the variances are equal and there is no significant difference in the means. Noting the tests that are being performed, the Bartlett test is being used to check for equal variance because all four groups are normally distributed, and the Oneway ANOVA is being used to test if all means are equal because, all four groups are normally distributed and the variances are equal. However, if not all the groups are normally distributed, the Levene Test will be used to check for equal variance instead of the Bartlett Test. Also, if the groups are not normally distributed or the variances are not equal, the Kruskal-Wallis test will be used instead of the Oneway ANOVA.
 
-Let's consider an example where the data is grouped by the 'Month' column instead of 'Condition':
+If instead the four columns One, Two, Three and Four are to be analyzed, the easier way to perform the analysis is with the unstacked method. The following code will perform a Oneway analysis of the four columns:
 
 ::
 
-    data = list()
-    months = list()
-    for name, group in df.groupby(df['Month']):
-        data.append(group['Two'])
-        months.append(name)
-    
-    analyze(data,
-            groups=months,
-            categories='Months from List',
-            name='Column Two',
-            title='Oneway from pandas')
+    analyze([df['One'], df['Two'], df['Three'], df['Four']], 
+            groups=['One', 'Two', 'Three', 'Four'],
+            categories='Columns',
+            title='Unstacked Oneway')
 
-.. image:: ../img/corr10.png
+.. image:: ../img/comp2_2.png
 
 ::
 
     Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    ----------------
+
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    5              2.2163        3.4431       -2.6899        4.1257        5.1658       Mar           
-    5              1.7872        3.4116       -3.0538        1.1383        5.6546       Feb           
-    5              0.9972        1.5334       -1.1743        1.2664        2.8004       Aug           
-    5             -1.3628        3.3515       -5.7216       -1.0495        3.3774       Sep           
-    5              1.4629        2.0392       -1.5363        1.3246        4.0653       May           
-    5             -0.0327        1.9319       -2.1934        0.9879        1.8137       Jun           
-    5              1.8617        4.6673       -5.1767        4.9062        5.2850       Jul           
-    5             -1.2622        3.9392       -7.4153       -0.1489        3.0673       Jan           
-    5             -1.3938        3.0508       -5.6558       -1.8426        1.7373       Apr           
-    5             -1.2777        3.4456       -5.9492       -0.3654        3.1604       Nov           
-    5             -0.1753        3.0070       -3.9105       -0.0537        3.5229       Dec           
-    5              0.4673        1.9890       -2.2962        0.2914        2.7754       Oct           
- 
- 
-    Bartlett Test
-    -------------
- 
-    T value =  8.1523
-    p value =  0.6996
- 
-    H0: Variances are equal
- 
- 
-    Oneway ANOVA
-    ------------
- 
-    f value =  0.9875
-    p value =  0.4709
- 
-    H0: Group means are matched
+    60            -0.1006        0.9761       -2.2349       -0.0917        1.6386       Four          
+    60            -0.0562        1.0779       -2.4036       -0.0228        2.2466       One           
+    60            -0.9148        0.7104       -2.9286       -0.6900       -0.0024       Three         
+    60             0.2740        3.1115       -7.4153        0.3968        5.6546       Two           
 
-In this example, a for loop is used to build the data and month lists. This method works well, but the months are graphed out of order. Since the possible months are known in advance, it's possible to set the months in the order they should appear in. This is done by creating a list called months with the ordered months, a dictionary comprehension called data and list comprehension that puts the values in data in the order of the months list:
+
+    Levene Test
+    -----------
+
+    alpha   =  0.0500
+    W value =  44.7814
+    p value =  0.0000
+
+    HA: Variances are not equal
+
+
+
+    Kruskal-Wallis
+    --------------
+
+    alpha   =  0.0500
+    h value =  24.0538
+    p value =  0.0000
+
+    HA: Group means are not matched
+
+To perform a Oneway analysis using the unstacked method, the columns to be analyzed are passed in a list or tuple, and the groups argument needs to be a list or tuple of the group names. One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:
 
 ::
 
-    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    data = {month: data['Two'] for month, data in df.groupby(df['Month'])}
-    analyze([data[month] for month in months],
-            groups=months,
-            categories='Ordered Months from Dictionary',
-            name='Column Two',
-            title='Oneway from pandas')
+    analyze({'One': df['One'], 'Two': df['Two'], 'Three': df['Three'], 'Four': df['Four']}, 
+            categories='Columns',
+            title='Unstacked Oneway Using a Dictionary Comp')
 
-.. image:: ../img/comp11.png
-
-::
-
-    Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
-    --------------------------------------------------------------------------------------------------
-    5              2.2163        3.4431       -2.6899        4.1257        5.1658       Mar           
-    5              1.7872        3.4116       -3.0538        1.1383        5.6546       Feb           
-    5              0.9972        1.5334       -1.1743        1.2664        2.8004       Aug           
-    5             -1.3628        3.3515       -5.7216       -1.0495        3.3774       Sep           
-    5              1.4629        2.0392       -1.5363        1.3246        4.0653       May           
-    5             -0.0327        1.9319       -2.1934        0.9879        1.8137       Jun           
-    5              1.8617        4.6673       -5.1767        4.9062        5.2850       Jul           
-    5             -1.2622        3.9392       -7.4153       -0.1489        3.0673       Jan           
-    5             -1.3938        3.0508       -5.6558       -1.8426        1.7373       Apr           
-    5             -1.2777        3.4456       -5.9492       -0.3654        3.1604       Nov           
-    5             -0.1753        3.0070       -3.9105       -0.0537        3.5229       Dec           
-    5              0.4673        1.9890       -2.2962        0.2914        2.7754       Oct           
- 
- 
-    Bartlett Test
-    -------------
- 
-    T value =  8.1523
-    p value =  0.6996
- 
-    H0: Variances are equal
- 
- 
-    Oneway ANOVA
-    ------------
- 
-    f value =  0.9875
-    p value =  0.4709
- 
-    H0: Group means are matched
-
-In the last example, the months list was used to specify the order the box plots should be graphed in. The same technique can be applied for selecting particular groups, such as only comparing months that have 31 days.
-
-::
-
-    months = ['Jan', 'Mar', 'May', 'Jul', 'Aug', 'Oct', 'Dec']
-    data = {month: data['Two'] for month, data in df.groupby(df['Month'])}
-    analyze([data[month] for month in months],
-            groups=months,
-            categories='Months with 31 Days',
-            name='Column Two',
-            title='Oneway from pandas')
-
-.. image:: ../img/comp12.png
-
-::
-
-    Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
-    --------------------------------------------------------------------------------------------------
-    5             -1.2622        3.9392       -7.4153       -0.1489        3.0673       Jan           
-    5              2.2163        3.4431       -2.6899        4.1257        5.1658       Mar           
-    5              0.9972        1.5334       -1.1743        1.2664        2.8004       Aug           
-    5              1.4629        2.0392       -1.5363        1.3246        4.0653       May           
-    5             -0.1753        3.0070       -3.9105       -0.0537        3.5229       Dec           
-    5              0.4673        1.9890       -2.2962        0.2914        2.7754       Oct           
-    5              1.8617        4.6673       -5.1767        4.9062        5.2850       Jul           
- 
- 
-    Bartlett Test
-    -------------
- 
-    T value =  6.6838
-    p value =  0.3511
- 
-    H0: Variances are equal
- 
- 
-    Oneway ANOVA
-    ------------
- 
-    f value =  0.7583
-    p value =  0.6085
- 
-    H0: Group means are matched
+The output will be identical to the previous example. The analysis also shows that the variances are not equal, and the means are not matched. Also, because the data in column Three is not normally distributed, the Levene Test is used to test for equal variance instead of the Bartlett Test, and the Kruskal-Wallis Test is used instead of the Oneway ANOVA.
 
 With pandas, it's possible to perform advanced aggregation and filtering functions using the GroupBy object's ``apply`` method. Since the sample sizes were small for each month in the above examples, it might be helpful to group the data by annual quarters instead. First, let's create a function that adds a column called 'Quarter' to the DataFrame where the value is either Q1, Q2, Q3 or Q4 depending on the month. 
 
@@ -726,42 +637,46 @@ Using the new function is simple. The same techniques from previous examples are
 
 ::
 
-    quarters = ['Q1', 'Q2', 'Q3', 'Q4']
+    quarters = ('Q1', 'Q2', 'Q3', 'Q4')
     df2 = df.groupby(df['Month']).apply(set_quarter)
     data = {quarter: data['Two'] for quarter, data in df2.groupby(df2['Quarter'])}
     analyze([data[quarter] for quarter in quarters],
             groups=quarters,
             categories='Quarters',
             name='Column Two',
-            title='Oneway from pandas')
+            title='Oneway of Annual Quarters')
 
-.. image:: ../img/comp13.png
+.. image:: ../img/comp3_2.png
 
 ::
 
     Group Statistics
- 
-    Count         Mean          Std Dev       Min           Median        Max           Group         
+    ----------------
+
+    n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
     15             0.9138        3.7034       -7.4153        0.8059        5.6546       Q1            
-    15             0.4987        3.4778       -5.7216        0.2217        5.2850       Q3            
     15             0.0122        2.5243       -5.6558        1.1374        4.0653       Q2            
+    15             0.4987        3.4778       -5.7216        0.2217        5.2850       Q3            
     15            -0.3286        2.7681       -5.9492       -0.0537        3.5229       Q4            
- 
- 
+
+
     Bartlett Test
     -------------
- 
+
+    alpha   =  0.0500
     T value =  2.6544
     p value =  0.4480
- 
+
     H0: Variances are equal
- 
- 
+
+
+
     Oneway ANOVA
     ------------
- 
+
+    alpha   =  0.0500
     f value =  0.4474
     p value =  0.7201
- 
+
     H0: Group means are matched

@@ -2,7 +2,7 @@
 An easy to use and powerful python-based data exploration and analysis tool
 
 ## Current Version:
-2.0 --- Released December 27, 2017
+2.0 --- Released December 31, 2017
 
 [![PyPI](https://img.shields.io/pypi/v/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
 [![PyPI](https://img.shields.io/pypi/format/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
