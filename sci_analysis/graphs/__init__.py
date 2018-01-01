@@ -3,4 +3,5 @@ Modules:
     graphs - graphing classes
 """
 
-# from graph import *
+from .vector import GraphHisto, GraphScatter, GraphBoxplot, GraphGroupScatter
+from .categorical import GraphFrequency

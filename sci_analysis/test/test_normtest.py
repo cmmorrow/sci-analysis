@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import NormTest, MinimumSizeError, NoDataError
+from ..analysis import NormTest
+from ..analysis.exc import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -11,8 +12,21 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         parms = [5, 0.1]
         alpha = 0.05
-        self.assertGreater(NormTest(st.norm.rvs(*parms, size=100), display=False, alpha=alpha).p_value, alpha,
+        x_input = st.norm.rvs(*parms, size=100)
+        other = """
+
+Shapiro-Wilk test for normality
+-------------------------------
+
+alpha   =  0.0500
+W value =  0.9880
+p value =  0.5050
+
+H0: Data is normally distributed
+"""
+        self.assertGreater(NormTest(x_input, display=False, alpha=alpha).p_value, alpha,
                            "FAIL: Normal test Type I error")
+        self.assertEqual(str(NormTest(x_input, display=False, alpha=alpha)), other)
 
     def test_301_Norm_test_single_fail(self):
         """Test the normal distribution check fails for a different distribution"""
@@ -43,7 +57,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         alpha = 0.05
         groups = [st.norm.rvs(5, 0.1, size=100), st.norm.rvs(4, 0.75, size=75), st.norm.rvs(1, 1, size=50)]
-        self.assertGreater(NormTest(*groups, alpha=alpha, display=False).p_value, alpha,
+        self.assertGreater(NormTest(*groups, alpha=alpha, display=True).p_value, alpha,
                            "FAIL: Normal test Type I error")
 
     def test_305_Norm_test_multi_fail(self):

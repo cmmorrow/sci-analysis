@@ -4,14 +4,6 @@ sci_analysis/.idea/.name
 
 sci_analysis.egg-info/top_level.txt
 
-.idea/.name
-
-.idea/.name
-
-.idea/.name
-
-.idea/.name
-
 sci_analysis/.idea/encodings.xml
 
 .idea/encodings.xml
@@ -38,43 +30,11 @@ sci_analysis/.idea/vcs.xml
 
 sci_analysis/.idea/workspace.xml
 
-build/lib/sci_analysis/__init__.py
+build/*
 
-build/lib/sci_analysis/analysis/__init__.py
-
-build/lib/sci_analysis/analysis/analysis.py
-
-build/lib/sci_analysis/data/__init__.py
-
-build/lib/sci_analysis/data/data.py
-
-build/lib/sci_analysis/data/vector.py
-
-build/lib/sci_analysis/graphs/__init__.py
-
-build/lib/sci_analysis/graphs/graph.py
-
-build/lib/sci_analysis/old/scianalysis.py
-
-build/lib/sci_analysis/operations/__init__.py
-
-build/lib/sci_analysis/operations/data_operations.py
-
-build/lib/sci_analysis/test/__init__.py
-
-build/lib/sci_analysis/test/test.py
-
-dist/sci_analysis-1.3.2-py2-none-any.whl
-
-dist/sci_analysis-1.3.2.tar.gz
-
-dist/sci_analysis-1.3.3.tar.gz
+dist/*
 
 *.whl
-
-dist/sci_analysis-1.3.4.tar.gz
-
-*.pyc
 
 *.pyc
 
@@ -82,20 +42,27 @@ dist/sci_analysis-1.3.4.tar.gz
 
 sci_analysis/test/.coverage
 
-*.pyc
-
-.tox/*
-
 sci_analysis/test/images/*.png
 
-dist/sci_analysis-1.4.1.tar.gz
-
-dist/sci_analysis-1.4.1.tar.gz
-
-dist/sci_analysis-1.4.2.tar.gz
-
-dist/sci_analysis-1.4.1.tar.gz
-
-dist/sci_analysis-1.4.1.tar.gz
-
-dist/sci_analysis-1.4.2.tar.gz
+build_distro.sh
+setup.cfg.old
+build/lib/sci_analysis/test/test_analyze.py
+build/lib/sci_analysis/test/test_anova.py
+build/lib/sci_analysis/test/test_correlation.py
+build/lib/sci_analysis/test/test_data_operations.py
+build/lib/sci_analysis/test/test_equalvariance.py
+build/lib/sci_analysis/test/test_graph_boxplots.py
+build/lib/sci_analysis/test/test_graph_histo.py
+build/lib/sci_analysis/test/test_graph_scatter.py
+build/lib/sci_analysis/test/test_groupstatistics.py
+build/lib/sci_analysis/test/test_kruskal.py
+build/lib/sci_analysis/test/test_kstest.py
+build/lib/sci_analysis/test/test_linregress.py
+build/lib/sci_analysis/test/test_mannwhitney.py
+build/lib/sci_analysis/test/test_normtest.py
+build/lib/sci_analysis/test/test_statistics.py
+build/lib/sci_analysis/test/test_ttest.py
+build/lib/sci_analysis/test/test_twosampleks.py
+build/lib/sci_analysis/test/test_vector.py
+.DS_Store
+build/lib/sci_analysis/test/test_linregress.py

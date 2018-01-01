@@ -2,137 +2,117 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from ..analysis.analysis import Correlation, MinimumSizeError, NoDataError
-from ..data.data import UnequalVectorLengthError
+from ..analysis import Correlation
+from ..analysis.exc import MinimumSizeError, NoDataError
+from ..data import UnequalVectorLengthError, Vector
 
 
 class MyTestCase(unittest.TestCase):
-    def test_400_Correlation_corr_pearson(self):
+    def test_Correlation_corr_pearson(self):
         """Test the Correlation class for correlated normally distributed data"""
         np.random.seed(987654321)
         x_input_array = list(st.norm.rvs(size=100))
-        y_input_array = [x * 3 for x in x_input_array]
+        y_input_array = np.array([x + st.norm.rvs(0, 0.5, size=1) for x in x_input_array])
         alpha = 0.05
-        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
-                        "FAIL: Correlation pearson Type II error")
+        output = """
 
-    def test_401_Correlation_corr_pearson_test_type(self):
-        """Test the Correlation class for correlated normally distributed data"""
-        np.random.seed(987654321)
-        x_input_array = list(st.norm.rvs(size=100))
-        y_input_array = [x * 3 for x in x_input_array]
-        alpha = 0.05
-        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'pearson',
-                         "FAIL: Correlation pearson wrong type")
+Pearson Correlation Coefficient
+-------------------------------
 
-    def test_402_Correlation_no_corr_pearson(self):
+alpha   =  0.0500
+r value =  0.8904
+p value =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        exp = Correlation(x_input_array, y_input_array, alpha=alpha, display=False)
+        self.assertLess(exp.p_value, alpha, "FAIL: Correlation pearson Type II error")
+        self.assertEqual(exp.test_type, 'pearson')
+        self.assertAlmostEqual(exp.r_value, 0.8904, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, 0.8904, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_Correlation_no_corr_pearson(self):
         """Test the Correlation class for uncorrelated normally distributed data"""
         np.random.seed(987654321)
+        x_input_array = st.norm.rvs(size=100)
+        y_input_array = st.norm.rvs(size=100)
         alpha = 0.05
-        self.assertGreater(Correlation(st.norm.rvs(size=100),
-                                       st.norm.rvs(size=100),
-                                       alpha=alpha,
-                                       display=False).p_value, alpha,
-                           "FAIL: Correlation pearson Type I error")
+        output = """
 
-    def test_403_Correlation_no_corr_pearson_test_type(self):
-        """Test the Correlation class for uncorrelated normally distributed data"""
-        np.random.seed(987654321)
-        alpha = 0.05
-        self.assertEqual(Correlation(st.norm.rvs(size=100),
-                                     st.norm.rvs(size=100),
-                                     alpha=alpha,
-                                     display=False).test_type, 'pearson',
-                         "FAIL: Correlation pearson wrong type")
+Pearson Correlation Coefficient
+-------------------------------
 
-    def test_404_Correlation_no_corr_pearson_r_value(self):
-        """Test the Correlation class for uncorrelated normally distributed data"""
-        np.random.seed(987654321)
-        alpha = 0.05
-        self.assertAlmostEqual(Correlation(st.norm.rvs(size=100),
-                                           st.norm.rvs(size=100),
-                                           alpha=alpha,
-                                           display=False).r_value, -0.0055,
-                               delta=0.0001,
-                               msg="FAIL: Correlation pearson r value")
+alpha   =  0.0500
+r value = -0.0055
+p value =  0.9567
 
-    def test_405_Correlation_corr_spearman(self):
+H0: There is no significant relationship between predictor and response
+"""
+        exp = Correlation(x_input_array, y_input_array, alpha=alpha, display=False)
+        self.assertGreater(exp.p_value, alpha, "FAIL: Correlation pearson Type I error")
+        self.assertEqual(exp.test_type, 'pearson')
+        self.assertAlmostEqual(exp.r_value, -0.0055, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, -0.0055, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.9567, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_Correlation_corr_spearman(self):
         """Test the Correlation class for correlated randomly distributed data"""
         np.random.seed(987654321)
         x_input_array = list(st.weibull_min.rvs(1.7, size=100))
-        y_input_array = [x * 3 for x in x_input_array]
+        y_input_array = np.array([x + st.norm.rvs(0, 0.5, size=1) for x in x_input_array])
         alpha = 0.05
-        self.assertLess(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
-                        "FAIL: Correlation spearman Type II error")
+        output = """
 
-    def test_406_Correlation_corr_spearman_test_type(self):
-        """Test the Correlation class for correlated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = list(st.weibull_min.rvs(1.7, size=100))
-        y_input_array = [x * 3 for x in x_input_array]
-        alpha = 0.05
-        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'spearman',
-                         "FAIL: Correlation spearman wrong type")
+Spearman Correlation Coefficient
+--------------------------------
 
-    def test_407_Correlation_no_corr_spearman(self):
+alpha   =  0.0500
+r value =  0.7271
+p value =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        exp = Correlation(x_input_array, y_input_array, alpha=alpha, display=False)
+        self.assertLess(exp.p_value, alpha, "FAIL: Correlation spearman Type II error")
+        self.assertEqual(exp.test_type, 'spearman')
+        self.assertAlmostEqual(exp.r_value, 0.7271, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, 0.7271, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_Correlation_no_corr_spearman(self):
         """Test the Correlation class for uncorrelated randomly distributed data"""
         np.random.seed(987654321)
         x_input_array = st.norm.rvs(size=100)
         y_input_array = st.weibull_min.rvs(1.7, size=100)
         alpha = 0.05
-        self.assertGreater(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).p_value, alpha,
-                           "FAIL: Correlation spearman Type I error")
+        output = """
 
-    def test_408_Correlation_no_corr_spearman_test_type(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = st.norm.rvs(size=100)
-        y_input_array = st.weibull_min.rvs(1.7, size=100)
-        alpha = 0.05
-        self.assertEqual(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).test_type, 'spearman',
-                         "FAIL: Correlation spearman wrong type")
+Spearman Correlation Coefficient
+--------------------------------
 
-    def test_409_Correlation_no_corr_spearman_xdata(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = st.norm.rvs(size=100)
-        y_input_array = st.weibull_min.rvs(1.7, size=100)
-        alpha = 0.05
-        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).xdata,
-                                       x_input_array),
-                        "FAIL: Correlation spearman xdata")
+alpha   =  0.0500
+r value = -0.0528
+p value =  0.6021
 
-    def test_410_Correlation_no_corr_spearman_predictor(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = st.norm.rvs(size=100)
-        y_input_array = st.weibull_min.rvs(1.7, size=100)
-        alpha = 0.05
-        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).predictor,
-                                       x_input_array),
-                        "FAIL: Correlation spearman predictor")
+H0: There is no significant relationship between predictor and response
+"""
+        exp = Correlation(x_input_array, y_input_array, alpha=alpha, display=False)
+        self.assertGreater(exp.p_value, alpha, "FAIL: Correlation spearman Type I error")
+        self.assertEqual(exp.test_type, 'spearman')
+        self.assertAlmostEqual(exp.r_value, -0.0528, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.6021, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, -0.0528, delta=0.0001)
+        self.assertTrue(np.array_equal(x_input_array, exp.xdata))
+        self.assertTrue(np.array_equal(x_input_array, exp.predictor))
+        self.assertTrue(np.array_equal(y_input_array, exp.ydata))
+        self.assertTrue(np.array_equal(y_input_array, exp.response))
+        self.assertEqual(str(exp), output)
 
-    def test_411_Correlation_no_corr_spearman_ydata(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = st.norm.rvs(size=100)
-        y_input_array = st.weibull_min.rvs(1.7, size=100)
-        alpha = 0.05
-        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).ydata,
-                                       y_input_array),
-                        "FAIL: Correlation spearman ydata")
-
-    def test_412_Correlation_no_corr_spearman_response(self):
-        """Test the Correlation class for uncorrelated randomly distributed data"""
-        np.random.seed(987654321)
-        x_input_array = st.norm.rvs(size=100)
-        y_input_array = st.weibull_min.rvs(1.7, size=100)
-        alpha = 0.05
-        self.assertTrue(np.array_equal(Correlation(x_input_array, y_input_array, alpha=alpha, display=False).response,
-                                       y_input_array),
-                        "FAIL: Correlation spearman response")
-
-    def test_413_Correlation_no_corr_pearson_just_above_min_size(self):
+    def test_Correlation_no_corr_pearson_just_above_min_size(self):
         """Test the Correlation class for uncorrelated normally distributed data just above the minimum size"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -142,7 +122,7 @@ class MyTestCase(unittest.TestCase):
                                     display=False).p_value,
                         "FAIL: Correlation pearson just above minimum size")
 
-    def test_414_Correlation_no_corr_pearson_at_min_size(self):
+    def test_Correlation_no_corr_pearson_at_min_size(self):
         """Test the Correlation class for uncorrelated normally distributed data at the minimum size"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -151,7 +131,7 @@ class MyTestCase(unittest.TestCase):
                                                                 alpha=alpha,
                                                                 display=False).p_value)
 
-    def test_415_Correlation_no_corr_pearson_unequal_vectors(self):
+    def test_Correlation_no_corr_pearson_unequal_vectors(self):
         """Test the Correlation class for uncorrelated normally distributed data with unequal vectors"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -161,7 +141,7 @@ class MyTestCase(unittest.TestCase):
                                                                         alpha=alpha,
                                                                         display=False).p_value)
 
-    def test_416_Correlation_no_corr_pearson_empty_vector(self):
+    def test_Correlation_no_corr_pearson_empty_vector(self):
         """Test the Correlation class for uncorrelated normally distributed data with an empty vector"""
         np.random.seed(987654321)
         alpha = 0.05
@@ -169,6 +149,62 @@ class MyTestCase(unittest.TestCase):
                                                            st.norm.rvs(size=5),
                                                            alpha=alpha,
                                                            display=False).p_value)
+
+    def test_Correlation_vector(self):
+        """Test the Correlation class with an input Vector"""
+        np.random.seed(987654321)
+        x_input_array = list(st.norm.rvs(size=100))
+        y_input_array = np.array([x + st.norm.rvs(0, 0.5, size=1) for x in x_input_array])
+        alpha = 0.05
+        output = """
+
+Pearson Correlation Coefficient
+-------------------------------
+
+alpha   =  0.0500
+r value =  0.8904
+p value =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        exp = Correlation(Vector(x_input_array, other=y_input_array), alpha=alpha, display=False)
+        self.assertLess(exp.p_value, alpha, "FAIL: Correlation pearson Type II error")
+        self.assertEqual(exp.test_type, 'pearson')
+        self.assertAlmostEqual(exp.r_value, 0.8904, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, 0.8904, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_Correlation_vector_alpha(self):
+        """Test the Correlation class with an input Vector and different alpha"""
+        np.random.seed(987654321)
+        x_input_array = list(st.norm.rvs(size=100))
+        y_input_array = np.array([x + st.norm.rvs(0, 0.5, size=1) for x in x_input_array])
+        alpha = 0.01
+        output = """
+
+Pearson Correlation Coefficient
+-------------------------------
+
+alpha   =  0.0100
+r value =  0.8904
+p value =  0.0000
+
+HA: There is a significant relationship between predictor and response
+"""
+        exp = Correlation(Vector(x_input_array, other=y_input_array), alpha=alpha, display=False)
+        self.assertLess(exp.p_value, alpha, "FAIL: Correlation pearson Type II error")
+        self.assertEqual(exp.test_type, 'pearson')
+        self.assertAlmostEqual(exp.r_value, 0.8904, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertAlmostEqual(exp.statistic, 0.8904, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_Correlation_missing_ydata(self):
+        """Test the case where no ydata is given."""
+        np.random.seed(987654321)
+        x_input_array = range(1, 101)
+        self.assertRaises(AttributeError, lambda: Correlation(x_input_array))
 
 
 if __name__ == '__main__':

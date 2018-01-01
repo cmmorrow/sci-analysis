@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import scipy.stats as st
 
-from analysis.analysis import EqualVariance, MinimumSizeError, NoDataError
+from ..analysis import EqualVariance
+from ..analysis.exc import MinimumSizeError, NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -16,23 +17,24 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*y_parms, size=100)
         z_input_array = st.norm.rvs(*z_parms, size=100)
         a = 0.05
-        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
-                           a,
-                           "FAIL: Equal variance Bartlett Type I error")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False)
+        output = """
 
-    def test_451_EqualVariance_Bartlett_matched_test_type(self):
-        """Test the EqualVariance class for normally distributed matched variances"""
-        np.random.seed(987654321)
-        x_parms = [4, 0.75]
-        y_parms = [4, 0.75]
-        z_parms = [4, 0.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.norm.rvs(*z_parms, size=100)
-        a = 0.05
-        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
-                         "Bartlett",
-                         "FAIL: Equal variance Bartlett test type")
+Bartlett Test
+-------------
+
+alpha   =  0.0500
+T value =  0.2264
+p value =  0.8930
+
+H0: Variances are equal
+"""
+        self.assertGreater(exp.p_value, a, "FAIL: Equal variance Bartlett Type I error")
+        self.assertEqual(exp.test_type, 'Bartlett')
+        self.assertAlmostEqual(exp.statistic, 0.2264, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, 0.2264, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.893, delta=0.001)
+        self.assertEqual(str(exp), output)
 
     def test_452_EqualVariance_Bartlett_unmatched(self):
         """Test the EqualVariance class for normally distributed unmatched variances"""
@@ -44,56 +46,24 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*y_parms, size=100)
         z_input_array = st.norm.rvs(*z_parms, size=100)
         a = 0.05
-        self.assertLess(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value, a,
-                        "FAIL: Equal variance bartlett Type II error")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=True)
+        output = """
 
-    def test_453_EqualVariance_Bartlett_unmatched_test_type(self):
-        """Test the EqualVariance class for normally distributed unmatched variances"""
-        np.random.seed(987654321)
-        x_parms = [4, 1.35]
-        y_parms = [4, 1.35]
-        z_parms = [4, 0.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.norm.rvs(*z_parms, size=100)
-        a = 0.05
-        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
-                         "Bartlett",
-                         "FAIL: Equal variance bartlett test type")
+Bartlett Test
+-------------
 
-    def test_454_EqualVariance_Bartlett_unmatched_statistic(self):
-        """Test the EqualVariance class for normally distributed unmatched variances"""
-        np.random.seed(987654321)
-        x_parms = [4, 1.35]
-        y_parms = [4, 1.35]
-        z_parms = [4, 0.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.norm.rvs(*z_parms, size=100)
-        a = 0.05
-        self.assertAlmostEqual(EqualVariance(x_input_array, y_input_array, z_input_array,
-                                             alpha=a,
-                                             display=False).statistic,
-                               43.0402,
-                               delta=0.0001,
-                               msg="FAIL: Equal variance bartlett statistic")
+alpha   =  0.0500
+T value =  43.0402
+p value =  0.0000
 
-    def test_455_EqualVariance_Bartlett_unmatched_t_value(self):
-        """Test the EqualVariance class for normally distributed unmatched variances"""
-        np.random.seed(987654321)
-        x_parms = [4, 1.35]
-        y_parms = [4, 1.35]
-        z_parms = [4, 0.75]
-        x_input_array = st.norm.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.norm.rvs(*z_parms, size=100)
-        a = 0.05
-        self.assertAlmostEqual(EqualVariance(x_input_array, y_input_array, z_input_array,
-                                             alpha=a,
-                                             display=False).t_value,
-                               43.0402,
-                               delta=0.0001,
-                               msg="FAIL: Equal variance bartlett t value")
+HA: Variances are not equal
+"""
+        self.assertLess(exp.p_value, a, "FAIL: Equal variance bartlett Type II error")
+        self.assertEqual(exp.test_type, 'Bartlett')
+        self.assertAlmostEqual(exp.statistic, 43.0402, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, 43.0402, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_456_EqualVariance_Bartlett_unmatched_w_value(self):
         """Test the EqualVariance class for normally distributed unmatched variances"""
@@ -109,14 +79,13 @@ class MyTestCase(unittest.TestCase):
                                                           alpha=a,
                                                           display=False).w_value)
 
-    # TODO: Update this to use a specific exception in the future
     def test_457_EqualVariance_Bartlett_single_argument(self):
         """Test the EqualVariance class for normally distributed unmatched variances"""
         np.random.seed(987654321)
         x_parms = [4, 1.35]
         x_input_array = st.norm.rvs(*x_parms, size=100)
         a = 0.05
-        self.assertRaises(TypeError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
+        self.assertRaises(NoDataError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
 
     def test_458_EqualVariance_Levene_matched(self):
         """Test the EqualVariance class for non-normally distributed matched variances"""
@@ -128,23 +97,24 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.weibull_min.rvs(*y_parms, size=100)
         z_input_array = st.weibull_min.rvs(*z_parms, size=100)
         a = 0.05
-        self.assertGreater(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
-                           a,
-                           "FAIL: Unequal variance levene Type I error")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False)
+        output = """
 
-    def test_459_EqualVariance_Levene_matched_test_type(self):
-        """Test the EqualVariance class for non-normally distributed matched variances"""
-        np.random.seed(987654321)
-        x_parms = [1.7]
-        y_parms = [1.7]
-        z_parms = [1.7]
-        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
-        y_input_array = st.weibull_min.rvs(*y_parms, size=100)
-        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
-        a = 0.05
-        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
-                         "Levene",
-                         "FAIL: Unequal variance levene test type")
+Levene Test
+-----------
+
+alpha   =  0.0500
+W value =  1.7545
+p value =  0.1748
+
+H0: Variances are equal
+"""
+        self.assertGreater(exp.p_value, a, "FAIL: Unequal variance levene Type I error")
+        self.assertEqual(exp.test_type, 'Levene')
+        self.assertAlmostEqual(exp.statistic, 1.7545, delta=0.0001)
+        self.assertAlmostEqual(exp.w_value, 1.7545, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.1748, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_460_EqualVariance_Levene_unmatched(self):
         """Test the EqualVariance class for non-normally distributed unmatched variances"""
@@ -156,60 +126,32 @@ class MyTestCase(unittest.TestCase):
         x_input_array = st.weibull_min.rvs(*x_parms, size=100)
         y_input_array = st.norm.rvs(*y_parms, size=100)
         z_input_array = st.weibull_min.rvs(*z_parms, size=100)
-        self.assertLess(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value, a,
-                        "FAIL: Unequal variance levene Type II error")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=True)
+        output = """
 
-    def test_461_EqualVariance_Levene_unmatched_test_type(self):
-        """Test the EqualVariance class for non-normally distributed unmatched variances"""
+Levene Test
+-----------
+
+alpha   =  0.0500
+W value =  11.2166
+p value =  0.0000
+
+HA: Variances are not equal
+"""
+        self.assertLess(exp.p_value, a, "FAIL: Unequal variance levene Type II error")
+        self.assertEqual(exp.test_type, 'Levene')
+        self.assertAlmostEqual(exp.statistic, 11.2166, delta=0.0001)
+        self.assertAlmostEqual(exp.w_value, 11.2166, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
+        self.assertEqual(str(exp), output)
+
+    def test_463_EqualVariance_Levene_single_argument(self):
+        """Test the EqualVariance class for normally distributed unmatched variances"""
         np.random.seed(987654321)
         x_parms = [1.7]
-        y_parms = [4, 0.75]
-        z_parms = [1.7]
-        a = 0.05
         x_input_array = st.weibull_min.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
-        self.assertEqual(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).test_type,
-                         "Levene",
-                         "FAIL: Unequal variance levene test type")
-
-    def test_462_EqualVariance_Levene_unmatched_statistic(self):
-        """Test the EqualVariance class for non-normally distributed unmatched variances"""
-        np.random.seed(987654321)
-        x_parms = [1.7]
-        y_parms = [4, 0.75]
-        z_parms = [1.7]
         a = 0.05
-        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
-        self.assertAlmostEqual(EqualVariance(x_input_array,
-                                             y_input_array,
-                                             z_input_array,
-                                             alpha=a,
-                                             display=False).statistic,
-                               11.2166,
-                               delta=0.0001,
-                               msg="FAIL: Unequal variance levene statistic")
-
-    def test_463_EqualVariance_Levene_unmatched_w_value(self):
-        """Test the EqualVariance class for non-normally distributed unmatched variances"""
-        np.random.seed(987654321)
-        x_parms = [1.7]
-        y_parms = [4, 0.75]
-        z_parms = [1.7]
-        a = 0.05
-        x_input_array = st.weibull_min.rvs(*x_parms, size=100)
-        y_input_array = st.norm.rvs(*y_parms, size=100)
-        z_input_array = st.weibull_min.rvs(*z_parms, size=100)
-        self.assertAlmostEqual(EqualVariance(x_input_array,
-                                             y_input_array,
-                                             z_input_array,
-                                             alpha=a,
-                                             display=False).w_value,
-                               11.2166,
-                               delta=0.0001,
-                               msg="FAIL: Unequal variance levene w value")
+        self.assertRaises(NoDataError, lambda: EqualVariance(x_input_array, alpha=a, display=False).p_value)
 
     def test_464_EqualVariance_Levene_unmatched_t_value(self):
         """Test the EqualVariance class for non-normally distributed unmatched variances"""
@@ -237,8 +179,24 @@ class MyTestCase(unittest.TestCase):
         y_input_array = st.norm.rvs(*y_parms, size=3)
         z_input_array = st.norm.rvs(*z_parms, size=3)
         a = 0.05
-        self.assertTrue(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
-                        "FAIL: Equal variance Bartlett just above min size")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False)
+        output = """
+
+Bartlett Test
+-------------
+
+alpha   =  0.0500
+T value =  0.0785
+p value =  0.9615
+
+H0: Variances are equal
+"""
+        self.assertGreater(exp.p_value, a, "FAIL: Equal variance Bartlett just above min size")
+        self.assertEqual(exp.test_type, 'Bartlett')
+        self.assertAlmostEqual(exp.statistic, 0.0785, delta=0.0001)
+        self.assertAlmostEqual(exp.t_value, 0.0785, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.9615, delta=0.0001)
+        self.assertEqual(str(exp), output)
 
     def test_466_EqualVariance_Bartlett_matched_at_min_size(self):
         """Test the EqualVariance class for normally distributed matched variances at min size"""
@@ -263,13 +221,25 @@ class MyTestCase(unittest.TestCase):
         y_input_array = ["one", "two", "three", "four", "five"]
         z_input_array = st.norm.rvs(*z_parms, size=100)
         a = 0.05
-        self.assertTrue(EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False).p_value,
-                        "FAIL: Equal variance Bartlett should pass with single empty vector")
+        exp = EqualVariance(x_input_array, y_input_array, z_input_array, alpha=a, display=False)
+        output = """
+
+Bartlett Test
+-------------
+
+alpha   =  0.0500
+T value =  0.0374
+p value =  0.8466
+
+H0: Variances are equal
+"""
+        self.assertGreater(exp.p_value, a)
+        self.assertEqual(str(exp), output)
 
     def test_466_EqualVariance_Bartlett_all_empty_vectors(self):
         """Test the EqualVariance class for normally distributed matched variances with all empty vectors"""
         np.random.seed(987654321)
-        x_input_array = [float("nan"), float("nan"), float("nan"), "four", float("nan")]
+        x_input_array = [np.nan, np.nan, np.nan, "four", np.nan]
         y_input_array = ["one", "two", "three", "four", "five"]
         a = 0.05
         self.assertTrue(NoDataError, lambda: EqualVariance(x_input_array, y_input_array,

@@ -3,7 +3,9 @@ import numpy as np
 import scipy.stats as st
 from os import path, getcwd
 
-from ..graphs.graph import GraphHisto, NoDataError, MinimumSizeError
+from ..data import Vector
+from ..graphs import GraphHisto
+from ..analysis.exc import NoDataError
 
 
 class MyTestCase(unittest.TestCase):
@@ -100,7 +102,7 @@ class MyTestCase(unittest.TestCase):
                                    cdf=True,
                                    save_to='{}test_histo_108'.format(self.save_path)))
 
-    def test_109_no_box_plot_cdf_fit(self):
+    def test_109_cdf_fit(self):
         """Generate a histogram graph with fit and cdf"""
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=5000)
@@ -109,7 +111,7 @@ class MyTestCase(unittest.TestCase):
                                    fit=True,
                                    save_to='{}test_histo_109'.format(self.save_path)))
 
-    def test_110_no_box_plot_cdf_fit(self):
+    def test_110_fit(self):
         """Generate a histogram graph with fit"""
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=5000)
@@ -175,7 +177,7 @@ class MyTestCase(unittest.TestCase):
                                    bins=100,
                                    save_to='{}test_histo_116'.format(self.save_path)))
 
-    def test_117_distribution_bins_boxplot(self):
+    def test_117_distribution_bins_no_boxplot(self):
         """Generate a histogram graph with no boxplot, cdf, distribution and bins set"""
         np.random.seed(987654321)
         input_array = st.weibull_min.rvs(1.7, size=5000)
@@ -281,7 +283,7 @@ class MyTestCase(unittest.TestCase):
     def test_128_xname(self):
         """Set the xname of a histogram graph"""
         np.random.seed(987654321)
-        input_array = st.norm.rvs(size=5000)
+        input_array = Vector(st.norm.rvs(size=5000))
         self.assertTrue(GraphHisto(input_array,
                                    xname='Test',
                                    save_to='{}test_histo_128'.format(self.save_path)))
@@ -289,7 +291,7 @@ class MyTestCase(unittest.TestCase):
     def test_129_name(self):
         """Set the name of a histogram graph"""
         np.random.seed(987654321)
-        input_array = st.norm.rvs(size=5000)
+        input_array = Vector(st.norm.rvs(size=5000))
         self.assertTrue(GraphHisto(input_array,
                                    name='Test',
                                    save_to='{}test_histo_129'.format(self.save_path)))
@@ -297,7 +299,7 @@ class MyTestCase(unittest.TestCase):
     def test_130_yname(self):
         """Set the yname of a histogram graph"""
         np.random.seed(987654321)
-        input_array = st.norm.rvs(size=5000)
+        input_array = Vector(st.norm.rvs(size=5000))
         self.assertTrue(GraphHisto(input_array,
                                    yname='Test',
                                    save_to='{}test_histo_130'.format(self.save_path)))
@@ -306,22 +308,23 @@ class MyTestCase(unittest.TestCase):
         """Generate a histogram graph with 500 random missing values"""
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=5000)
-        indicies = [x for x in np.random.randint(0, 4999, 500)]
+        indicies = list(np.random.randint(0, 4999, 500))
         for x in indicies:
             input_array = np.insert(input_array, x, np.nan, axis=0)
-        self.assertTrue(GraphHisto(input_array, name='Missing Test', save_to='{}test_histo_131'.format(self.save_path)))
+        self.assertTrue(GraphHisto(Vector(input_array), name='Missing Test',
+                                   save_to='{}test_histo_131'.format(self.save_path)))
 
-    def test_132_at_min_size(self):
-        """Generate a histogram graph at the minimum size"""
-        np.random.seed(987654321)
-        input_array = st.norm.rvs(size=2)
-        self.assertTrue(GraphHisto(input_array, name='At Min Size', save_to='{}test_histo_132'.format(self.save_path)))
-
-    def test_133_min_size(self):
-        """Generate a histogram graph below the minimum size"""
-        np.random.seed(987654321)
-        input_array = st.norm.rvs(size=1)
-        self.assertRaises(MinimumSizeError, lambda: GraphHisto(input_array))
+    # def test_132_at_min_size(self):
+    #     """Generate a histogram graph at the minimum size"""
+    #     np.random.seed(987654321)
+    #     input_array = Vector(st.norm.rvs(size=2))
+    #     self.assertTrue(GraphHisto(input_array, name='At Min Size', save_to='{}test_histo_132'.format(self.save_path)))
+    #
+    # def test_133_min_size(self):
+    #     """Generate a histogram graph below the minimum size"""
+    #     np.random.seed(987654321)
+    #     input_array = Vector(st.norm.rvs(size=1))
+    #     self.assertRaises(MinimumSizeError, lambda: GraphHisto(input_array))
 
     def test_134_graph_string(self):
         """Generate a histogram graph with string data"""
@@ -352,6 +355,26 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_array = st.norm.rvs(size=2000)
         self.assertTrue(GraphHisto(input_array, title='Title Test', save_to='{}test_histo_138'.format(self.save_path)))
+
+    def test_139_graph_no_data(self):
+        """Catch the case where no data is passed to GraphHisto"""
+        input_array = Vector()
+        self.assertRaises(NoDataError, lambda: GraphHisto(input_array))
+
+    def test_140_graph_vector(self):
+        """Generate a histogram from a Vector object"""
+        np.random.seed(987654321)
+        input_array = Vector(st.norm.rvs(size=5000))
+        self.assertTrue(GraphHisto(input_array, save_to='{}test_histo_140'.format(self.save_path)))
+
+    def test_141_graph_groups(self):
+        """Generate a histogram from a Vector with groups"""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=2500)
+        grp1 = ['one'] * 2500
+        grp2 = ['two'] * 2500
+        exp = Vector(input_array, groups=grp1).append(Vector(input_array, groups=grp2))
+        self.assertTrue(GraphHisto(exp, save_to='{}test_histo_141'.format(self.save_path)))
 
 
 if __name__ == '__main__':

@@ -1,13 +1,5 @@
-"""sci_analysis module: graph
-Classes:
-    Graph - The super class all other sci_analysis graphing classes descend from.
-    GraphHisto - Draws a histogram.
-    GraphScatter - Draws an x-by-y scatter plot.
-    GraphBoxplot - Draws box plots of the provided data as well as an optional probability plot.
-
-"""
-from __future__ import absolute_import
-from __future__ import print_function
+import warnings
+import six
 
 # matplotlib imports
 from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \
@@ -15,151 +7,36 @@ from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, set
 from matplotlib.gridspec import GridSpec
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, argsort
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape
 
 # Scipy imports
 from scipy.stats import probplot, gaussian_kde
 
 # local imports
-from ..data.data import assign
-from ..operations.data_operations import is_dict, is_group
-# TODO: Add preferences back in a future version
-# from ..preferences.preferences import GraphPreferences
-# from six.moves import range
+from .base import Graph
+from ..data import Vector, is_dict, is_group, is_vector
+from ..analysis.exc import NoDataError
 
 
-class MinimumSizeError(Exception):
-    """Thrown when the length of the Data object is less than the Graph object's _min_size property."""
-    pass
+def future(message):
+    warnings.warn(message, FutureWarning, stacklevel=2)
 
 
-class NoDataError(Exception):
-    """Thrown when the Data object passed to a Graph object is empty or has no graph-able data."""
-    pass
+class VectorGraph(Graph):
 
-
-class Graph(object):
-    """The super class all other sci_analysis graphing classes descend from.
-    Classes that descend from Graph should implement the draw method at bare minimum.
-
-    Graph members are _nrows, _ncols, _xsize, _ysize, _data, _xname and _yname. The _nrows
-    member is the number of graphs that will span vertically. The _ncols member is
-    the number of graphs that will span horizontally. The _xsize member is the horizontal
-    size of the graph area. The _ysize member is the vertical size of the graph area.
-    The _data member the data to be plotted. The _xname member is the x-axis label.
-    The _yname member is the y-axis label.
-
-    Parameters
-    ----------
-    _nrows : int, static
-        The number of graphs that will span vertically.
-    _ncols : int, static
-        The number of graphs that will span horizontally.
-    _xsize : int, static
-        The horizontal size of the graph area.
-    _ysize : int, static
-        The vertical size of the graph area.
-    _min_size : int, static
-        The minimum required length of the data to be graphed.
-    _xname : str
-        The x-axis label.
-    _yname : str
-        The y-axis label.
-    _data : Data or list(d1, d2, ..., dn)
-        The data to graph.
-
-    Returns
-    -------
-    pass
-    """
-
-    _nrows = 1
-    _ncols = 1
-    _xsize = 5
-    _ysize = 5
-    _min_size = 1
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, sequence, **kwargs):
         """Converts the data argument to a Vector object and sets it to the Graph
         object's vector member. Sets the xname and yname arguments as the axis
         labels. The default values are "x" and "y".
-
-        Parameters
-        ----------
-        args : tuple
-            The data to be graphed.
-        kwargs : dict
-            The input parameters that control graphing behavior.
         """
 
-        self._xname = kwargs['xname'] if 'xname' in kwargs else 'x'
-        self._yname = kwargs['yname'] if 'yname' in kwargs else 'y'
-
-        if 'intersect' in kwargs:
-            x, y = assign(args[0], args[1])
-            if x is None or y is None:
-                raise NoDataError("Cannot graph because there is no data")
-            try:
-                x, y = x.data_prep(y)
-            except TypeError:
-                raise NoDataError("Cannot perform test because there is no data")
-            if len(x) <= self._min_size or len(y) <= self._min_size:
-                raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-            self._data = [x, y]
+        if is_vector(sequence):
+            super(VectorGraph, self).__init__(sequence, **kwargs)
         else:
-            data = list()
-            for d in args:
-                clean = assign(d).data_prep()
-                if clean is None:
-                    data.append(None)
-                    continue
-                if len(clean) <= self._min_size:
-                    raise MinimumSizeError("length of data is less than the minimum size {}".format(self._min_size))
-                data.append(clean)
-            if not is_group(data):
-                raise NoDataError("Cannot perform test because there is no data")
-            if len(data) == 1:
-                data = data[0]
-            self._data = data
+            super(VectorGraph, self).__init__(Vector(sequence), **kwargs)
+        if len(self._data.groups.keys()) == 0:
+            raise NoDataError("Cannot draw graph because there is no data.")
         self.draw()
-
-    @staticmethod
-    def get_color(num):
-        """Return a color based on the given num argument.
-
-        Parameters
-        ----------
-        num : int
-            A numeric value greater than zero that returns a corresponding color.
-
-        Returns
-        -------
-        color : tuple
-            A color tuple calculated from the num argument.
-        """
-        colors = [(0.0, 0.3, 0.7, 1.0),     # blue
-                  (1.0, 0.1, 0.1, 1.0),     # red
-                  (0.0, 0.7, 0.3, 1.0),     # green
-                  (1.0, 0.5, 0.0, 1.0),     # orange
-                  (0.1, 1.0, 1.0, 1.0),     # cyan
-                  (1.0, 1.0, 0.0, 1.0),     # yellow
-                  (1.0, 0.0, 1.0, 1.0),     # magenta
-                  (0.5, 0.0, 1.0, 1.0),     # purple
-                  (0.5, 1.0, 0.0, 1.0),     # light green
-                  (0.0, 0.0, 0.0, 1.0)      # black
-                  ]
-        desired_color = []
-        if num < 0:
-            num *= -1
-        floor = int(num) // len(colors)
-        remainder = int(num) % len(colors)
-        selected = colors[remainder]
-        if floor > 0:
-            for value in selected:
-                desired_color.append(value / (2.0 * floor) + 0.4)
-            return tuple(desired_color)
-        else:
-            return selected
 
     def draw(self):
         """
@@ -168,7 +45,7 @@ class Graph(object):
         raise NotImplementedError
 
 
-class GraphHisto(Graph):
+class GraphHisto(VectorGraph):
     """Draws a histogram.
 
     New class members are bins, color and box_plot. The bins member is the number
@@ -215,14 +92,6 @@ class GraphHisto(Graph):
             name = kwargs['xname']
 
         super(GraphHisto, self).__init__(data, xname=name, yname=yname)
-        # if GraphPreferences.Plot.boxplot != GraphPreferences.Plot.defaults[0]:
-        #    _box_plot = GraphPreferences.Plot.boxplot
-        # else:
-        #    _box_plot = box_plot
-        # if GraphPreferences.Plot.cdf != GraphPreferences.Plot.defaults[2]:
-        #    _cdf = GraphPreferences.Plot.cdf
-        # else:
-        #    _cdf = cdf
 
     def fit_distro(self):
         """
@@ -240,7 +109,7 @@ class GraphHisto(Graph):
                                           globals(),
                                           locals(),
                                           [self._distribution], 0), self._distribution)
-        parms = distro_class.fit(self._data)
+        parms = distro_class.fit(self._data.data)
         distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
         distro_pdf = distro_class.pdf(distro, *parms)
         distro_cdf = distro_class.cdf(distro, *parms)
@@ -256,7 +125,7 @@ class GraphHisto(Graph):
             First value - The cdf x-axis points
             Second value - The cdf y-axis points
         """
-        x_sorted_vector = sort(self._data)
+        x_sorted_vector = sort(self._data.data)
         if len(x_sorted_vector) == 0:
             return 0, 0
         y_sorted_vector = arange(len(x_sorted_vector) + 1) / float(len(x_sorted_vector))
@@ -295,14 +164,14 @@ class GraphHisto(Graph):
         title = self._title
         if self._mean is not None and self._std is not None:
             if self._sample:
-                title = r"{}{}$\bar x = {},  s = {}$".format(title, "\n", self._mean, self._std)
+                title = r"{}{}$\bar x = {:.4f},  s = {:.4f}$".format(title, "\n", self._mean, self._std)
             else:
-                title = r"{}{}$\mu = {}$,  $\sigma = {}$".format(title, "\n", self._mean, self._std)
+                title = r"{}{}$\mu = {:.4f}$,  $\sigma = {:.4f}$".format(title, "\n", self._mean, self._std)
         f.suptitle(title, fontsize=14)
 
         # Adjust the bin size if it's greater than the vector size
-        if len(self._data) < self._bins:
-            self._bins = len(self._data)
+        if len(self._data.data) < self._bins:
+            self._bins = len(self._data.data)
 
         # Fit the distribution
         if self._fit:
@@ -331,14 +200,12 @@ class GraphHisto(Graph):
                 ax_box = subplot(gs[len(h_ratios) - 2], sharex=ax_cdf)
             else:
                 ax_box = subplot(gs[len(h_ratios) - 2])
-            # if GraphPreferences.distribution['violin']:
-            bp = ax_box.boxplot(self._data, vert=False, showmeans=True)
+            bp = ax_box.boxplot(self._data.data, vert=False, showmeans=True)
             setp(bp['boxes'], color='k')
             setp(bp['whiskers'], color='k')
-            vp = ax_box.violinplot(self._data, vert=False, showextrema=False, showmedians=False, showmeans=False)
+            vp = ax_box.violinplot(self._data.data, vert=False, showextrema=False, showmedians=False, showmeans=False)
             setp(vp['bodies'], facecolors=self.get_color(0))
             ax_box.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-            # if GraphPreferences.distribution['boxplot']:
             yticks([])
             p.append(ax_box.get_xticklabels())
             ax_hist = subplot(gs[len(h_ratios) - 1], sharex=ax_box)
@@ -346,7 +213,7 @@ class GraphHisto(Graph):
             ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
-        ax_hist.hist(self._data, self._bins, normed=True, color=self.get_color(0))
+        ax_hist.hist(self._data.data, self._bins, normed=True, color=self.get_color(0), zorder=0)
         ax_hist.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         ax_hist.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if self._fit:
@@ -365,7 +232,7 @@ class GraphHisto(Graph):
         pass
 
 
-class GraphScatter(Graph):
+class GraphScatter(VectorGraph):
     """Draws an x-by-y scatter plot.
 
     Unique class members are fit and style. The fit member is a boolean flag for
@@ -380,7 +247,7 @@ class GraphScatter(Graph):
     _xsize = 8
     _ysize = 7
 
-    def __init__(self, xdata, ydata, **kwargs):
+    def __init__(self, xdata, ydata=None, **kwargs):
         """GraphScatter constructor.
 
         :param xdata: The x-axis data.
@@ -397,15 +264,18 @@ class GraphScatter(Graph):
         self._points = kwargs['points'] if 'points' in kwargs else True
         self._contours = kwargs['contours'] if 'contours' in kwargs else False
         self._contour_props = (31, 1.1)
-        # self.contour_props = tuple({'num_of_contours': 31, 'contour_width': 1.1}.values())
-        # self._histogram_props = (kwargs['bins'] if 'bins' in kwargs else 20, self.get_color(0))
-        # self._histogram_borders = kwargs['histogram_borders'] if 'histogram_borders' in kwargs else False
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
         self._title = kwargs['title'] if 'title' in kwargs else 'Bivariate'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
-        super(GraphScatter, self).__init__(xdata, ydata, xname=xname, yname=yname, intersect=True)
+        if ydata is None:
+            if is_vector(xdata):
+                super(GraphScatter, self).__init__(xdata, xname=xname, yname=yname)
+            else:
+                raise AttributeError('ydata argument cannot be None.')
+        else:
+            super(GraphScatter, self).__init__(Vector(xdata, other=ydata), xname=xname, yname=yname)
 
     def calc_contours(self):
         """
@@ -419,12 +289,12 @@ class GraphScatter(Graph):
             Third value - z-axis points
             Fourth value - The contour levels
         """
-        xmin = self._data[0].min()
-        xmax = self._data[0].max()
-        ymin = self._data[1].min()
-        ymax = self._data[1].max()
+        xmin = self._data.data.min()
+        xmax = self._data.data.max()
+        ymin = self._data.other.min()
+        ymax = self._data.other.max()
 
-        values = vstack([self._data[0], self._data[1]])
+        values = vstack([self._data.data, self._data.other])
         kernel = gaussian_kde(values)
         _x, _y = mgrid[xmin:xmax:100j, ymin:ymax:100j]
         positions = vstack([_x.ravel(), _y.ravel()])
@@ -440,12 +310,11 @@ class GraphScatter(Graph):
         fit_coordinates : list
             A list of the min and max fit points.
         """
-        x = self._data[0]
-        y = self._data[1]
+        x = self._data.data
+        y = self._data.other
         p = polyfit(x, y, 1, full=True)
         fit = polyval(p[0], x)
-        index = argsort(x)
-        return [x[index[0]], x[index[-1]]], [fit[index[0]], fit[index[-1]]]
+        return (x.min(), x.max()), (fit.min(), fit.max())
 
     def draw(self):
         """
@@ -457,8 +326,8 @@ class GraphScatter(Graph):
         """
 
         # Setup the grid variables
-        x = self._data[0]
-        y = self._data[1]
+        x = self._data.data
+        y = self._data.other
         h_ratio = [1, 1]
         w_ratio = [1, 1]
 
@@ -466,7 +335,7 @@ class GraphScatter(Graph):
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
             self._xsize, self._ysize = 8.5, 7.5
-            h_ratio, w_ratio = [2, 5], [5, 2]
+            h_ratio, w_ratio = (2, 5), (5, 2)
             main_plot = 2
         else:
             main_plot = 0
@@ -484,11 +353,9 @@ class GraphScatter(Graph):
 
         # Draw the points
         if self._points:
-            # This case was added to cover a matplotlib issue where 4 arguments get interpreted as color
-            if len(x) == 4:
-                ax2.scatter(x, y, c='blue', marker='o', linewidths=0, alpha=0.6, zorder=1)
-            else:
-                ax2.scatter(x, y, c=self.get_color(0), marker='o', linewidths=0, alpha=0.6, zorder=1)
+            # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
+            color = (self.get_color(0),)
+            ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=0.6, zorder=1)
 
         # Draw the contours
         if self._contours:
@@ -535,7 +402,167 @@ class GraphScatter(Graph):
         pass
 
 
-class GraphBoxplot(Graph):
+class GraphGroupScatter(VectorGraph):
+    """Draws an x-by-y scatter plot with more than a single group.
+
+    Unique class members are fit and style. The fit member is a boolean flag for
+    whether to draw the linear best fit line. The style member is a tuple of
+    formatted strings that set the matplotlib point style and line style. It is
+    also worth noting that the vector member for the GraphScatter class is a
+    tuple of xdata and ydata.
+    """
+
+    _nrows = 1
+    _ncols = 1
+    _xsize = 8
+    _ysize = 7
+
+    def __init__(self, xdata, ydata=None, groups=None, **kwargs):
+        """GraphScatter constructor.
+
+        :param xdata: The x-axis data.
+        :param ydata: The y-axis data.
+        :param _fit: Display the optional line fit.
+        :param _points: Display the scatter points.
+        :param _contours: Display the density contours
+        :param _boxplot_borders: Display the boxplot borders
+        :param _title: The title of the graph.
+        :param _save_to: Save the graph to the specified path.
+        :return: pass
+        """
+        self._fit = kwargs['fit'] if 'fit' in kwargs else True
+        self._points = kwargs['points'] if 'points' in kwargs else True
+        self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
+        self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else True
+        self._title = kwargs['title'] if 'title' in kwargs else 'Group Bivariate'
+        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
+        xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
+        if ydata is None:
+            if is_vector(xdata):
+                super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)
+            else:
+                raise AttributeError('ydata argument cannot be None.')
+        else:
+            super(GraphGroupScatter, self).__init__(Vector(xdata, other=ydata, groups=groups), xname=xname, yname=yname)
+
+    @staticmethod
+    def calc_fit(x, y):
+        """
+        Calculates the best fit line using sum of squares.
+
+        Returns
+        -------
+        fit_coordinates : list
+            A list of the min and max fit points.
+        """
+        p = polyfit(x, y, 1, full=True)
+        fit = polyval(p[0], x)
+        return (x.min(), x.max()), (fit.min(), fit.max())
+
+    def draw(self):
+        """
+        Draws the scatter plot based on the set parameters.
+
+        Returns
+        -------
+        pass
+        """
+
+        # Setup the grid variables
+        x = self._data.data
+        y = self._data.other
+        groups = sorted(self._data.groups.keys())
+        h_ratio = [1, 1]
+        w_ratio = [1, 1]
+
+        # Setup the figure and gridspec
+        if self._boxplot_borders:
+            self._nrows, self._ncols = 2, 2
+            self._xsize, self._ysize = 8.5, 7.5
+            h_ratio, w_ratio = (2, 5), (5, 2)
+            main_plot = 2
+        else:
+            main_plot = 0
+
+        # Setup the figure
+        f = figure(figsize=(self._xsize, self._ysize))
+        f.suptitle(self._title, fontsize=14)
+        if self._boxplot_borders:
+            gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
+        else:
+            gs = GridSpec(self._nrows, self._ncols)
+
+        # Draw the main graph
+        ax2 = subplot(gs[main_plot])
+
+        for grp, (grp_x, grp_y) in self._data.paired_groups.items():
+            i = groups.index(grp)
+            alpha_trans = 0.6
+            if self._highlight is not None:
+                try:
+                    if grp in self._highlight:
+                        alpha_trans = 0.6
+                    else:
+                        alpha_trans = 0.2
+                except TypeError:
+                    alpha_trans = 0.6
+            if isinstance(grp, six.string_types) and len(grp) > 20:
+                grp = grp[0:21] + '...'
+
+            # Draw the points
+            if self._points:
+                # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
+                color = (self.get_color(i),)
+                ax2.scatter(grp_x, grp_y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1, label=grp)
+
+            # Draw the fit line
+            if self._fit:
+                fit_x, fit_y = self.calc_fit(grp_x, grp_y)
+                if self._points:
+                    ax2.plot(fit_x, fit_y, linestyle='--', color=self.get_color(i), linewidth=2, zorder=2)
+                else:
+                    ax2.plot(fit_x, fit_y, linestyle='--', color=self.get_color(i), linewidth=2, zorder=2, label=grp)
+
+        # Draw the legend
+        if (self._fit or self._points) and len(groups) > 1:
+            ax2.legend(loc='best')
+
+        # Draw the grid lines and labels
+        ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        xlabel(self._xname)
+        ylabel(self._yname)
+
+        # Draw the boxplot borders
+        if self._boxplot_borders:
+            ax1 = subplot(gs[0], sharex=ax2)
+            ax3 = subplot(gs[3], sharey=ax2)
+            bpx = ax1.boxplot(x, vert=False, showmeans=True)
+            bpy = ax3.boxplot(y, vert=True, showmeans=True)
+            setp(bpx['boxes'], color='k')
+            setp(bpx['whiskers'], color='k')
+            setp(bpy['boxes'], color='k')
+            setp(bpy['whiskers'], color='k')
+            vpx = ax1.violinplot(x, vert=False, showmedians=False, showmeans=False, showextrema=False)
+            vpy = ax3.violinplot(y, vert=True, showmedians=False, showmeans=False, showextrema=False)
+            setp(vpx['bodies'], facecolors=self.get_color(0))
+            setp(vpy['bodies'], facecolors=self.get_color(0))
+            ax1.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            setp([ax1.get_xticklabels(), ax1.get_yticklabels(), ax3.get_xticklabels(), ax3.get_yticklabels()],
+                 visible=False)
+
+        # Save the figure to disk or display
+        if self._save_to:
+            savefig(self._save_to)
+            close(f)
+        else:
+            show()
+        pass
+
+
+class GraphBoxplot(VectorGraph):
     """Draws box plots of the provided data as well as an optional probability plot.
 
     Unique class members are groups, nqp and prob. The groups member is a list of
@@ -562,8 +589,10 @@ class GraphBoxplot(Graph):
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
-        xname = kwargs['xname'] if 'xname' in kwargs else 'Categories'
-        yname = kwargs['yname'] if 'yname' in kwargs else 'Values'
+        name = kwargs['name'] if 'name' in kwargs else 'Values'
+        categories = kwargs['categories'] if 'categories' in kwargs else 'Categories'
+        xname = kwargs['xname'] if 'xname' in kwargs else categories
+        yname = kwargs['yname'] if 'yname' in kwargs else name
         self._title = kwargs['title'] if 'title' in kwargs else 'Oneway'
         self._nqp = kwargs['nqp'] if 'nqp' in kwargs else True
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
@@ -573,23 +602,34 @@ class GraphBoxplot(Graph):
             self._title = 'Oneway and Normal Quantile Plot'
         else:
             self._title = 'Oneway'
-        data = list()
-        groups = list()
-        if is_dict(args[0]):
+
+        if is_vector(args[0]):
+            data = args[0]
+        elif is_dict(args[0]):
+            data = Vector()
             for g, d in args[0].items():
-                data.append(d)
-                groups.append(g)
-            self._groups = groups
+                data.append(Vector(d, groups=[g] * len(d)))
         else:
-            if 'groups' in kwargs:
-                if kwargs['groups']:
-                    self._groups = kwargs['groups']
+            if is_group(args) and len(args) > 1:
+                future('Graphing boxplots by passing multiple arguments will be removed in a future version. '
+                       'Instead, pass unstacked arguments as a dictionary.')
+                data = Vector()
+                if 'groups' in kwargs:
+                    if len(kwargs['groups']) != len(args):
+                        raise AttributeError('The length of passed groups does not match the number passed data.')
+                    for g, d in zip(kwargs['groups'], args):
+                        data.append(Vector(d, groups=[g] * len(d)))
                 else:
-                    self._groups = list(range(1, len(args) + 1))
+                    for d in args:
+                        data.append(Vector(d))
             else:
-                self._groups = list(range(1, len(args) + 1))
-            data = args
-        super(GraphBoxplot, self).__init__(*data, xname=xname, yname=yname, save_to=self._save_to)
+                if 'groups' in kwargs:
+                    if len(kwargs['groups']) != len(args[0]):
+                        raise AttributeError('The length of passed groups does not match the number passed data.')
+                    data = Vector(args[0], groups=kwargs['groups'])
+                else:
+                    data = Vector(args[0])
+        super(GraphBoxplot, self).__init__(data, xname=xname, yname=yname, save_to=self._save_to)
 
     def draw(self):
         """
@@ -600,23 +640,13 @@ class GraphBoxplot(Graph):
         pass
         """
 
+        groups, data = zip(*[(g, v['ind']) for g, v in self._data.values.groupby('grp')])
+
         # Create the quantile plot arrays
-        prob = list()
-        if self._nqp:
-            new_groups = list()
-            if not is_group(self._data):
-                prob.append(probplot(self._data))
-            else:
-                for i, d in enumerate(self._data):
-                    if d is not None:
-                        prob.append(probplot(d))
-                        new_groups.append(self._groups[i])
-                self._groups = new_groups
-        if is_group(self._data):
-            self._data = [d for d in self._data if d is not None]
+        prob = [probplot(v) for v in data]
 
         # Create the figure and gridspec
-        if len(prob) > 0:
+        if self._nqp and len(prob) > 0:
             self._xsize *= 2
         else:
             self._ncols = 1
@@ -626,31 +656,28 @@ class GraphBoxplot(Graph):
 
         # Draw the boxplots
         ax1 = subplot(gs[0])
-        bp = ax1.boxplot(self._data, showmeans=True, labels=self._groups)
+        bp = ax1.boxplot(data, showmeans=True, labels=groups)
         setp(bp['boxes'], color='k')
         setp(bp['whiskers'], color='k')
-        vp = ax1.violinplot(self._data, showextrema=False, showmedians=False, showmeans=False)
-        if is_group(self._data):
-            for i in range(len(self._data)):
-                setp(vp['bodies'][i], facecolors=self.get_color(i))
-        else:
-            setp(vp['bodies'][0], facecolors=self.get_color(0))
+        vp = ax1.violinplot(data, showextrema=False, showmedians=False, showmeans=False)
+        for i in range(len(groups)):
+            setp(vp['bodies'][i], facecolors=self.get_color(i))
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-        if any([True if len(str(g)) > 10 else False for g in self._groups]) or len(self._groups) > 5:
+        if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)
         subplots_adjust(bottom=0.2)
         ylabel(self._yname)
         xlabel(self._xname)
 
         # Draw the normal quantile plot
-        if len(prob) > 0:
+        if self._nqp and len(prob) > 0:
             ax2 = subplot(gs[1], sharey=ax1)
             for i, g in enumerate(prob):
                 osm = g[0][0]
                 osr = g[0][1]
                 slope = g[1][0]
                 intercept = g[1][1]
-                ax2.plot(osm, osr, marker='^', color=self.get_color(i), label=self._groups[i])
+                ax2.plot(osm, osr, marker='^', color=self.get_color(i), label=groups[i])
                 ax2.plot(osm, slope * osm + intercept, linestyle='--', linewidth=2, color=self.get_color(i))
             ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
             ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)

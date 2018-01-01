@@ -13,8 +13,10 @@ Functions:
     is_group - checks if a given variable is a list of iterable objects.
     is_group_dict - checks if a given variable is a dictionary of iterable objects.
 """
-from __future__ import absolute_import
+# from __future__ import absolute_import
 import six
+import numpy as np
+import pandas as pd
 
 
 def to_float(seq):
@@ -24,7 +26,7 @@ def to_float(seq):
 
     Parameters
     ----------
-    seq : array_like
+    seq : array-like
         The input object.
 
     Returns
@@ -32,8 +34,6 @@ def to_float(seq):
     subseq : array_like
         seq with values converted to a float or "nan".
 
-    Examples
-    --------
     >>> to_float(['1', '2', '3', 'four', '5'])
     [1.0, 2.0, 3.0, nan, 5.0]
     """
@@ -54,7 +54,7 @@ def flatten(seq):
 
     Parameters
     ----------
-    seq : array_like
+    seq : array-like
         The input object.
 
     Returns
@@ -62,36 +62,35 @@ def flatten(seq):
     subseq : array_like
         A flattened copy of the input object.
 
-    Examples
-    --------
-
     Flatten a two-dimensional list into a one-dimensional list
 
     >>> flatten([[1, 2, 3], [4, 5, 6]])
-    [1, 2, 3, 4, 5, 6]
+    array([1, 2, 3, 4, 5, 6])
 
     Flatten a three-dimensional list into a one-dimensional list
 
     >>> flatten([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12])
+
+    >>> flatten(([1, 2, 3], [4, 5, 6]))
+    array([1, 2, 3, 4, 5, 6])
+
+    >>> flatten(list(zip([1, 2, 3], [4, 5, 6])))
+    array([1, 4, 2, 5, 3, 6])
+
+    >>> flatten([(1, 2), (3, 4), (5, 6), (7, 8)])
+    array([1, 2, 3, 4, 5, 6, 7, 8])
     """
-    flat = list()
-    for row in seq:
-        if is_iterable(row):
-            for col in flatten(row):
-                flat.append(col)
-        else:
-            flat.append(row)
-    return flat
+    return np.array(seq).flatten()
 
 
-def is_tuple(seq):
+def is_tuple(obj):
     """
     Checks if a given sequence is a tuple.
 
     Parameters
     ----------
-    seq : array_like
+    obj : object
         The input array.
 
     Returns
@@ -99,8 +98,6 @@ def is_tuple(seq):
     test result : bool
         The test result of whether seq is a tuple or not.
 
-    Examples
-    --------
     >>> is_tuple(('a', 'b'))
     True
 
@@ -110,16 +107,16 @@ def is_tuple(seq):
     >>> is_tuple(4)
     False
     """
-    return True if isinstance(seq, tuple) else False
+    return True if isinstance(obj, tuple) else False
 
 
-def is_iterable(variable):
+def is_iterable(obj):
     """
     Checks if a given variable is iterable, but not a string.
 
     Parameters
     ----------
-    variable : object
+    obj : object
         The input argument.
 
     Returns
@@ -127,8 +124,6 @@ def is_iterable(variable):
     test result : bool
         The test result of whether variable is iterable or not.
 
-    Examples
-    --------
     >>> is_iterable([1, 2, 3])
     True
 
@@ -143,23 +138,28 @@ def is_iterable(variable):
     >>> is_iterable('foobar')
     False
 
+    Scalars return False.
+
+    >>> is_iterable(42)
+    False
+
     """
-    if isinstance(variable, six.string_types):
+    if isinstance(obj, six.string_types):
         return False
     try:
-        variable.__iter__()
+        obj.__iter__()
         return True
     except (AttributeError, TypeError):
         return False
 
 
-def is_array(seq):
+def is_array(obj):
     """
     Checks if a given sequence is a numpy Array object.
 
     Parameters
     ----------
-    seq : array_like
+    obj : object
         The input argument.
 
     Returns
@@ -167,8 +167,6 @@ def is_array(seq):
     test result : bool
         The test result of whether seq is a numpy Array or not.
 
-    Examples
-    --------
     >>> import numpy as np
 
     >>> is_array([1, 2, 3, 4, 5])
@@ -177,16 +175,38 @@ def is_array(seq):
     >>> is_array(np.array([1, 2, 3, 4, 5]))
     True
     """
-    return hasattr(seq, 'dtype')
+    return hasattr(obj, 'dtype')
 
 
-def is_dict(seq):
+def is_series(obj):
+    """
+    Checks if a given sequence is a Pandas Series object.
+
+    Parameters
+    ----------
+    obj : object
+        The input argument.
+
+    Returns
+    -------
+    bool
+
+    >>> is_series([1, 2, 3])
+    False
+
+    >>> is_series(pd.Series([1, 2, 3]))
+    True
+    """
+    return isinstance(obj, pd.Series)
+
+
+def is_dict(obj):
     """
     Checks if a given sequence is a dictionary.
 
     Parameters
     ----------
-    seq : array_like
+    obj : object
         The input argument.
 
     Returns
@@ -194,8 +214,6 @@ def is_dict(seq):
     test result : bool
         The test result of whether seq is a dictionary or not.
 
-    Examples
-    --------
     >>> is_dict([1, 2, 3])
     False
 
@@ -208,11 +226,7 @@ def is_dict(seq):
     >>> is_dict('foobar')
     False
     """
-    try:
-        seq.values()
-        return True
-    except (AttributeError, TypeError):
-        return False
+    return isinstance(obj, dict)
 
 
 def is_group(seq):
@@ -229,10 +243,11 @@ def is_group(seq):
     test result : bool
         The test result of whether seq is a list of array_like values or not.
 
-    Examples
-    --------
     >>> is_group([[1, 2, 3], [4, 5, 6]])
     True
+
+    >>> is_group({'one': 1, 'two': 2, 'three': 3})
+    False
 
     >>> is_group(([1, 2, 3], [4, 5, 6]))
     True
@@ -258,7 +273,7 @@ def is_dict_group(seq):
 
     Parameters
     ----------
-    seq : array_like
+    seq : array-like
         The input argument.
 
     Returns
@@ -266,8 +281,6 @@ def is_dict_group(seq):
     test result : bool
         The test result of whether seq is a dictionary of array_like values or not.
 
-    Examples
-    --------
     >>> is_dict_group([[1, 2, 3], [4, 5, 6]])
     False
 

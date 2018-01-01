@@ -1,22 +1,28 @@
 sudo: required
 language: python
 python:
-  - "2.7"
-  - "3.5"
+- '2.7'
+- '3.5'
+- '3.6'
 before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - "sleep 3"
-  - "sudo apt-get install libatlas-base-dev gfortran"
-  - "mkdir $HOME/.matplotlib"
-  - "echo 'backend: TkAgg' > $HOME/.matplotlib/matplotlibrc"
-# command to install dependencies
-install: 
-#  - "pip install numpy"
-  - "pip install scipy"
-  - "pip install pandas"
-  - "pip install matplotlib"
-  - "pip install six"
-  - "pip install pytest"
-# command to run tests
-script: py.test
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3
+- sudo apt-get install libatlas-base-dev gfortran
+- mkdir $HOME/.matplotlib
+- 'echo ''backend: TkAgg'' > $HOME/.matplotlib/matplotlibrc'
+install:
+- pip install scipy
+- pip install pandas
+- pip install matplotlib
+- pip install six
+- pip install pytest
+- pip install pytest-pep8
+- pip install pytest-cov
+- pip install coveralls
+script: py.test --cov=sci_analysis --cov-report term-missing
+after_success:
+- coveralls
+notifications:
+  slack:
+    secure: 1oz2HBPjjnU8d1H25SptO9061qah1vVu/zsE8uhWYCTsDPWBXhPIN732AtT2NmXMIQwB7fMBRTDv6jmGBpmMZc7FZcL9gC106LrHBip7np3LeogFBerGaC4T1NcwX3rNmZP34pUxpkk34Wrg+EbeGGk4ufevC3yOZqn2PXw6vXz1+169PcYFFmeaQUnloBY1cP5dZ9+N01XFL1lXjdUxwL9dqlTESz2r1i1cV5JMxTQxXA3SkDERzjmNCasvVWXCMWT6i1HDTDZXNAHBhMUHXtM579qJt4fLB7B83Fn3sxyVunPmcSU62GBZ3WbUPUtqmpnjAYAB45S+KaNExL72fXl9fFqfjcR2Sj7njQnMDQc6B4MwQi/yzm8TAaK0gZPSxCIB1IwP4vn6o+Tzugrsi0niH4R9TzgoBmrVA64d1x9zVrklYk3ze162NxHaFefqbTbBPulF+5xHCeR/lBZfAsKoEJoyCBBpot04e4tbIHAtgqiMPyv5kMICU3F6pBbNsoSuTb0Oju9yoGERQvS2xSn/dvhRd6A4qvOWPwV4oEXgR6z9Eb0PH/utAdCfO7cLGs55ynTCPOW5lnUn+jGQqhWL/ojtlPJUBwviELMgImqlUfhXtMpk7M7wDICWXN/jZXwhK0DW49JJq6yUaAq0WhABfdt416kz0o0+cDowM5k=
