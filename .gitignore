@@ -44,7 +44,6 @@ sci_analysis/test/.coverage
 
 sci_analysis/test/images/*.png
 
-img/*
 build_distro.sh
 setup.cfg.old
 build/lib/sci_analysis/test/test_analyze.py
@@ -66,5 +65,4 @@ build/lib/sci_analysis/test/test_ttest.py
 build/lib/sci_analysis/test/test_twosampleks.py
 build/lib/sci_analysis/test/test_vector.py
 .DS_Store
-build/lib/sci_analysis/test/test_linregress.py
 build/lib/sci_analysis/test/test_linregress.py
