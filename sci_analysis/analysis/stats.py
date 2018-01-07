@@ -1,3 +1,5 @@
+from math import sqrt
+
 # Pandas imports
 from pandas import DataFrame
 
@@ -9,7 +11,7 @@ from scipy.stats import skew, kurtosis, sem
 
 from .base import Analysis, std_output
 from .exc import NoDataError, MinimumSizeError
-from ..data import Vector, Categorical, is_dict, is_group, is_categorical, is_vector
+from ..data import Vector, Categorical, is_dict, is_group, is_categorical, is_vector, is_tuple
 
 
 class VectorStatistics(Analysis):
@@ -147,6 +149,11 @@ class GroupStatistics(Analysis):
     _max = 'Max'
     _q2 = 'Median'
     _min = 'Min'
+    _total = 'Total'
+    _pooled = 'Pooled Std Dev'
+    _gmean = 'Grand Mean'
+    _gmedian = 'Grand Median'
+    _num_of_groups = 'Number of Groups'
 
     def __init__(self, *args, **kwargs):
         groups = kwargs['groups'] if 'groups' in kwargs else None
@@ -166,8 +173,6 @@ class GroupStatistics(Analysis):
             data.append(Vector(d, groups=[g for _ in range(0, len(d))]))
         if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
-        # if len(data) == 1:
-        #     data = data[0]
         super(GroupStatistics, self).__init__(data, display=display)
         self.logic()
 
@@ -191,10 +196,32 @@ class GroupStatistics(Analysis):
                           self._min: amin(vector),
                           }
             out.append(row_result)
-        self._results = DataFrame(out).sort_values(self._group).to_dict(orient='records')
+        summ = DataFrame(out).sort_values(self._group)
+        groups = len(summ)
+        if groups > 1:
+            total = len(self._data.data)
+            pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - groups))
+            gmean = summ[self._mean].mean()
+            gmedian = median(self._data.data)
+            self._results = ({
+                self._num_of_groups: groups,
+                self._total: total,
+                self._pooled: pooled,
+                self._gmean: gmean,
+                self._gmedian: gmedian,
+            }, summ)
+        else:
+            self._results = summ
 
     def __str__(self):
         order = (
+            self._num_of_groups,
+            self._total,
+            self._gmean,
+            self._pooled,
+            self._gmedian,
+        )
+        group_order = (
             self._n,
             self._mean,
             self._std,
@@ -203,7 +230,14 @@ class GroupStatistics(Analysis):
             self._max,
             self._group,
         )
-        return std_output(self._name, self._results, order=order)
+        if is_tuple(self._results):
+            out = '{}{}'.format(
+                std_output('Overall Statistics', self._results[0], order=order),
+                std_output(self._name, self._results[1].to_dict(orient='records'), order=group_order),
+            )
+        else:
+            out = std_output(self._name, self._results.to_dict(orient='records'), order=group_order)
+        return out
 
 
 class GroupStatisticsStacked(Analysis):
@@ -217,6 +251,11 @@ class GroupStatisticsStacked(Analysis):
     _max = 'Max'
     _q2 = 'Median'
     _min = 'Min'
+    _total = 'Total'
+    _pooled = 'Pooled Std Dev'
+    _gmean = 'Grand Mean'
+    _gmedian = 'Grand Median'
+    _num_of_groups = 'Number of Groups'
 
     def __init__(self, values, groups=None, **kwargs):
         display = kwargs['display'] if 'display' in kwargs else True
@@ -235,7 +274,7 @@ class GroupStatisticsStacked(Analysis):
     def logic(self):
         if not self._data:
             pass
-        self._results = list()
+        self._results = []
         self.run()
         if self._display:
             print(self)
@@ -254,10 +293,32 @@ class GroupStatisticsStacked(Analysis):
                           self._min: amin(vector),
                           }
             out.append(row_result)
-        self._results = DataFrame(out).sort_values(self._group).to_dict(orient='records')
+        summ = DataFrame(out).sort_values(self._group)
+        groups = len(summ)
+        if groups > 1:
+            total = len(self._data.data)
+            pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - groups))
+            gmean = summ[self._mean].mean()
+            gmedian = median(self._data.data)
+            self._results = ({
+                self._num_of_groups: groups,
+                self._total: total,
+                self._pooled: pooled,
+                self._gmean: gmean,
+                self._gmedian: gmedian,
+            }, summ)
+        else:
+            self._results = summ
 
     def __str__(self):
-        order = [
+        order = (
+            self._num_of_groups,
+            self._total,
+            self._gmean,
+            self._pooled,
+            self._gmedian,
+        )
+        group_order = (
             self._n,
             self._mean,
             self._std,
@@ -265,8 +326,15 @@ class GroupStatisticsStacked(Analysis):
             self._q2,
             self._max,
             self._group,
-        ]
-        return std_output(self._name, self._results, order=order)
+        )
+        if is_tuple(self._results):
+            out = '{}{}'.format(
+                std_output('Overall Statistics', self._results[0], order=order),
+                std_output(self._name, self._results[1].to_dict(orient='records'), order=group_order),
+            )
+        else:
+            out = std_output(self._name, self._results.to_dict(orient='records'), order=group_order)
+        return out
 
 
 class CategoricalStatistics(Analysis):
