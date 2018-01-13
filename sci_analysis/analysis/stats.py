@@ -173,6 +173,11 @@ class GroupStatistics(Analysis):
             data.append(Vector(d, groups=[g for _ in range(0, len(d))]))
         if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
+        self.k = None
+        self.total = None
+        self.pooled = None
+        self.gmean = None
+        self.gmedian = None
         super(GroupStatistics, self).__init__(data, display=display)
         self.logic()
 
@@ -197,18 +202,18 @@ class GroupStatistics(Analysis):
                           }
             out.append(row_result)
         summ = DataFrame(out).sort_values(self._group)
-        groups = len(summ)
-        if groups > 1:
-            total = len(self._data.data)
-            pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - groups))
-            gmean = summ[self._mean].mean()
-            gmedian = median(self._data.data)
+        self.total = len(self._data.data)
+        self.k = len(summ)
+        if self.k > 1:
+            self.pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - self.k))
+            self.gmean = summ[self._mean].mean()
+            self.gmedian = median(self._data.data)
             self._results = ({
-                self._num_of_groups: groups,
-                self._total: total,
-                self._pooled: pooled,
-                self._gmean: gmean,
-                self._gmedian: gmedian,
+                self._num_of_groups: self.k,
+                self._total: self.total,
+                self._pooled: self.pooled,
+                self._gmean: self.gmean,
+                self._gmedian: self.gmedian,
             }, summ)
         else:
             self._results = summ
@@ -238,6 +243,18 @@ class GroupStatistics(Analysis):
         else:
             out = std_output(self._name, self._results.to_dict(orient='records'), order=group_order)
         return out
+
+    @property
+    def grand_mean(self):
+        return self.gmean
+
+    @property
+    def grand_median(self):
+        return self.gmedian
+
+    @property
+    def pooled_std(self):
+        return self.pooled
 
 
 class GroupStatisticsStacked(Analysis):
@@ -268,6 +285,11 @@ class GroupStatisticsStacked(Analysis):
             data = Vector(values, groups=groups)
         if data.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
+        self.pooled = None
+        self.gmean = None
+        self.gmedian = None
+        self.total = None
+        self.k = None
         super(GroupStatisticsStacked, self).__init__(data, display=display)
         self.logic()
 
@@ -294,18 +316,18 @@ class GroupStatisticsStacked(Analysis):
                           }
             out.append(row_result)
         summ = DataFrame(out).sort_values(self._group)
-        groups = len(summ)
-        if groups > 1:
-            total = len(self._data.data)
-            pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - groups))
-            gmean = summ[self._mean].mean()
-            gmedian = median(self._data.data)
+        self.total = len(self._data.data)
+        self.k = len(summ)
+        if self.k > 1:
+            self.pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - self.k))
+            self.gmean = summ[self._mean].mean()
+            self.gmedian = median(self._data.data)
             self._results = ({
-                self._num_of_groups: groups,
-                self._total: total,
-                self._pooled: pooled,
-                self._gmean: gmean,
-                self._gmedian: gmedian,
+                self._num_of_groups: self.k,
+                self._total: self.total,
+                self._pooled: self.pooled,
+                self._gmean: self.gmean,
+                self._gmedian: self.gmedian,
             }, summ)
         else:
             self._results = summ
@@ -335,6 +357,18 @@ class GroupStatisticsStacked(Analysis):
         else:
             out = std_output(self._name, self._results.to_dict(orient='records'), order=group_order)
         return out
+
+    @property
+    def grand_mean(self):
+        return self.gmean
+
+    @property
+    def grand_median(self):
+        return self.gmedian
+
+    @property
+    def pooled_std(self):
+        return self.pooled
 
 
 class CategoricalStatistics(Analysis):

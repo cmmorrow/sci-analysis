@@ -38,6 +38,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatistics(x_input_array, y_input_array, z_input_array, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 163)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.0798, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
+        self.assertAlmostEqual(res.gmean, 4.1568, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
+        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
+        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
 
     def test_0002_group_statistics_group_names(self):
         """Test the Group Statistic class with group names specified in a list"""
@@ -100,6 +108,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatistics(data, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 163)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.0798, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
+        self.assertAlmostEqual(res.gmean, 4.1568, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
+        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
+        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
 
     def test_0004_group_statistics_dict_just_above_min_size(self):
         """Test the Group Statistic class with data passed as a dict just above min size"""
@@ -131,6 +147,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatistics(data, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 6)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 4.0150, 4)
+        self.assertAlmostEqual(res.pooled_std, 4.0150, 4)
+        self.assertAlmostEqual(res.gmean, 4.4847, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.4847, 4)
+        self.assertAlmostEqual(res.gmedian, 5.6247, 4)
+        self.assertAlmostEqual(res.grand_median, 5.6247, 4)
 
     def test_0005_group_statistics_dict_at_min_size(self):
         """Test the Group Statistic class with data passed as a dict at min size"""
@@ -170,6 +194,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatistics(data, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 20)
+        self.assertEqual(res.k, 2)
+        self.assertAlmostEqual(res.pooled, 1.2409, 4)
+        self.assertAlmostEqual(res.pooled_std, 1.2409, 4)
+        self.assertAlmostEqual(res.gmean, 5.1489, 4)
+        self.assertAlmostEqual(res.grand_mean, 5.1489, 4)
+        self.assertAlmostEqual(res.gmedian, 5.3048, 4)
+        self.assertAlmostEqual(res.grand_median, 5.3048, 4)
 
     def test_0007_group_statistics_single_group(self):
         """Test the Group Statistic class with a single group"""
@@ -186,6 +218,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatistics(x_input_array, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 10)
+        self.assertEqual(res.k, 1)
+        self.assertIsNone(res.pooled)
+        self.assertIsNone(res.pooled_std)
+        self.assertIsNone(res.gmean)
+        self.assertIsNone(res.grand_mean)
+        self.assertIsNone(res.gmedian)
+        self.assertIsNone(res.grand_median)
 
     def test_0008_group_statistics_dict_empty(self):
         """Test the Group Statistic class with data passed as empty"""
@@ -235,6 +275,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatisticsStacked(ref['values'], ref['groups'], display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 163)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.0798, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
+        self.assertAlmostEqual(res.gmean, 4.1568, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
+        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
+        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
 
     def test_0011_group_statistics_stacked_no_data(self):
         """Test the event when all passed data is NA"""
@@ -265,6 +313,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatisticsStacked(ref['values'], ref['groups'], display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 3)
+        self.assertEqual(res.k, 1)
+        self.assertIsNone(res.pooled)
+        self.assertIsNone(res.pooled_std)
+        self.assertIsNone(res.gmean)
+        self.assertIsNone(res.grand_mean)
+        self.assertIsNone(res.gmedian)
+        self.assertIsNone(res.grand_median)
 
     def test_0014_group_statistics_stacked_vector(self):
         """Test the Stacked Group Statistic class with a Vector input object."""
@@ -299,6 +355,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatisticsStacked(exp, display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 163)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.0798, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
+        self.assertAlmostEqual(res.gmean, 4.1568, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
+        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
+        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
 
     def test_0015_group_statistics_stacked_missing_groups(self):
         """Test the case where the groups argument is not provided."""
@@ -341,6 +405,14 @@ n             Mean          Std Dev       Min           Median        Max       
         res = GroupStatisticsStacked(ref['values'], ref['groups'], display=False)
         self.assertTrue(res)
         self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 147)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.1549, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.1549, 4)
+        self.assertAlmostEqual(res.gmean, 4.8060, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.8060, 4)
+        self.assertAlmostEqual(res.gmedian, 2.0912, 4)
+        self.assertAlmostEqual(res.grand_median, 2.0912, 4)
 
 
 if __name__ == '__main__':
