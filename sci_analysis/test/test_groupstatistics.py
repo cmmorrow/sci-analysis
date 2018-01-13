@@ -26,6 +26,7 @@ Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
 Grand Median     =  2.3293
 
+
 Group Statistics
 ----------------
 
@@ -55,6 +56,7 @@ Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
 Grand Median     =  2.3293
+
 
 Group Statistics
 ----------------
@@ -86,6 +88,7 @@ Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
 Grand Median     =  2.3293
 
+
 Group Statistics
 ----------------
 
@@ -115,6 +118,7 @@ Total            =  6
 Grand Mean       =  4.4847
 Pooled Std Dev   =  4.0150
 Grand Median     =  5.6247
+
 
 Group Statistics
 ----------------
@@ -154,6 +158,7 @@ Total            =  20
 Grand Mean       =  5.1489
 Pooled Std Dev   =  1.2409
 Grand Median     =  5.3048
+
 
 Group Statistics
 ----------------
@@ -218,6 +223,7 @@ Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
 Grand Median     =  2.3293
 
+
 Group Statistics
 ----------------
 
@@ -281,6 +287,7 @@ Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
 Grand Median     =  2.3293
 
+
 Group Statistics
 ----------------
 
@@ -321,6 +328,7 @@ Total            =  147
 Grand Mean       =  4.8060
 Pooled Std Dev   =  2.1549
 Grand Median     =  2.0912
+
 
 Group Statistics
 ----------------

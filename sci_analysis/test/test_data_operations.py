@@ -4,14 +4,16 @@ import numpy as np
 import numpy.ma as ma
 import pandas as pd
 
-from ..data import is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, flatten, is_series, \
-    Vector, is_data, is_vector, is_numeric
+from ..data import (is_array, is_dict, is_dict_group, is_group, is_iterable, is_tuple, to_float, flatten, is_series,
+                    Vector, is_data, is_vector, is_numeric, is_number)
 
 
 class MyTestCase(unittest.TestCase):
     inputs = {
         'num': 3,
+        'float': 1.34,
         'string': "hello",
+        'num_string': '1.34',
         'char': "h",
         'none': None,
         'list': [1, 2, 3, 4, 5],
@@ -44,6 +46,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_array = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -77,6 +81,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_dict = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -110,6 +116,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_iterable = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -143,6 +151,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_tuple = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -176,6 +186,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_data = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -209,6 +221,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_vector = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -242,6 +256,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_group = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -275,6 +291,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_dict_group = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -308,6 +326,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_series = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -341,6 +361,8 @@ class MyTestCase(unittest.TestCase):
 
     ans_numeric = {
         'num': 0,
+        'float': 0,
+        'num_string': 0,
         'string': 0,
         'char': 0,
         'none': 0,
@@ -363,6 +385,41 @@ class MyTestCase(unittest.TestCase):
         'zero_len_array': 0,
         'empty_array': 0,
         'vector': 1,
+        'series': 0,
+        'dict_series': 0,
+        'large_array': 0,
+        'large_list': 0,
+        'group': 0,
+        'group_of_lists': 0,
+        'dict_of_lists': 0
+    }
+
+    ans_number = {
+        'num': 1,
+        'float': 1,
+        'num_string': 1,
+        'string': 0,
+        'char': 0,
+        'none': 0,
+        'list': 0,
+        'num_list': 0,
+        'mixed_list': 0,
+        'zero_len_list': 0,
+        'multiple_dim_list': 0,
+        'tuple': 0,
+        'num_tuple': 0,
+        'mixed_tuple': 0,
+        'dict': 0,
+        'array': 0,
+        'float_array': 0,
+        'nan_array': 0,
+        'negative_array': 0,
+        'masked_array': 0,
+        'multi_dim_array': 0,
+        'scalar_array': 1,
+        'zero_len_array': 0,
+        'empty_array': 0,
+        'vector': 0,
         'series': 0,
         'dict_series': 0,
         'large_array': 0,
@@ -535,6 +592,19 @@ class MyTestCase(unittest.TestCase):
                 print("FAIL: " + name)
                 eval_numeric[name] = 0
         self.assertTrue(eval_numeric == self.ans_numeric, "FAIL: is_numeric test")
+
+    def test_011_is_number(self):
+        """Test the is_number function"""
+        eval_numeric = {}
+        for name, test in self.inputs.items():
+            try:
+                assert is_number(test)
+                print("PASS: " + name)
+                eval_numeric[name] = 1
+            except AssertionError:
+                print("FAIL: " + name)
+                eval_numeric[name] = 0
+        self.assertTrue(eval_numeric == self.ans_number, "FAIL: is_number test")
 
     def test_050_to_float_list(self):
         """Test the to_float int list conversion"""

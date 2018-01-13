@@ -231,7 +231,7 @@ class GroupStatistics(Analysis):
             self._group,
         )
         if is_tuple(self._results):
-            out = '{}{}'.format(
+            out = '{}\n{}'.format(
                 std_output('Overall Statistics', self._results[0], order=order),
                 std_output(self._name, self._results[1].to_dict(orient='records'), order=group_order),
             )
@@ -328,7 +328,7 @@ class GroupStatisticsStacked(Analysis):
             self._group,
         )
         if is_tuple(self._results):
-            out = '{}{}'.format(
+            out = '{}\n{}'.format(
                 std_output('Overall Statistics', self._results[0], order=order),
                 std_output(self._name, self._results[1].to_dict(orient='records'), order=group_order),
             )
@@ -346,6 +346,7 @@ class CategoricalStatistics(Analysis):
     _cat = 'Category'
     _freq = 'Frequency'
     _perc = 'Percent'
+    _total = 'Total'
 
     def __init__(self, data, **kwargs):
         order = kwargs['order'] if 'order' in kwargs else None

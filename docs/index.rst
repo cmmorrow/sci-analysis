@@ -110,7 +110,7 @@ A histogram and box plot of the data should appear, as well as printed output si
     Statistics
     ----------
  
-    Count     =  1000
+    n         =  1000
     Mean      =  0.0551
     Std Dev   =  1.0287
     Std Error =  0.0325

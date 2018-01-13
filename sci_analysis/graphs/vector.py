@@ -2,8 +2,8 @@ import warnings
 import six
 
 # matplotlib imports
-from matplotlib.pyplot import show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks, \
-    subplots_adjust
+from matplotlib.pyplot import (show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks,
+                               subplots_adjust)
 from matplotlib.gridspec import GridSpec
 
 # Numpy imports
@@ -14,7 +14,7 @@ from scipy.stats import probplot, gaussian_kde
 
 # local imports
 from .base import Graph
-from ..data import Vector, is_dict, is_group, is_vector
+from ..data import Vector, is_dict, is_group, is_vector, is_number
 from ..analysis.exc import NoDataError
 
 
@@ -596,6 +596,8 @@ class GraphBoxplot(VectorGraph):
         self._title = kwargs['title'] if 'title' in kwargs else 'Oneway'
         self._nqp = kwargs['nqp'] if 'nqp' in kwargs else True
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
+        self._gmean = kwargs['gmean'] if 'gmean' in kwargs else None
+        self._gmedian = kwargs['gmedian'] if 'gmedian' in kwargs else None
         if 'title' in kwargs:
             self._title = kwargs['title']
         elif self._nqp:
@@ -663,6 +665,10 @@ class GraphBoxplot(VectorGraph):
         for i in range(len(groups)):
             setp(vp['bodies'][i], facecolors=self.get_color(i))
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+        if is_number(self._gmean):
+            ax1.axhline(float(self._gmean), c='red', linestyle='--', alpha=0.8)
+        if is_number(self._gmedian):
+            ax1.axhline(float(self._gmedian), c='blue', linestyle=':', alpha=0.8)
         if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)
         subplots_adjust(bottom=0.2)
