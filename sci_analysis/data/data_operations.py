@@ -300,3 +300,45 @@ def is_dict_group(seq):
             return False
     except (AttributeError, TypeError):
         return False
+
+
+def is_number(obj):
+    """
+    Checks if the given object is a number.
+
+    Parameters
+    ----------
+    obj : object
+        The input argument.
+
+    Returns
+    -------
+    test result : bool
+        The test result of whether obj can be converted to a number or not.
+
+    >>> is_number(3)
+    True
+
+    >>> is_number(1.34)
+    True
+
+    >>> is_number('3')
+    True
+
+    >>> is_number(np.array(3))
+    True
+
+    >>> is_number('a')
+    False
+
+    >>> is_number([1, 2, 3])
+    False
+
+    >>> is_number(None)
+    False
+    """
+    try:
+        float(obj)
+        return True
+    except (ValueError, TypeError):
+        return False

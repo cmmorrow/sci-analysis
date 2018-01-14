@@ -118,6 +118,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
 
     """
+    from numpy import mean, median
     from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency, GraphGroupScatter
     from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
@@ -139,11 +140,12 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             xdata = list(xdata.values())
 
         # Show the box plot and stats
+        out_stats = GroupStatistics(*xdata, groups=groups, display=False)
         if groups is not None:
-            GraphBoxplot(*xdata, groups=groups, **kwargs)
+            GraphBoxplot(*xdata, groups=groups, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
         else:
-            GraphBoxplot(*xdata, **kwargs)
-        GroupStatistics(*xdata, groups=groups)
+            GraphBoxplot(*xdata, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
+        print(out_stats)
 
         if len(xdata) == 2:
             norm = NormTest(*xdata, alpha=alpha, display=False)
@@ -197,8 +199,9 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         tested.append('Stacked Oneway')
 
         # Show the box plot and stats
-        GraphBoxplot(_data, **kwargs)
-        GroupStatisticsStacked(_data)
+        out_stats = GroupStatisticsStacked(_data, display=False)
+        GraphBoxplot(_data, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
+        print(out_stats)
 
         group_data = tuple(_data.groups.values())
         if len(group_data) == 2:

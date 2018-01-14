@@ -41,15 +41,24 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
         input_2_array = st.norm.rvs(1, size=2000)
-        self.assertTrue(GraphBoxplot(input_1_array, input_2_array, save_to='{}test_box_100'.format(self.save_path)))
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
+        self.assertTrue(GraphBoxplot(input_1_array, input_2_array,
+                                     gmean=gmean,
+                                     gmedian=gmedian,
+                                     save_to='{}test_box_100'.format(self.save_path)))
 
     def test_101_boxplot_2_no_nqp(self):
         """Generate a boxplot graph with no nqp"""
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
         input_2_array = st.norm.rvs(1, size=2000)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
         self.assertTrue(GraphBoxplot(input_1_array, input_2_array,
                                      nqp=False,
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_101'.format(self.save_path)))
 
     def test_102_boxplot_2_weird_variance(self):
@@ -57,7 +66,12 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(0, 0.1, size=2000)
         input_2_array = st.norm.rvs(1, 8, size=2000)
-        self.assertTrue(GraphBoxplot(input_1_array, input_2_array, save_to='{}test_box_102'.format(self.save_path)))
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
+        self.assertTrue(GraphBoxplot(input_1_array, input_2_array,
+                                     gmean=gmean,
+                                     gmedian=gmedian,
+                                     save_to='{}test_box_102'.format(self.save_path)))
 
     def test_103_boxplot_2_groups(self):
         """Generate a boxplot graph with set group names"""
@@ -84,8 +98,12 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(0, 5, size=1234)
         input_2_array = st.norm.rvs(0, 5, size=56)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
         self.assertTrue(GraphBoxplot(input_1_array, input_2_array,
                                      title='Diff Size',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_105'.format(self.save_path)))
 
     def test_106_boxplot_2_diff_size_diff_disto(self):
@@ -93,8 +111,12 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.weibull_min.rvs(2, size=1234)
         input_2_array = st.norm.rvs(0, size=56)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
         self.assertTrue(GraphBoxplot(input_1_array, input_2_array,
                                      title='Diff Size, Diff Distribution',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_106'.format(self.save_path)))
 
     def test_107_boxplot_2_diff_size_diff_disto_dict(self):
@@ -102,8 +124,12 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.weibull_min.rvs(2, size=1234)
         input_2_array = st.norm.rvs(0, size=56)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array)])
         self.assertTrue(GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
                                      title='Diff Size, Diff Distribution Dict',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_107'.format(self.save_path)))
 
     def test_108_boxplot_2_size_4(self):
@@ -205,7 +231,13 @@ class MyTestCase(TestWarnings):
         input_2_array = st.norm.rvs(1, size=2000)
         input_3_array = st.norm.rvs(2, 0.5, size=2000)
         input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array), np.mean(input_3_array),
+                         np.mean(input_4_array)))
+        gmedian = np.median([np.median(input_1_array), np.median(input_2_array), np.median(input_3_array),
+                             np.median(input_4_array)])
         self.assertTrue(GraphBoxplot(input_1_array, input_2_array, input_3_array, input_4_array,
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_118'.format(self.save_path)))
 
     def test_119_boxplot_4_no_nqp(self):
@@ -303,6 +335,15 @@ class MyTestCase(TestWarnings):
         input_12_array = st.norm.rvs(-0.5, 2, size=1386)
         input_13_array = st.norm.rvs(0, 0.5, size=548)
         input_14_array = st.weibull_min.rvs(1.7, size=2000)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array), np.mean(input_3_array), np.mean(input_4_array),
+                         np.mean(input_5_array), np.mean(input_6_array), np.mean(input_7_array), np.mean(input_8_array),
+                         np.mean(input_9_array), np.mean(input_10_array), np.mean(input_11_array),
+                         np.mean(input_12_array), np.mean(input_13_array), np.mean(input_14_array)))
+        gmedian = np.median((np.median(input_1_array), np.median(input_2_array), np.median(input_3_array),
+                             np.median(input_4_array), np.median(input_5_array), np.median(input_6_array),
+                             np.median(input_7_array), np.median(input_8_array), np.median(input_9_array),
+                             np.median(input_10_array), np.median(input_11_array), np.median(input_12_array),
+                             np.median(input_13_array), np.median(input_14_array)))
         self.assertTrue(GraphBoxplot({'Group 1': input_1_array,
                                       'Group 2': input_2_array,
                                       'Group 3': input_3_array,
@@ -318,6 +359,8 @@ class MyTestCase(TestWarnings):
                                       'Group 13': input_13_array,
                                       'Group 14': input_14_array},
                                      title='14 Arrays',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_126'.format(self.save_path)))
 
     def test_127_boxplot_1_default(self):
@@ -446,9 +489,13 @@ class MyTestCase(TestWarnings):
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
         input_2_array = st.norm.rvs(1, size=2000)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        gmedian = np.median((np.median(input_1_array), np.median(input_2_array)))
         vector = Vector(input_1_array).append(Vector(input_2_array))
         self.assertTrue(GraphBoxplot(vector,
                                      title='Vector Simple Test',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
                                      save_to='{}test_box_138'.format(self.save_path)))
 
     def test_139_boxplot_vector_ignore_groups(self):
@@ -542,6 +589,44 @@ class MyTestCase(TestWarnings):
         input_1_array = 3
         self.assertTrue(GraphBoxplot(input_1_array, title='Scalar Boxplot',
                                      save_to='{}test_box_147'.format(self.save_path)))
+
+    def test_148_boxplot_vector_only_gmean(self):
+        """Generate a boxplot graph from a Vector object and don't show gmedian."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
+        vector = Vector(input_1_array).append(Vector(input_2_array))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     gmean=gmean,
+                                     save_to='{}test_box_148'.format(self.save_path)))
+
+    def test_149_boxplot_vector_only_gmedian(self):
+        """Generate a boxplot graph from a Vector object and don't show gmean."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        gmedian = np.median((np.median(input_1_array), np.median(input_2_array)))
+        vector = Vector(input_1_array).append(Vector(input_2_array))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     gmedian=gmedian,
+                                     save_to='{}test_box_149'.format(self.save_path)))
+
+    def test_150_boxplot_vector_gmean_not_a_number(self):
+        """Test the case where gmean is not a number."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        gmean = 'abcdefg'
+        gmedian = np.median((np.median(input_1_array), np.median(input_2_array)))
+        vector = Vector(input_1_array).append(Vector(input_2_array))
+        self.assertTrue(GraphBoxplot(vector,
+                                     title='Vector Simple Test',
+                                     gmean=gmean,
+                                     gmedian=gmedian,
+                                     save_to='{}test_box_150'.format(self.save_path)))
 
 
 if __name__ == '__main__':
