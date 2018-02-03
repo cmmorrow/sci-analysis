@@ -704,7 +704,7 @@ class GraphBoxplot(VectorGraph):
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if self._gmean:
             ax1.axhline(float(self.grand_mean(data)), c='k', linestyle='--', alpha=0.4)
-        if is_number(self._gmedian):
+        if self._gmedian:
             ax1.axhline(float(self.grand_median(data)), c='k', linestyle=':', alpha=0.4)
         if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)

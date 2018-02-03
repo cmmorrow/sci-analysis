@@ -28,7 +28,7 @@ class MyTestCase(TestWarnings):
     def save_path(self):
         if getcwd().split('/')[-1] == 'test':
             return './images/'
-        elif getcwd().split('/')[-1] == 'sci-analysis':
+        elif getcwd().split('/')[-1] == 'sci_analysis':
             if path.exists('./setup.py'):
                 return './sci_analysis/test/images/'
             else:
@@ -250,7 +250,7 @@ class MyTestCase(TestWarnings):
                            save_to='{}test_box_115'.format(self.save_path))
         self.assertTrue(res)
         self.assertEqual(gmean, res.grand_mean((np.nanmean(input_1_array, axis=None),
-                                                      np.nanmean(input_2_array, axis=None))))
+                                                np.nanmean(input_2_array, axis=None))))
         self.assertEqual(gmedian, res.grand_median([np.nanmedian(input_1_array, axis=None),
                                                     np.nanmedian(input_2_array, axis=None)]))
 
@@ -718,6 +718,38 @@ class MyTestCase(TestWarnings):
                   .append(Vector(input_3_array))
                   .append(Vector(input_4_array)))
         self.assertTrue(GraphBoxplot(vector, save_to='{}test_box_151'.format(self.save_path), circles=False))
+
+    def test_152_no_gmean(self):
+        """Generate a boxplot graph from a vector object with four groups and no grand mean line."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        input_3_array = st.norm.rvs(2, 0.5, size=2000)
+        input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        vector = (Vector(input_1_array)
+                  .append(Vector(input_2_array))
+                  .append(Vector(input_3_array))
+                  .append(Vector(input_4_array)))
+        res = GraphBoxplot(vector,
+                           gmean=False,
+                           save_to='{}test_box_152'.format(self.save_path))
+        self.assertTrue(res)
+
+    def test_153_no_gmedian(self):
+        """Generate a boxplot graph from a vector object with four groups and no grand median line."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        input_3_array = st.norm.rvs(2, 0.5, size=2000)
+        input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        vector = (Vector(input_1_array)
+            .append(Vector(input_2_array))
+            .append(Vector(input_3_array))
+            .append(Vector(input_4_array)))
+        res = GraphBoxplot(vector,
+                           gmedian=False,
+                           save_to='{}test_box_153'.format(self.save_path))
+        self.assertTrue(res)
 
 
 if __name__ == '__main__':
