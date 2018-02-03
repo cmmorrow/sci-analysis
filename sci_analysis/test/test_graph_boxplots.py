@@ -668,45 +668,7 @@ class MyTestCase(TestWarnings):
         self.assertTrue(GraphBoxplot(input_1_array, title='Scalar Boxplot',
                                      save_to='{}test_box_147'.format(self.save_path)))
 
-    def test_148_boxplot_vector_only_gmean(self):
-        """Generate a boxplot graph from a Vector object and don't show gmedian."""
-        np.random.seed(987654321)
-        input_1_array = st.norm.rvs(size=2000)
-        input_2_array = st.norm.rvs(1, size=2000)
-        gmean = np.mean((np.mean(input_1_array), np.mean(input_2_array)))
-        vector = Vector(input_1_array).append(Vector(input_2_array))
-        self.assertTrue(GraphBoxplot(vector,
-                                     title='Vector Simple Test',
-                                     gmean=gmean,
-                                     save_to='{}test_box_148'.format(self.save_path)))
-
-    def test_149_boxplot_vector_only_gmedian(self):
-        """Generate a boxplot graph from a Vector object and don't show gmean."""
-        np.random.seed(987654321)
-        input_1_array = st.norm.rvs(size=2000)
-        input_2_array = st.norm.rvs(1, size=2000)
-        gmedian = np.median((np.median(input_1_array), np.median(input_2_array)))
-        vector = Vector(input_1_array).append(Vector(input_2_array))
-        self.assertTrue(GraphBoxplot(vector,
-                                     title='Vector Simple Test',
-                                     gmedian=gmedian,
-                                     save_to='{}test_box_149'.format(self.save_path)))
-
-    def test_150_boxplot_vector_gmean_not_a_number(self):
-        """Test the case where gmean is not a number."""
-        np.random.seed(987654321)
-        input_1_array = st.norm.rvs(size=2000)
-        input_2_array = st.norm.rvs(1, size=2000)
-        gmean = 'abcdefg'
-        gmedian = np.median((np.median(input_1_array), np.median(input_2_array)))
-        vector = Vector(input_1_array).append(Vector(input_2_array))
-        self.assertTrue(GraphBoxplot(vector,
-                                     title='Vector Simple Test',
-                                     gmean=gmean,
-                                     gmedian=gmedian,
-                                     save_to='{}test_box_150'.format(self.save_path)))
-
-    def test_151_boxplot_vector_no_circles(self):
+    def test_148_boxplot_vector_no_circles(self):
         """Generate a boxplot graph from a vector object with four groups and no circles."""
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
@@ -717,9 +679,9 @@ class MyTestCase(TestWarnings):
                   .append(Vector(input_2_array))
                   .append(Vector(input_3_array))
                   .append(Vector(input_4_array)))
-        self.assertTrue(GraphBoxplot(vector, save_to='{}test_box_151'.format(self.save_path), circles=False))
+        self.assertTrue(GraphBoxplot(vector, save_to='{}test_box_148'.format(self.save_path), circles=False))
 
-    def test_152_no_gmean(self):
+    def test_149_no_gmean(self):
         """Generate a boxplot graph from a vector object with four groups and no grand mean line."""
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
@@ -732,10 +694,10 @@ class MyTestCase(TestWarnings):
                   .append(Vector(input_4_array)))
         res = GraphBoxplot(vector,
                            gmean=False,
-                           save_to='{}test_box_152'.format(self.save_path))
+                           save_to='{}test_box_149'.format(self.save_path))
         self.assertTrue(res)
 
-    def test_153_no_gmedian(self):
+    def test_150_no_gmedian(self):
         """Generate a boxplot graph from a vector object with four groups and no grand median line."""
         np.random.seed(987654321)
         input_1_array = st.norm.rvs(size=2000)
@@ -748,7 +710,7 @@ class MyTestCase(TestWarnings):
             .append(Vector(input_4_array)))
         res = GraphBoxplot(vector,
                            gmedian=False,
-                           save_to='{}test_box_153'.format(self.save_path))
+                           save_to='{}test_box_150'.format(self.save_path))
         self.assertTrue(res)
 
 
