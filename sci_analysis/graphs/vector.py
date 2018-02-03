@@ -1,16 +1,19 @@
 import warnings
 import six
+from math import sqrt, fabs
 
 # matplotlib imports
 from matplotlib.pyplot import (show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks,
                                subplots_adjust)
 from matplotlib.gridspec import GridSpec
+from matplotlib.patches import Circle
+from matplotlib.collections import PatchCollection
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median
 
 # Scipy imports
-from scipy.stats import probplot, gaussian_kde
+from scipy.stats import probplot, gaussian_kde, t
 
 # local imports
 from .base import Graph
@@ -575,9 +578,10 @@ class GraphBoxplot(VectorGraph):
     """
 
     _nrows = 1
-    _ncols = 2
+    _ncols = 1
     _xsize = 7.5
     _ysize = 6
+    _default_alpha = 0.05
 
     def __init__(self, *args, **kwargs):
         """GraphBoxplot constructor. NOTE: If vectors is a dict, the boxplots are
@@ -596,8 +600,10 @@ class GraphBoxplot(VectorGraph):
         self._title = kwargs['title'] if 'title' in kwargs else 'Oneway'
         self._nqp = kwargs['nqp'] if 'nqp' in kwargs else True
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
-        self._gmean = kwargs['gmean'] if 'gmean' in kwargs else None
-        self._gmedian = kwargs['gmedian'] if 'gmedian' in kwargs else None
+        self._gmean = kwargs['gmean'] if 'gmean' in kwargs else True
+        self._gmedian = kwargs['gmedian'] if 'gmedian' in kwargs else True
+        self._circles = kwargs['circles'] if 'circles' in kwargs else True
+        self._alpha = kwargs['alpha'] if 'alpha' in kwargs else self._default_alpha
         if 'title' in kwargs:
             self._title = kwargs['title']
         elif self._nqp:
@@ -633,6 +639,31 @@ class GraphBoxplot(VectorGraph):
                     data = Vector(args[0])
         super(GraphBoxplot, self).__init__(data, xname=xname, yname=yname, save_to=self._save_to)
 
+    @staticmethod
+    def grand_mean(data):
+        return mean([mean(sample) for sample in data])
+
+    @staticmethod
+    def grand_median(data):
+        return median([median(sample) for sample in data])
+
+    def tukey_circles(self, data):
+        num = []
+        den = []
+        crit = []
+        radii = []
+        xbar = []
+        for sample in data:
+            df = len(sample) - 1
+            num.append(std(sample, ddof=1) ** 2 * df)
+            den.append(df)
+            crit.append(t.ppf(1 - self._alpha, df))
+        mse = sum(num) / sum(den)
+        for i, sample in enumerate(data):
+            radii.append(fabs(crit[i]) * sqrt(mse / len(sample)))
+            xbar.append(mean(sample))
+        return tuple(zip(xbar, radii))
+
     def draw(self):
         """
         Draws the boxplots based on the set parameters.
@@ -642,6 +673,14 @@ class GraphBoxplot(VectorGraph):
         pass
         """
 
+        # Setup the grid variables
+        w_ratio = [1]
+        if self._circles:
+            w_ratio = [4, 1]
+            self._ncols += 1
+        if self._nqp:
+            w_ratio.append(4 if self._circles else 1)
+            self._ncols += 1
         groups, data = zip(*[(g, v['ind']) for g, v in self._data.values.groupby('grp')])
 
         # Create the quantile plot arrays
@@ -650,11 +689,9 @@ class GraphBoxplot(VectorGraph):
         # Create the figure and gridspec
         if self._nqp and len(prob) > 0:
             self._xsize *= 2
-        else:
-            self._ncols = 1
         f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
-        gs = GridSpec(self._nrows, self._ncols, wspace=0)
+        gs = GridSpec(self._nrows, self._ncols, width_ratios=w_ratio, wspace=0)
 
         # Draw the boxplots
         ax1 = subplot(gs[0])
@@ -665,31 +702,42 @@ class GraphBoxplot(VectorGraph):
         for i in range(len(groups)):
             setp(vp['bodies'][i], facecolors=self.get_color(i))
         ax1.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-        if is_number(self._gmean):
-            ax1.axhline(float(self._gmean), c='red', linestyle='--', alpha=0.8)
+        if self._gmean:
+            ax1.axhline(float(self.grand_mean(data)), c='k', linestyle='--', alpha=0.4)
         if is_number(self._gmedian):
-            ax1.axhline(float(self._gmedian), c='blue', linestyle=':', alpha=0.8)
+            ax1.axhline(float(self.grand_median(data)), c='k', linestyle=':', alpha=0.4)
         if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)
         subplots_adjust(bottom=0.2)
         ylabel(self._yname)
         xlabel(self._xname)
 
+        # Draw the Tukey-Kramer circles
+        if self._circles:
+            ax2 = subplot(gs[1], sharey=ax1)
+            for i, (center, radius) in enumerate(self.tukey_circles(data)):
+                c = Circle((0.5, center), radius=radius, facecolor='none', edgecolor=self.get_color(i))
+                ax2.add_patch(c)
+            ax2.set_aspect('equal')
+            setp(ax2.get_xticklabels(), visible=False)
+            setp(ax2.get_yticklabels(), visible=False)
+            xticks([])
+
         # Draw the normal quantile plot
         if self._nqp and len(prob) > 0:
-            ax2 = subplot(gs[1], sharey=ax1)
+            ax3 = subplot(gs[2], sharey=ax1) if self._circles else subplot(gs[1], sharey=ax1)
             for i, g in enumerate(prob):
                 osm = g[0][0]
                 osr = g[0][1]
                 slope = g[1][0]
                 intercept = g[1][1]
-                ax2.plot(osm, osr, marker='^', color=self.get_color(i), label=groups[i])
-                ax2.plot(osm, slope * osm + intercept, linestyle='--', linewidth=2, color=self.get_color(i))
-            ax2.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-            ax2.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
-            ax2.legend(loc='best')
+                ax3.plot(osm, osr, marker='^', color=self.get_color(i), label=groups[i])
+                ax3.plot(osm, slope * osm + intercept, linestyle='--', linewidth=2, color=self.get_color(i))
+            ax3.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax3.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
+            ax3.legend(loc='best')
             xlabel("Quantiles")
-            setp(ax2.get_yticklabels(), visible=False)
+            setp(ax3.get_yticklabels(), visible=False)
 
         # Save the figure to disk or display
         if self._save_to:
