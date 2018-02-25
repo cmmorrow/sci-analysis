@@ -705,12 +705,29 @@ class MyTestCase(TestWarnings):
         input_3_array = st.norm.rvs(2, 0.5, size=2000)
         input_4_array = st.weibull_min.rvs(1.4, size=2000)
         vector = (Vector(input_1_array)
-            .append(Vector(input_2_array))
-            .append(Vector(input_3_array))
-            .append(Vector(input_4_array)))
+                  .append(Vector(input_2_array))
+                  .append(Vector(input_3_array))
+                  .append(Vector(input_4_array)))
         res = GraphBoxplot(vector,
                            gmedian=False,
                            save_to='{}test_box_150'.format(self.save_path))
+        self.assertTrue(res)
+
+    def test_151_no_gmedian_or_gmean(self):
+        """Generate a boxplot graph from a vector object with four groups and no grand mean or median line."""
+        np.random.seed(987654321)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        input_3_array = st.norm.rvs(2, 0.5, size=2000)
+        input_4_array = st.weibull_min.rvs(1.4, size=2000)
+        vector = (Vector(input_1_array)
+                  .append(Vector(input_2_array))
+                  .append(Vector(input_3_array))
+                  .append(Vector(input_4_array)))
+        res = GraphBoxplot(vector,
+                           gmean=False,
+                           gmedian=False,
+                           save_to='{}test_box_151'.format(self.save_path))
         self.assertTrue(res)
 
 

@@ -7,7 +7,6 @@ from matplotlib.pyplot import (show, subplot, yticks, xlabel, ylabel, figure, se
                                subplots_adjust)
 from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Circle
-from matplotlib.collections import PatchCollection
 
 # Numpy imports
 from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median
@@ -17,7 +16,7 @@ from scipy.stats import probplot, gaussian_kde, t
 
 # local imports
 from .base import Graph
-from ..data import Vector, is_dict, is_group, is_vector, is_number
+from ..data import Vector, is_dict, is_group, is_vector
 from ..analysis.exc import NoDataError
 
 
