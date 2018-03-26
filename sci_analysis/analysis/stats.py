@@ -261,6 +261,7 @@ class GroupStatisticsStacked(Analysis):
 
     _min_size = 1
     _name = 'Group Statistics'
+    _agg_name = 'Overall Statistics'
     _group = 'Group'
     _n = 'n'
     _mean = 'Mean'
@@ -351,7 +352,7 @@ class GroupStatisticsStacked(Analysis):
         )
         if is_tuple(self._results):
             out = '{}\n{}'.format(
-                std_output('Overall Statistics', self._results[0], order=order),
+                std_output(self._agg_name, self._results[0], order=order),
                 std_output(self._name, self._results[1].to_dict(orient='records'), order=group_order),
             )
         else:
@@ -376,11 +377,13 @@ class CategoricalStatistics(Analysis):
 
     _min_size = 1
     _name = 'Statistics'
+    _agg_name = 'Overall Statistics'
     _rank = 'Rank'
     _cat = 'Category'
     _freq = 'Frequency'
     _perc = 'Percent'
     _total = 'Total'
+    _num_of_grps = 'Number of Groups'
 
     def __init__(self, data, **kwargs):
         order = kwargs['order'] if 'order' in kwargs else None
@@ -400,13 +403,30 @@ class CategoricalStatistics(Analysis):
                    percents=self._perc,
                    ranks=self._rank)
         self.data.summary.rename(columns=col, inplace=True)
-        self._results = self.data.summary.to_dict(orient='records')
+        if self.data.num_of_groups > 1:
+            self._results = ({
+                self._total: self.data.total,
+                self._num_of_grps: self.data.num_of_groups,
+            }, self.data.summary.to_dict(orient='records'))
+        else:
+            self._results = self.data.summary.to_dict(orient='records')
 
     def __str__(self):
-        order = [
+        order = (
+            self._total,
+            self._num_of_grps,
+        )
+        grp_order = (
             self._rank,
             self._freq,
             self._perc,
             self._cat,
-        ]
-        return std_output(self._name, self._results, order=order)
+        )
+        if is_tuple(self._results):
+            out = '{}\n{}'.format(
+                std_output(self._agg_name, self._results[0], order=order),
+                std_output(self._name, self._results[1], order=grp_order),
+            )
+        else:
+            out = std_output(self._name, self._results, order=grp_order)
+        return out
