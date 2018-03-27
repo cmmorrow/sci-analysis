@@ -141,7 +141,7 @@ A histogram and statistics for categorical data can be performed with the follow
 
 ::
     
-    pets = ['dog', 'cat', 'rat', 'cat', 'rabbit', 'dog', 'hampster', 'cat', 'rabbit', 'dog', 'dog']
+    pets = ['dog', 'cat', 'rat', 'cat', 'rabbit', 'dog', 'hamster', 'cat', 'rabbit', 'dog', 'dog']
     analyze(pets)
 
 A histogram and printed output similar to that below should be shown:
@@ -158,7 +158,7 @@ A histogram and printed output similar to that below should be shown:
     1             4              36.3636      dog           
     2             3              27.2727      cat           
     3             2              18.1818      rabbit        
-    4             1              9.0909       hampster      
+    4             1              9.0909       hamster
     4             1              9.0909       rat           
 
 Let's examine the ``analyze`` function in more detail. Here's the signature for the ``analyze`` function:
