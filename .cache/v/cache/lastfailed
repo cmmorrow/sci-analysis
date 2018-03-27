@@ -1,4 +1,5 @@
 {
   "sci_analysis/test/test_graph_frequency.py": true,
+  "sci_analysis/test/test_graph_histo.py": true,
   "sci_analysis/test/test_groupcorrelation.py::MyTestCase::test_pearson_correlation_different_alpha": true
 }

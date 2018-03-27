@@ -215,7 +215,10 @@ class GraphHisto(VectorGraph):
             ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
-        ax_hist.hist(self._data.data, self._bins, normed=True, color=self.get_color(0), zorder=0)
+        try:
+            ax_hist.hist(self._data.data, self._bins, density=True, color=self.get_color(0), zorder=0)
+        except TypeError:
+            ax_hist.hist(self._data.data, self._bins, normed=True, color=self.get_color(0), zorder=0)
         ax_hist.xaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         ax_hist.yaxis.grid(True, linestyle='-', which='major', color='grey', alpha=0.75)
         if self._fit:
