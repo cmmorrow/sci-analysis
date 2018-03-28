@@ -215,6 +215,7 @@ class GraphHisto(VectorGraph):
             ax_hist = subplot(gs[len(h_ratios) - 1])
 
         # Draw the histogram
+        # First try to use the density arg which replaced normed (which is now depricated) in matplotlib 2.2.2
         try:
             ax_hist.hist(self._data.data, self._bins, density=True, color=self.get_color(0), zorder=0)
         except TypeError:
