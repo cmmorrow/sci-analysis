@@ -159,7 +159,13 @@ class GraphHisto(VectorGraph):
             h_ratios.insert(0, cdf_span)
 
         # Create the figure and grid spec
-        f = figure(figsize=(self._xsize, self._ysize))
+        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
+        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
+        try:
+            f = figure(**f_args)
+        except TypeError:
+            del f_args['constrained_layout']
+            f = figure(**f_args)
         gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratios, hspace=0)
 
         # Set the title
@@ -343,7 +349,13 @@ class GraphScatter(VectorGraph):
             main_plot = 0
 
         # Setup the figure
-        f = figure(figsize=(self._xsize, self._ysize))
+        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
+        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
+        try:
+            f = figure(**f_args)
+        except TypeError:
+            del f_args['constrained_layout']
+            f = figure(**f_args)
         f.suptitle(self._title, fontsize=14)
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
@@ -488,7 +500,13 @@ class GraphGroupScatter(VectorGraph):
             main_plot = 0
 
         # Setup the figure
-        f = figure(figsize=(self._xsize, self._ysize))
+        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
+        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
+        try:
+            f = figure(**f_args)
+        except TypeError:
+            del f_args['constrained_layout']
+            f = figure(**f_args)
         f.suptitle(self._title, fontsize=14)
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
@@ -688,7 +706,13 @@ class GraphBoxplot(VectorGraph):
         # Create the figure and gridspec
         if self._nqp and len(prob) > 0:
             self._xsize *= 2
-        f = figure(figsize=(self._xsize, self._ysize))
+        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
+        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
+        try:
+            f = figure(**f_args)
+        except TypeError:
+            del f_args['constrained_layout']
+            f = figure(**f_args)
         f.suptitle(self._title, fontsize=14)
         gs = GridSpec(self._nrows, self._ncols, width_ratios=w_ratio, wspace=0)
 
