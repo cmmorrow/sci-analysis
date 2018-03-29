@@ -38,6 +38,10 @@ build/*
 
 dist/*
 
+.cache/*
+
+.pytest_cache/*
+
 *.whl
 
 *.pyc
@@ -51,3 +55,4 @@ sci_analysis/test/images/*.png
 build_distro.sh
 setup.cfg.old
 .DS_Store
+.cache/v/cache/lastfailed

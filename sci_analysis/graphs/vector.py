@@ -159,13 +159,7 @@ class GraphHisto(VectorGraph):
             h_ratios.insert(0, cdf_span)
 
         # Create the figure and grid spec
-        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
-        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
-        try:
-            f = figure(**f_args)
-        except TypeError:
-            del f_args['constrained_layout']
-            f = figure(**f_args)
+        f = figure(figsize=(self._xsize, self._ysize))
         gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratios, hspace=0)
 
         # Set the title
@@ -353,13 +347,7 @@ class GraphScatter(VectorGraph):
             main_plot = 0
 
         # Setup the figure
-        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
-        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
-        try:
-            f = figure(**f_args)
-        except TypeError:
-            del f_args['constrained_layout']
-            f = figure(**f_args)
+        f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
@@ -504,13 +492,7 @@ class GraphGroupScatter(VectorGraph):
             main_plot = 0
 
         # Setup the figure
-        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
-        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
-        try:
-            f = figure(**f_args)
-        except TypeError:
-            del f_args['constrained_layout']
-            f = figure(**f_args)
+        f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
         if self._boxplot_borders:
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
@@ -710,13 +692,7 @@ class GraphBoxplot(VectorGraph):
         # Create the figure and gridspec
         if self._nqp and len(prob) > 0:
             self._xsize *= 2
-        f_args = dict(figsize=(self._xsize, self._ysize), constrained_layout=False)
-        # Manually disable constrained_layout which was added in matplotlib 2.2.2 if using >= 2.2.2
-        try:
-            f = figure(**f_args)
-        except TypeError:
-            del f_args['constrained_layout']
-            f = figure(**f_args)
+        f = figure(figsize=(self._xsize, self._ysize))
         f.suptitle(self._title, fontsize=14)
         gs = GridSpec(self._nrows, self._ncols, width_ratios=w_ratio, wspace=0)
 
@@ -745,10 +721,11 @@ class GraphBoxplot(VectorGraph):
             for i, (center, radius) in enumerate(self.tukey_circles(data)):
                 c = Circle((0.5, center), radius=radius, facecolor='none', edgecolor=self.get_color(i))
                 ax2.add_patch(c)
-            ax2.set_aspect('equal')
+            # matplotlib 2.2.2 requires adjustable='datalim' to display properly.
+            ax2.set_aspect('equal', adjustable='datalim')
             setp(ax2.get_xticklabels(), visible=False)
             setp(ax2.get_yticklabels(), visible=False)
-            xticks([])
+            ax2.set_xticks([])
 
         # Draw the normal quantile plot
         if self._nqp and len(prob) > 0:
