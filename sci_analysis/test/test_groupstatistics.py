@@ -24,7 +24,7 @@ Number of Groups =  3
 Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
-Grand Median     =  2.3293
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -44,8 +44,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
         self.assertAlmostEqual(res.gmean, 4.1568, 4)
         self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
-        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
-        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
     def test_0002_group_statistics_group_names(self):
         """Test the Group Statistic class with group names specified in a list"""
@@ -63,7 +63,7 @@ Number of Groups =  3
 Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
-Grand Median     =  2.3293
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -94,7 +94,7 @@ Number of Groups =  3
 Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
-Grand Median     =  2.3293
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -114,8 +114,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
         self.assertAlmostEqual(res.gmean, 4.1568, 4)
         self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
-        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
-        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
     def test_0004_group_statistics_dict_just_above_min_size(self):
         """Test the Group Statistic class with data passed as a dict just above min size"""
@@ -133,7 +133,7 @@ Number of Groups =  3
 Total            =  6
 Grand Mean       =  4.4847
 Pooled Std Dev   =  4.0150
-Grand Median     =  5.6247
+Grand Median     =  3.1189
 
 
 Group Statistics
@@ -153,8 +153,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 4.0150, 4)
         self.assertAlmostEqual(res.gmean, 4.4847, 4)
         self.assertAlmostEqual(res.grand_mean, 4.4847, 4)
-        self.assertAlmostEqual(res.gmedian, 5.6247, 4)
-        self.assertAlmostEqual(res.grand_median, 5.6247, 4)
+        self.assertAlmostEqual(res.gmedian, 3.1189, 4)
+        self.assertAlmostEqual(res.grand_median, 3.1189, 4)
 
     def test_0005_group_statistics_dict_at_min_size(self):
         """Test the Group Statistic class with data passed as a dict at min size"""
@@ -181,7 +181,7 @@ Number of Groups =  2
 Total            =  20
 Grand Mean       =  5.1489
 Pooled Std Dev   =  1.2409
-Grand Median     =  5.3048
+Grand Median     =  5.1744
 
 
 Group Statistics
@@ -200,8 +200,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 1.2409, 4)
         self.assertAlmostEqual(res.gmean, 5.1489, 4)
         self.assertAlmostEqual(res.grand_mean, 5.1489, 4)
-        self.assertAlmostEqual(res.gmedian, 5.3048, 4)
-        self.assertAlmostEqual(res.grand_median, 5.3048, 4)
+        self.assertAlmostEqual(res.gmedian, 5.1744, 4)
+        self.assertAlmostEqual(res.grand_median, 5.1744, 4)
 
     def test_0007_group_statistics_single_group(self):
         """Test the Group Statistic class with a single group"""
@@ -261,7 +261,7 @@ Number of Groups =  3
 Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
-Grand Median     =  2.3293
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -281,8 +281,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
         self.assertAlmostEqual(res.gmean, 4.1568, 4)
         self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
-        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
-        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
     def test_0011_group_statistics_stacked_no_data(self):
         """Test the event when all passed data is NA"""
@@ -341,7 +341,7 @@ Number of Groups =  3
 Total            =  163
 Grand Mean       =  4.1568
 Pooled Std Dev   =  2.0798
-Grand Median     =  2.3293
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -361,8 +361,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
         self.assertAlmostEqual(res.gmean, 4.1568, 4)
         self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
-        self.assertAlmostEqual(res.gmedian, 2.3293, 4)
-        self.assertAlmostEqual(res.grand_median, 2.3293, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
     def test_0015_group_statistics_stacked_missing_groups(self):
         """Test the case where the groups argument is not provided."""
@@ -391,7 +391,7 @@ Number of Groups =  3
 Total            =  147
 Grand Mean       =  4.8060
 Pooled Std Dev   =  2.1549
-Grand Median     =  2.0912
+Grand Median     =  2.2217
 
 
 Group Statistics
@@ -411,8 +411,8 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.pooled_std, 2.1549, 4)
         self.assertAlmostEqual(res.gmean, 4.8060, 4)
         self.assertAlmostEqual(res.grand_mean, 4.8060, 4)
-        self.assertAlmostEqual(res.gmedian, 2.0912, 4)
-        self.assertAlmostEqual(res.grand_median, 2.0912, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
 
 if __name__ == '__main__':

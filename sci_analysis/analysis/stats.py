@@ -207,7 +207,7 @@ class GroupStatistics(Analysis):
         if self.k > 1:
             self.pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - self.k))
             self.gmean = summ[self._mean].mean()
-            self.gmedian = median(self._data.data)
+            self.gmedian = median(summ[self._q2])
             self._results = ({
                 self._num_of_groups: self.k,
                 self._total: self.total,
@@ -322,7 +322,7 @@ class GroupStatisticsStacked(Analysis):
         if self.k > 1:
             self.pooled = sqrt(((summ[self._n] - 1) * summ[self._std] ** 2).sum() / (summ[self._n].sum() - self.k))
             self.gmean = summ[self._mean].mean()
-            self.gmedian = median(self._data.data)
+            self.gmedian = median(summ[self._q2])
             self._results = ({
                 self._num_of_groups: self.k,
                 self._total: self.total,

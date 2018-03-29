@@ -8,7 +8,7 @@ from ..analysis.exc import MinimumSizeError, NoDataError
 
 class MyTestCase(unittest.TestCase):
 
-    display = True
+    display = False
 
     def test_1000_Vector_stats_count(self):
         """Test the vector statistics class"""
