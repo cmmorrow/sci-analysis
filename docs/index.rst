@@ -14,7 +14,7 @@ An easy to use and powerful python-based data exploration and analysis tool
 Current Version
 ---------------
 
-2.0 --- Released December 31, 2017
+2.1 --- Released March 30, 2018
 
 What is sci_analysis?
 =====================
@@ -23,14 +23,15 @@ sci_analysis is a python package for quickly performing statistical data analysi
 
 The types of analysis that can be performed are histograms of numeric or categorical data, bivariate analysis of two numeric data vectors, and one-way analysis of variance.
 
-What's new in sci_analysis version 2.0?
+What's new in sci_analysis version 2.1?
 =======================================
 
-* In version 2.0, the code base was re-factored to use pandas as the internal data structure instead of numpy. This change shouldn't have a noticeable effect, but should lead to faster releases moving forward. 
-* Categorical data is now supported by passing in a single array of string values to the ``analyze`` function. 
-* Multiple scatter plots can now be shown on the same graph by passing in a *groups* argument.
-* Oneway analysis can now be performed on stacked data by passing in all the data to the ``analyze`` function and an array of the corresponding groups using the *groups* argument.
-* The function ``analyse`` was added as an alias to ``analyze``.
+* Version 2.1 makes improvements to Statistical output and plots.
+* Tukey-Kramer circles were added to the Oneway analysis plot.
+* Grand Mean and Grand Median were added to the Oneway analysis plot.
+* Overall Statistics were added to Oneway analysis.
+* Overall Statistics were added to Categorical analysis.
+* The Categorical analysis graph was changed to improve the appearance.
 
 Getting started with sci_analysis
 =================================
@@ -150,16 +151,23 @@ A histogram and printed output similar to that below should be shown:
 
 ::
     
+    Overall Statistics
+    ------------------
+
+    Total            =  11
+    Number of Groups =  5
+
+
     Statistics
     ----------
-    
-    Rank          Frequency     Percent       Category      
+
+    Rank          Frequency     Percent       Category
     --------------------------------------------------------
-    1             4              36.3636      dog           
-    2             3              27.2727      cat           
-    3             2              18.1818      rabbit        
+    1             4              36.3636      dog
+    2             3              27.2727      cat
+    3             2              18.1818      rabbit
     4             1              9.0909       hamster
-    4             1              9.0909       rat           
+    4             1              9.0909       rat
 
 Let's examine the ``analyze`` function in more detail. Here's the signature for the ``analyze`` function:
 
@@ -237,34 +245,45 @@ If ``xdata`` is supplied as a dictionary, the keys are the names of the groups a
 
 ::
     
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  145
+    Grand Mean       =  0.0598
+    Pooled Std Dev   =  1.0992
+    Grand Median     =  0.0741
+
+
     Group Statistics
     ----------------
- 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
-    25             0.2403        0.9181       -1.8853        0.3791        1.6715       Group B       
-    30            -0.1282        1.0652       -2.4718       -0.0266        1.7617       Group C       
-    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
- 
- 
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+    25             0.2403        0.9181       -1.8853        0.3791        1.6715       Group B
+    30            -0.1282        1.0652       -2.4718       -0.0266        1.7617       Group C
+    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D
+
+
     Bartlett Test
     -------------
- 
+
     alpha   =  0.0500
     T value =  1.8588
     p value =  0.6022
- 
+
     H0: Variances are equal
- 
- 
+
+
+
     Oneway ANOVA
     ------------
- 
+
     alpha   =  0.0500
     f value =  1.0813
     p value =  0.3591
- 
+
     H0: Group means are matched
 
 In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let's try another example, but this time change the variance of group B:
@@ -282,15 +301,25 @@ In the example above, sci_analysis is telling us the four groups are normally di
 
 ::
     
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  145
+    Grand Mean       =  0.2049
+    Pooled Std Dev   =  1.5350
+    Grand Median     =  0.1241
+
+
     Group Statistics
     ----------------
 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
-    25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B       
-    30            -0.0282        1.0652       -2.3718        0.0734        1.8617       Group C       
-    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D       
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+    25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B
+    30            -0.0282        1.0652       -2.3718        0.0734        1.8617       Group C
+    40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D
 
 
     Bartlett Test
@@ -330,15 +359,25 @@ In another example, let's compare groups that have different distibutions and di
 
 ::
     
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  145
+    Grand Mean       = -0.0694
+    Pooled Std Dev   =  1.4903
+    Grand Median     = -0.1148
+
+
     Group Statistics
     ----------------
 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A       
-    25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B       
-    30            -1.0340        0.8029       -2.7632       -0.7856       -0.0606       Group C       
-    40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D       
+    50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+    25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B
+    30            -1.0340        0.8029       -2.7632       -0.7856       -0.0606       Group C
+    40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D
 
 
     Levene Test
@@ -525,15 +564,25 @@ Let's start with an example. The following code will perform a Oneway analysis u
 
 ::
 
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  60
+    Grand Mean       =  0.2740
+    Pooled Std Dev   =  3.1385
+    Grand Median     =  0.0853
+
+
     Group Statistics
     ----------------
 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A       
-    15             0.7406        2.4806       -3.0538        0.9879        5.6546       Group B       
-    15             0.9334        3.9554       -5.9492       -0.0510        5.2850       Group C       
-    15            -0.1906        2.6335       -5.6558        0.2217        3.5229       Group D       
+    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A
+    15             0.7406        2.4806       -3.0538        0.9879        5.6546       Group B
+    15             0.9334        3.9554       -5.9492       -0.0510        5.2850       Group C
+    15            -0.1906        2.6335       -5.6558        0.2217        3.5229       Group D
 
 
     Bartlett Test
@@ -571,15 +620,25 @@ If instead the four columns One, Two, Three and Four are to be analyzed, the eas
 
 ::
 
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  240
+    Grand Mean       = -0.1994
+    Pooled Std Dev   =  1.7536
+    Grand Median     = -0.0572
+
+
     Group Statistics
     ----------------
 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    60            -0.1006        0.9761       -2.2349       -0.0917        1.6386       Four          
-    60            -0.0562        1.0779       -2.4036       -0.0228        2.2466       One           
-    60            -0.9148        0.7104       -2.9286       -0.6900       -0.0024       Three         
-    60             0.2740        3.1115       -7.4153        0.3968        5.6546       Two           
+    60            -0.1006        0.9761       -2.2349       -0.0917        1.6386       Four
+    60            -0.0562        1.0779       -2.4036       -0.0228        2.2466       One
+    60            -0.9148        0.7104       -2.9286       -0.6900       -0.0024       Three
+    60             0.2740        3.1115       -7.4153        0.3968        5.6546       Two
 
 
     Levene Test
@@ -650,15 +709,25 @@ Using the new function is simple. The same techniques from previous examples are
 
 ::
 
+    Overall Statistics
+    ------------------
+
+    Number of Groups =  4
+    Total            =  60
+    Grand Mean       =  0.2740
+    Pooled Std Dev   =  3.1561
+    Grand Median     =  0.5138
+
+
     Group Statistics
     ----------------
 
-    n             Mean          Std Dev       Min           Median        Max           Group         
+    n             Mean          Std Dev       Min           Median        Max           Group
     --------------------------------------------------------------------------------------------------
-    15             0.9138        3.7034       -7.4153        0.8059        5.6546       Q1            
-    15             0.0122        2.5243       -5.6558        1.1374        4.0653       Q2            
-    15             0.4987        3.4778       -5.7216        0.2217        5.2850       Q3            
-    15            -0.3286        2.7681       -5.9492       -0.0537        3.5229       Q4            
+    15             0.9138        3.7034       -7.4153        0.8059        5.6546       Q1
+    15             0.0122        2.5243       -5.6558        1.1374        4.0653       Q2
+    15             0.4987        3.4778       -5.7216        0.2217        5.2850       Q3
+    15            -0.3286        2.7681       -5.9492       -0.0537        3.5229       Q4
 
 
     Bartlett Test
