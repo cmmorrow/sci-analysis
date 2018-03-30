@@ -132,3 +132,11 @@ class Categorical(Data):
     @property
     def categories(self):
         return self._summary.categories
+
+    @property
+    def total(self):
+        return len(self._values)
+
+    @property
+    def num_of_groups(self):
+        return len(self._summary)

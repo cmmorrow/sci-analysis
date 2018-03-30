@@ -30,9 +30,17 @@ sci_analysis/.idea/vcs.xml
 
 sci_analysis/.idea/workspace.xml
 
+sci_analysis/.idea/*
+
+.idea/*
+
 build/*
 
 dist/*
+
+.cache/*
+
+.pytest_cache/*
 
 *.whl
 
@@ -46,23 +54,5 @@ sci_analysis/test/images/*.png
 
 build_distro.sh
 setup.cfg.old
-build/lib/sci_analysis/test/test_analyze.py
-build/lib/sci_analysis/test/test_anova.py
-build/lib/sci_analysis/test/test_correlation.py
-build/lib/sci_analysis/test/test_data_operations.py
-build/lib/sci_analysis/test/test_equalvariance.py
-build/lib/sci_analysis/test/test_graph_boxplots.py
-build/lib/sci_analysis/test/test_graph_histo.py
-build/lib/sci_analysis/test/test_graph_scatter.py
-build/lib/sci_analysis/test/test_groupstatistics.py
-build/lib/sci_analysis/test/test_kruskal.py
-build/lib/sci_analysis/test/test_kstest.py
-build/lib/sci_analysis/test/test_linregress.py
-build/lib/sci_analysis/test/test_mannwhitney.py
-build/lib/sci_analysis/test/test_normtest.py
-build/lib/sci_analysis/test/test_statistics.py
-build/lib/sci_analysis/test/test_ttest.py
-build/lib/sci_analysis/test/test_twosampleks.py
-build/lib/sci_analysis/test/test_vector.py
 .DS_Store
-build/lib/sci_analysis/test/test_linregress.py
+.cache/v/cache/lastfailed

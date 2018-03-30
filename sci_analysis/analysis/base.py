@@ -83,7 +83,7 @@ class Analysis(object):
         raise NotImplementedError
 
     def __str__(self):
-        return std_output(self._name, self._results, self._results.keys())
+        return std_output(self._name, self._results, tuple(self._results.keys()))
 
 
 def std_output(name, results, order, precision=4, spacing=14):
@@ -95,7 +95,7 @@ def std_output(name, results, order, precision=4, spacing=14):
         The name of the analysis report.
     results : dict or list
         The input dict or list to print.
-    order : list
+    order : list or tuple
         The list of keys in results to display and the order to display them in.
     precision : int
         The number of decimal places to show for float values.
