@@ -16,10 +16,10 @@ Current Version
    :target: https://pypi.python.org/pypi/sci_analysis
 .. image:: https://img.shields.io/pypi/pyversions/sci_analysis.svg
    :target: https://pypi.python.org/pypi/sci_analysis
-.. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=2.1.0
+.. image:: https://travis-ci.org/cmmorrow/sci-analysis.svg?branch=master
    :target: https://travis-ci.org/cmmorrow/sci-analysis
-.. image:: https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=2.1.0
-   :target: https://coveralls.io/github/cmmorrow/sci-analysis?branch=2.0.0
+.. image:: https://coveralls.io/repos/github/cmmorrow/sci-analysis/badge.svg?branch=master
+   :target: https://coveralls.io/github/cmmorrow/sci-analysis?branch=master
 
 What is sci-analysis?
 ---------------------
