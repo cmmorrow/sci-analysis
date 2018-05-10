@@ -1,0 +1,6 @@
+matplotlib
+m2r
+numpy
+pandas
+scipy
+six
