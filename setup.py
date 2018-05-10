@@ -5,7 +5,7 @@ with open('README.md', 'r') as readme:
 
 setup(
     name='sci_analysis',
-    version='2.1.0',
+    version='2.1.1rc0',
     packages=find_packages(),
     url='https://github.com/cmmorrow/sci-analysis',
     license='MIT License',
