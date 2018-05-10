@@ -56,3 +56,10 @@ build_distro.sh
 setup.cfg.old
 .DS_Store
 .cache/v/cache/lastfailed
+docs/.ipynb_checkpoints/sci_analysis_main-checkpoint.ipynb
+build_docs.sh
+build_docs.sh
+build_docs.sh
+docs/index.rst.bak
+docs/_build/*
+docs/_build/html/_static/classic.css

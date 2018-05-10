@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.rst', 'r') as readme:
+with open('README.md', 'r') as readme:
     long_description = readme.read()
 
 setup(
@@ -34,4 +34,5 @@ setup(
     install_requires=['numpy', 'scipy', 'pandas', 'matplotlib', 'six'],
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, >=3.5',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 )
