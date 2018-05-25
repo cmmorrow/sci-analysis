@@ -145,15 +145,19 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     if is_group(xdata) or is_dict_group(xdata):
         tested.append('Oneway')
         if is_dict(xdata):
+            if groups is not None:
+                GraphBoxplot(xdata, groups=groups, **kwargs)
+            else:
+                GraphBoxplot(xdata, **kwargs)
             groups = list(xdata.keys())
             xdata = list(xdata.values())
-
-        # Show the box plot and stats
-        out_stats = GroupStatistics(*xdata, groups=groups, display=False)
-        if groups is not None:
-            GraphBoxplot(*xdata, groups=groups, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
         else:
-            GraphBoxplot(*xdata, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
+            if groups is not None:
+                GraphBoxplot(*xdata, groups=groups, **kwargs)
+            else:
+                GraphBoxplot(*xdata, **kwargs)
+        out_stats = GroupStatistics(*xdata, groups=groups, display=False)
+        # Show the box plot and stats
         print(out_stats)
 
         if len(xdata) == 2:

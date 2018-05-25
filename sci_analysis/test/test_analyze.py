@@ -2,32 +2,13 @@ import unittest
 import numpy as np
 import pandas as pd
 import scipy.stats as st
-from os import path, getcwd
 
 from ..analysis.exc import NoDataError
 from ..analysis import analyze, analyse
+from .base import TestWarnings
 
 
-class MyTestCase(unittest.TestCase):
-
-    _seed = 987654321
-
-    @property
-    def save_path(self):
-        if getcwd().split('/')[-1] == 'test':
-            return './images/'
-        elif getcwd().split('/')[-1] == 'sci_analysis':
-            if path.exists('./setup.py'):
-                return './sci_analysis/test/images/'
-            else:
-                return './test/images/'
-        # elif getcwd().split('/')[-1] == 'sci-analysis':
-        #     if path.exists('./setup.py'):
-        #         return './sci_analysis/test/images/'
-        #     else:
-        #         return './test/images/'
-        else:
-            './'
+class MyTestCase(TestWarnings):
 
     def test_100_catch_no_data_1_array(self):
         """Catch the case where no data is passed"""
@@ -40,10 +21,6 @@ class MyTestCase(unittest.TestCase):
     def test_102_catch_xdata_no_iterable(self):
         """Catch the case where xdata is not iterable"""
         self.assertRaises(TypeError, lambda: analyze(1))
-
-    # def test_103_catch_more_than_2_data_args(self):
-    #     """Catch the case where more than 2 data arguments are given"""
-    #     self.assertRaises(ValueError, lambda: analyze(st.norm.rvs(size=10), st.norm.rvs(size=10), st.norm.rvs(size=10)))
 
     def test_104_ttest_large_default(self):
         """Perform an analysis on a large sample using the ttest"""
@@ -334,7 +311,7 @@ class MyTestCase(unittest.TestCase):
     def test_129_distribution_categorical_default(self):
         """Perform a distribution analysis with categorical data and default settings."""
         np.random.seed(self._seed)
-        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1, 26)] for _ in range(30)]
         self.assertListEqual(analyze(input_array,
                                      debug=True,
                                      save_to='{}test_analyze_129'.format(self.save_path)),
@@ -343,7 +320,7 @@ class MyTestCase(unittest.TestCase):
     def test_130_distribution_categorical_percent(self):
         """Perform a distribution analysis with categorical data and percent y-axis."""
         np.random.seed(self._seed)
-        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1, 26)] for _ in range(30)]
         self.assertListEqual(analyze(input_array,
                                      debug=True,
                                      percent=True,
@@ -353,7 +330,7 @@ class MyTestCase(unittest.TestCase):
     def test_131_distribution_categorical_percent_alias(self):
         """Perform a distribution analysis with categorical data and percent y-axis using the analyse alias."""
         np.random.seed(self._seed)
-        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1,26)] for _ in range(30)]
+        input_array = ['abcdefghijklmnopqrstuvwxyz'[:np.random.randint(1, 26)] for _ in range(30)]
         self.assertListEqual(analyse(input_array,
                                      debug=True,
                                      percent=True,

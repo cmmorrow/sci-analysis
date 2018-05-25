@@ -205,9 +205,9 @@ print(analyze.__doc__)
         xdata : array-like
             The primary set of data.
         ydata : array-like
-            The response data set.
+            The response or secondary set of data.
         groups : array-like
-            The group names used for a oneway analysis.
+            The group names used for location testing or Bivariate analysis.
         alpha : float
             The sensitivity to use for hypothesis tests.
     
@@ -218,10 +218,14 @@ print(analyze.__doc__)
     
         Notes
         -----
-        xdata : array-like, ydata : None - Distribution
-        xdata : array-like, ydata : array-like -- Bivariate
-        xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
-    
+        xdata : array-like(num), ydata : None --- Distribution
+        xdata : array-like(str), ydata : None --- Frequencies
+        xdata : array-like(num), ydata : array-like(num) --- Bivariate
+        xdata : array-like(num), ydata : array-like(num), groups : array-like --- Group Bivariate
+        xdata : list(array-like(num)), ydata : None --- Location Test(unstacked)
+        xdata : list(array-like(num)), ydata : None, groups : array-like --- Location Test(unstacked)
+        xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
+        xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
         
 
 

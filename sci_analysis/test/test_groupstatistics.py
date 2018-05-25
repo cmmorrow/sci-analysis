@@ -414,6 +414,45 @@ n             Mean          Std Dev       Min           Median        Max       
         self.assertAlmostEqual(res.gmedian, 2.2217, 4)
         self.assertAlmostEqual(res.grand_median, 2.2217, 4)
 
+    def test_0017_group_statistics_dict_groups_is_none(self):
+        """Test the Group Statistic class with data passed as a dict and None passed to groups"""
+        np.random.seed(987654321)
+        x_input_array = st.norm.rvs(2, 1, size=100)
+        y_input_array = st.norm.rvs(2, 3, size=45)
+        z_input_array = st.norm.rvs(8, 1, size=18)
+        data = {"one": x_input_array, "two": y_input_array, "three": z_input_array}
+        output = """
+
+Overall Statistics
+------------------
+
+Number of Groups =  3
+Total            =  163
+Grand Mean       =  4.1568
+Pooled Std Dev   =  2.0798
+Grand Median     =  2.2217
+
+
+Group Statistics
+----------------
+
+n             Mean          Std Dev       Min           Median        Max           Group         
+--------------------------------------------------------------------------------------------------
+100            2.0083        1.0641       -0.4718        2.0761        4.2466       one           
+18             8.0944        1.1855        6.0553        7.9712        10.5272      three         
+45             2.3678        3.5551       -4.8034        2.2217        11.4199      two           """
+        res = GroupStatistics(data, groups=None, display=False)
+        self.assertTrue(res)
+        self.assertEqual(str(res), output)
+        self.assertEqual(res.total, 163)
+        self.assertEqual(res.k, 3)
+        self.assertAlmostEqual(res.pooled, 2.0798, 4)
+        self.assertAlmostEqual(res.pooled_std, 2.0798, 4)
+        self.assertAlmostEqual(res.gmean, 4.1568, 4)
+        self.assertAlmostEqual(res.grand_mean, 4.1568, 4)
+        self.assertAlmostEqual(res.gmedian, 2.2217, 4)
+        self.assertAlmostEqual(res.grand_median, 2.2217, 4)
+
 
 if __name__ == '__main__':
     unittest.main()
