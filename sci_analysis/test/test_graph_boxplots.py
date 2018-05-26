@@ -80,7 +80,7 @@ class MyTestCase(TestWarnings):
                                                              input_2_array,
                                                              title='Diff Size',
                                                              save_to='{}test_box_105'.format(self.save_path)),
-                                        message=('multiple arguments', 'reshape'))
+                                        message='multiple arguments')
 
     def test_106_boxplot_2_diff_size_diff_disto(self):
         """Generate a boxplot graph with different sizes and different distributions"""
@@ -92,18 +92,17 @@ class MyTestCase(TestWarnings):
                                                              input_2_array,
                                                              title='Diff Size, Diff Distribution',
                                                              save_to='{}test_box_106'.format(self.save_path)),
-                                        message=('multiple arguments', 'reshape'))
+                                        message='multiple arguments')
 
     def test_107_boxplot_2_diff_size_diff_disto_dict(self):
         """Generate a boxplot graph with different sizes and different distributions as a dict"""
         np.random.seed(self._seed)
         input_1_array = st.weibull_min.rvs(2, size=1234)
         input_2_array = st.norm.rvs(0, size=56)
-        self.assertWarnsCrossCompatible(FutureWarning,
-                                        lambda: GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
-                                                             title='Diff Size, Diff Distribution Dict',
-                                                             save_to='{}test_box_107'.format(self.save_path)),
-                                        message='reshape')
+        res = GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
+                           title='Diff Size, Diff Distribution Dict',
+                           save_to='{}test_box_107'.format(self.save_path))
+        self.assertTrue(res)
 
     def test_108_boxplot_2_size_4(self):
         """Generate a boxplot graph with size 4"""
@@ -120,22 +119,16 @@ class MyTestCase(TestWarnings):
         np.random.seed(self._seed)
         input_1_array = st.norm.rvs(size=2)
         input_2_array = st.norm.rvs(size=3)
-        self.assertWarnsCrossCompatible(FutureWarning,
-                                        lambda: GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
-                                                             title='At Min Size',
-                                                             save_to='{}test_box_109'.format(self.save_path)),
-                                        message='reshape')
+        res = GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
+                           title='At Min Size',
+                           save_to='{}test_box_109'.format(self.save_path))
+        self.assertTrue(res)
 
     def test_110_boxplot_2_min_size(self):
         """Catch the min size case"""
         np.random.seed(self._seed)
         input_1_array = st.norm.rvs(size=1)
         input_2_array = st.norm.rvs(size=2)
-        self.assertWarnsCrossCompatible(FutureWarning,
-                                        lambda: GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
-                                                             title='At Min Size',
-                                                             save_to='{}test_box_109'.format(self.save_path)),
-                                        message='reshape')
         self.assertWarnsCrossCompatible(RuntimeWarning,
                                         lambda: GraphBoxplot({'Group 1': input_1_array, 'Group 2': input_2_array},
                                                              title='At Min Size',
