@@ -29,6 +29,8 @@ class TestWarnings(unittest.TestCase):
             callable_obj = args[0]
             args = args[1:]
             callable_obj(*args, **kwargs)
+            print(warning_list)
+            print(warning_list[0].category)
             self.assertTrue(any(item.category == expected_warning for item in warning_list))
             if _message is not None:
                 if is_iterable(_message):
