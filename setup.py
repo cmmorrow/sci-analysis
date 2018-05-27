@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as readme:
 
 setup(
     name='sci_analysis',
-    version='2.1.1rc3',
+    version='2.1.1',
     description='An easy to use and powerful python-based data exploration and analysis tool',
     long_description=long_description,
     long_description_content_type='text/markdown',
