@@ -43,7 +43,8 @@ class TestWarnings(unittest.TestCase):
                     for i, m in enumerate(_message):
                         self.assertTrue(m in str(warning_list[i].message))
                 else:
-                    self.assertTrue(any(_message in str(item.message) for item in warning_list))
+                    for caught_warning in warning_list:
+                        self.assertTrue(_message in str(caught_warning.message))
 
     def assertNotWarnsCrossCompatible(self, expected_warning, *args, **kwargs):
         with warnings.catch_warnings(record=True) as warning_list:
