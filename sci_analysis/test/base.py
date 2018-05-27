@@ -36,7 +36,6 @@ class TestWarnings(unittest.TestCase):
             print('org message: {}'.format(_message))
             print('expected warning: {}'.format(expected_warning))
             print('warning list: {}'.format(warning_list))
-            print('warning category: {}'.format(warning_list[0].category))
             for caught_warning in warning_list:
                 self.assertTrue(issubclass(caught_warning.category, expected_warning))
             if _message is not None:
