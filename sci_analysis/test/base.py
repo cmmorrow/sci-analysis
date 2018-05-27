@@ -33,9 +33,7 @@ class TestWarnings(unittest.TestCase):
             callable_obj = args[0]
             args = args[1:]
             callable_obj(*args, **kwargs)
-            print('org message: {}'.format(_message))
-            print('expected warning: {}'.format(expected_warning))
-            print('warning list: {}'.format(warning_list))
+            # This has to be done with for loops for py27 compatability
             for caught_warning in warning_list:
                 self.assertTrue(issubclass(caught_warning.category, expected_warning))
             if _message is not None:
