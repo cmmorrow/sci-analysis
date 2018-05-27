@@ -72,10 +72,11 @@ def analyse(xdata, ydata=None, groups=None, **kwargs):
     xdata : array-like
         The primary set of data.
     ydata : array-like
-        The response data set.
+        The response or secondary set of data.
     groups : array-like
-        The group names used for a oneway analysis.
-    kwargs
+        The group names used for location testing or Bivariate analysis.
+    alpha : float
+        The sensitivity to use for hypothesis tests.
 
     Returns
     -------
@@ -84,9 +85,14 @@ def analyse(xdata, ydata=None, groups=None, **kwargs):
 
     Notes
     -----
-    xdata : array-like, ydata : None - Distribution
-    xdata : array-like, ydata : array-like -- Bivariate
-    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
+    xdata : array-like(num), ydata : None --- Distribution
+    xdata : array-like(str), ydata : None --- Frequencies
+    xdata : array-like(num), ydata : array-like(num) --- Bivariate
+    xdata : array-like(num), ydata : array-like(num), groups : array-like --- Group Bivariate
+    xdata : list(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : list(array-like(num)), ydata : None, groups : array-like --- Location Test(unstacked)
+    xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
     """
     return analyze(xdata, ydata=ydata, groups=groups, **kwargs)
 
@@ -100,9 +106,9 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     xdata : array-like
         The primary set of data.
     ydata : array-like
-        The response data set.
+        The response or secondary set of data.
     groups : array-like
-        The group names used for a oneway analysis.
+        The group names used for location testing or Bivariate analysis.
     alpha : float
         The sensitivity to use for hypothesis tests.
 
@@ -113,12 +119,15 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
 
     Notes
     -----
-    xdata : array-like, ydata : None - Distribution
-    xdata : array-like, ydata : array-like -- Bivariate
-    xdata : list(array-like) or dict(array-like), ydata : None -- Oneway
-
+    xdata : array-like(num), ydata : None --- Distribution
+    xdata : array-like(str), ydata : None --- Frequencies
+    xdata : array-like(num), ydata : array-like(num) --- Bivariate
+    xdata : array-like(num), ydata : array-like(num), groups : array-like --- Group Bivariate
+    xdata : list(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : list(array-like(num)), ydata : None, groups : array-like --- Location Test(unstacked)
+    xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
     """
-    from numpy import mean, median
     from ..graphs import GraphHisto, GraphScatter, GraphBoxplot, GraphFrequency, GraphGroupScatter
     from ..data import (is_dict, is_iterable, is_group, is_dict_group, is_vector)
     from .exc import NoDataError
@@ -136,15 +145,19 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
     if is_group(xdata) or is_dict_group(xdata):
         tested.append('Oneway')
         if is_dict(xdata):
+            if groups is not None:
+                GraphBoxplot(xdata, groups=groups, **kwargs)
+            else:
+                GraphBoxplot(xdata, **kwargs)
             groups = list(xdata.keys())
             xdata = list(xdata.values())
-
-        # Show the box plot and stats
-        out_stats = GroupStatistics(*xdata, groups=groups, display=False)
-        if groups is not None:
-            GraphBoxplot(*xdata, groups=groups, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
         else:
-            GraphBoxplot(*xdata, gmean=out_stats.gmean, gmedian=out_stats.gmedian, **kwargs)
+            if groups is not None:
+                GraphBoxplot(*xdata, groups=groups, **kwargs)
+            else:
+                GraphBoxplot(*xdata, **kwargs)
+        out_stats = GroupStatistics(*xdata, groups=groups, display=False)
+        # Show the box plot and stats
         print(out_stats)
 
         if len(xdata) == 2:

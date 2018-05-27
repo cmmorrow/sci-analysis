@@ -336,6 +336,10 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(input_array.paired_groups[1][1].equals(input_array.flatten()[2]))
         self.assertTrue(input_array.paired_groups[2][1].equals(input_array.flatten()[3]))
 
+    def test_153_vector_data_frame(self):
+        input_array = pd.DataFrame([1, 2, 3], [4, 5, 6])
+        self.assertRaises(ValueError, lambda: Vector(input_array))
+
 
 if __name__ == '__main__':
     unittest.main()

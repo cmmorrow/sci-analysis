@@ -59,51 +59,54 @@ def is_vector(obj):
 class Numeric(Data):
     """An abstract class that all Data classes that represent numeric data should inherit from."""
 
-    _col_names = ['ind', 'dep', 'grp']
+    _ind = 'ind'
+    _dep = 'dep'
+    _grp = 'grp'
+    _col_names = (_ind, _dep, _grp)
 
     def __init__(self, sequence=None, other=None, groups=None, name=None):
         """Takes an array-like object and converts it to a pandas Series with any non-numeric values converted to NaN.
 
         Parameters
         ----------
-        sequence : array-like or int or float
+        sequence : int | list | set | tuple | np.array | pd.Series
             The input object
-        other : array-like
+        other : list | set | tuple | np.array | pd.Series, optional
             The secondary input object
-        groups : array-like
+        groups : list | set | tuple | np.array | pd.Series, optional
             The sequence of group names for sub-arrays
         name : str, optional
             The name of the Numeric object
         """
         self._auto_groups = True if groups is None else False
+        self._values = pd.DataFrame([], columns=self._col_names)
         if sequence is None:
-            super(Numeric, self).__init__(v=pd.DataFrame([], columns=self._col_names), n=name)
+            super(Numeric, self).__init__(v=self._values, n=name)
             self._type = None
-            self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
+            self._values.loc[:, self._grp] = self._values[self._grp].astype('category')
         elif is_data(sequence):
             super(Numeric, self).__init__(v=sequence.values, n=name)
             self._type = sequence.data_type
             self._auto_groups = sequence.auto_groups
+        elif isinstance(sequence, pd.DataFrame):
+            raise ValueError('sequence cannot be a pandas DataFrame object. Use a Series instead.')
         else:
             sequence = pd.to_numeric(self.data_prep(sequence), errors='coerce')
             other = pd.to_numeric(self.data_prep(other), errors='coerce') if other is not None else np.nan
             groups = self.data_prep(groups) if groups is not None else 1
             # TODO: This try block needs some work
             try:
-                self._values = pd.DataFrame([])
-                self._values[self._col_names[0]] = sequence
-                self._values[self._col_names[1]] = other
-                self._values[self._col_names[2]] = groups
-                self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
+                self._values[self._ind] = sequence
+                self._values[self._dep] = other
+                self._values[self._grp] = groups
+                self._values.loc[:, self._grp] = self._values[self._grp].astype('category')
             except ValueError:
                 raise UnequalVectorLengthError('length of data does not match length of other.')
-            if any(self._values[self._col_names[1]].notnull()):
+            if any(self._values[self._dep].notnull()):
                 self._values = self.drop_nan_intersect()
             else:
-                start_time = datetime.datetime.now()
                 self._values = self.drop_nan()
-                end_time = datetime.datetime.now()
-            self._type = self._values[self._col_names[0]].dtype
+            self._type = self._values[self._ind].dtype
             self._name = name
 
     @staticmethod
@@ -139,7 +142,7 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
-        return self._values.dropna(how='any', subset=[self._col_names[0]])
+        return self._values.dropna(how='any', subset=[self._ind])
 
     def drop_nan_intersect(self):
         """
@@ -151,7 +154,7 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
-        return self._values.dropna(how='any', subset=[self._col_names[0], self._col_names[1]]) # .reset_index(drop=True)
+        return self._values.dropna(how='any', subset=[self._ind, self._dep])
 
     @property
     def data_type(self):
@@ -159,22 +162,22 @@ class Numeric(Data):
 
     @property
     def data(self):
-        return self._values[self._col_names[0]]
+        return self._values[self._ind]
 
     @property
     def other(self):
-        return pd.Series([]) if all(self._values[self._col_names[1]].isnull()) else self._values[self._col_names[1]]
+        return pd.Series([]) if all(self._values[self._dep].isnull()) else self._values[self._dep]
 
     @property
     def groups(self):
-        return {grp: seq[self._col_names[0]].rename(grp)
-                for grp, seq in self._values.groupby(self._col_names[2])
+        return {grp: seq[self._ind].rename(grp)
+                for grp, seq in self._values.groupby(self._grp)
                 if not seq.empty}
 
     @property
     def paired_groups(self):
-        return {grp: (df[self._col_names[0]], df[self._col_names[1]])
-                for grp, df in self._values.groupby(self._col_names[2]) if not df.empty}
+        return {grp: (df[self._ind], df[self._dep])
+                for grp, df in self._values.groupby(self._grp) if not df.empty}
 
     @property
     def values(self):
@@ -209,8 +212,8 @@ class Vector(Numeric):
 
         super(Vector, self).__init__(sequence=sequence, other=other, groups=groups, name=name)
         if not self._values.empty:
-            self._values[self._col_names[0]] = self._values[self._col_names[0]].astype('float')
-            self._values[self._col_names[1]] = self._values[self._col_names[1]].astype('float')
+            self._values[self._ind] = self._values[self._ind].astype('float')
+            self._values[self._dep] = self._values[self._dep].astype('float')
 
     def is_empty(self):
         """
@@ -255,11 +258,11 @@ class Vector(Numeric):
         if other.data.empty:
             return self
         if self.auto_groups and other.auto_groups and len(self._values) > 0:
-            new_cat = max(self._values[self._col_names[2]].cat.categories) + 1
+            new_cat = max(self._values[self._grp].cat.categories) + 1
             other.values['grp'] = new_cat
         self._values = pd.concat([self._values, other.values], copy=False)
         self._values.reset_index(inplace=True, drop=True)
-        self._values.loc[:, self._col_names[2]] = self._values[self._col_names[2]].astype('category')
+        self._values.loc[:, self._grp] = self._values[self._grp].astype('category')
         return self
 
     def flatten(self):
@@ -272,7 +275,7 @@ class Vector(Numeric):
             A tuple of pandas Series.
         """
         if not self.other.empty:
-            return (tuple(data[self._col_names[0]] for grp, data in self.values.groupby(self._col_names[2])) +
-                    tuple(data[self._col_names[1]] for grp, data in self.values.groupby(self._col_names[2])))
+            return (tuple(data[self._ind] for grp, data in self.values.groupby(self._grp)) +
+                    tuple(data[self._dep] for grp, data in self.values.groupby(self._grp)))
         else:
-            return tuple(data[self._col_names[0]] for grp, data in self.values.groupby(self._col_names[2]))
+            return tuple(data[self._ind] for grp, data in self.values.groupby(self._grp))
