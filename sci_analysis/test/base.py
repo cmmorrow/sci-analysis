@@ -23,13 +23,20 @@ class TestWarnings(unittest.TestCase):
             './'
 
     def assertWarnsCrossCompatible(self, expected_warning, *args, **kwargs):
-        _message = kwargs['message'] if 'message' in kwargs else None
-        kwargs.pop('message')
+        if 'message' in kwargs:
+            _message = kwargs['message']
+            kwargs.pop('message')
+        else:
+            _message = None
         with catch_warnings(record=True) as warning_list:
             simplefilter('always')
             callable_obj = args[0]
             args = args[1:]
             callable_obj(*args, **kwargs)
+            print('org message: {}'.format(_message))
+            print('expected warning: {}'.format(expected_warning))
+            print('warning list: {}'.format(warning_list))
+            print('warning category: {}'.format(warning_list[0].category))
             self.assertTrue(any(item.category == expected_warning for item in warning_list))
             if _message is not None:
                 if is_iterable(_message):
