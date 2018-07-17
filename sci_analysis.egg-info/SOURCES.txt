@@ -25,6 +25,7 @@ sci_analysis/graphs/vector.py
 sci_analysis/preferences/__init__.py
 sci_analysis/preferences/preferences.py
 sci_analysis/test/__init__.py
+sci_analysis/test/base.py
 sci_analysis/test/test_analyze.py
 sci_analysis/test/test_anova.py
 sci_analysis/test/test_cat_statistics.py

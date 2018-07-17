@@ -318,9 +318,12 @@ class GraphScatter(VectorGraph):
         """
         x = self._data.data
         y = self._data.other
-        p = polyfit(x, y, 1, full=True)
-        fit = polyval(p[0], x)
-        return (x.min(), x.max()), (fit.min(), fit.max())
+        p = polyfit(x, y, 1)
+        fit = polyval(p, x)
+        if p[0] > 0:
+            return (x.min(), x.max()), (fit.min(), fit.max())
+        else:
+            return (x.min(), x.max()), (fit.max(), fit.min())
 
     def draw(self):
         """
@@ -462,9 +465,12 @@ class GraphGroupScatter(VectorGraph):
         fit_coordinates : list
             A list of the min and max fit points.
         """
-        p = polyfit(x, y, 1, full=True)
-        fit = polyval(p[0], x)
-        return (x.min(), x.max()), (fit.min(), fit.max())
+        p = polyfit(x, y, 1)
+        fit = polyval(p, x)
+        if p[0] > 0:
+            return (x.min(), x.max()), (fit.min(), fit.max())
+        else:
+            return (x.min(), x.max()), (fit.max(), fit.min())
 
     def draw(self):
         """
@@ -684,7 +690,7 @@ class GraphBoxplot(VectorGraph):
         if self._nqp:
             w_ratio.append(4 if self._circles else 1)
             self._ncols += 1
-        groups, data = zip(*[(g, v['ind']) for g, v in self._data.values.groupby('grp')])
+        groups, data = zip(*[(g, v['ind'].reset_index(drop=True)) for g, v in self._data.values.groupby('grp')])
 
         # Create the quantile plot arrays
         prob = [probplot(v) for v in data]

@@ -116,7 +116,7 @@ def is_iterable(obj):
 
     Parameters
     ----------
-    obj : object
+    obj : Any
         The input argument.
 
     Returns
@@ -308,7 +308,7 @@ def is_number(obj):
 
     Parameters
     ----------
-    obj : object
+    obj : Any
         The input argument.
 
     Returns

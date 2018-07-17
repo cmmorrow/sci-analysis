@@ -314,6 +314,13 @@ class MyTestCase(unittest.TestCase):
         vector = Vector()
         self.assertRaises(NoDataError, lambda: GraphScatter(vector))
 
+    def test_132_negative_corr(self):
+        """Generate a scatter plot with correlating data"""
+        np.random.seed(987654321)
+        input_x_array = st.weibull_min.rvs(2, size=2000)
+        input_y_array = np.array([3 - x + st.norm.rvs(0, 0.5, size=1) for x in input_x_array])
+        self.assertTrue(GraphScatter(input_x_array, input_y_array, save_to='{}test_scatter_132'.format(self.save_path)))
+
 
 if __name__ == '__main__':
     unittest.main()
