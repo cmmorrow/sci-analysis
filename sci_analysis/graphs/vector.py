@@ -318,9 +318,12 @@ class GraphScatter(VectorGraph):
         """
         x = self._data.data
         y = self._data.other
-        p = polyfit(x, y, 1, full=True)
-        fit = polyval(p[0], x)
-        return (x.min(), x.max()), (fit.min(), fit.max())
+        p = polyfit(x, y, 1)
+        fit = polyval(p, x)
+        if p[0] > 0:
+            return (x.min(), x.max()), (fit.min(), fit.max())
+        else:
+            return (x.min(), x.max()), (fit.max(), fit.min())
 
     def draw(self):
         """
@@ -462,9 +465,12 @@ class GraphGroupScatter(VectorGraph):
         fit_coordinates : list
             A list of the min and max fit points.
         """
-        p = polyfit(x, y, 1, full=True)
-        fit = polyval(p[0], x)
-        return (x.min(), x.max()), (fit.min(), fit.max())
+        p = polyfit(x, y, 1)
+        fit = polyval(p, x)
+        if p[0] > 0:
+            return (x.min(), x.max()), (fit.min(), fit.max())
+        else:
+            return (x.min(), x.max()), (fit.max(), fit.min())
 
     def draw(self):
         """
