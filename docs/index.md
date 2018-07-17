@@ -112,7 +112,7 @@ Now, sci-analysis should be ready to use. Try the following code:
 ```python
 np.random.seed(987654321)
 data = st.norm.rvs(size=1000)
-analyze(data)
+analyze(xdata=data)
 ```
 
 
