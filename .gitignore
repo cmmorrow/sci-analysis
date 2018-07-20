@@ -63,3 +63,5 @@ build_docs.sh
 docs/index.rst.bak
 docs/_build/*
 docs/_build/html/_static/classic.css
+.cache/v/cache/lastfailed
+.cache/v/cache/lastfailed
