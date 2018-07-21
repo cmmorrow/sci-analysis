@@ -431,6 +431,16 @@ class MyTestCase(TestWarnings):
                                  save_to='{}test_analyze_138'.format(self.save_path)),
                          ['Stacked Oneway', 'Kruskal'])
 
+    def test_139_stacked_two_group_mann_whitney(self):
+        np.random.seed(987654321)
+        size = 42
+        df = pd.DataFrame({'input': st.weibull_max.rvs(1.2, size=size),
+                           'Condition': ['Group A', 'Group B'] * (size // 2)})
+        self.assertEqual(analyze(df['input'], groups=df['Condition'],
+                                 debug=True,
+                                 save_to='{}test_analyze_139'.format(self.save_path)),
+                         ['Stacked Oneway', 'MannWhitney'])
+
 
 if __name__ == '__main__':
     unittest.main()
