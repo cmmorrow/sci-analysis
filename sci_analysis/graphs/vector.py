@@ -9,7 +9,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Circle
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median, ndarray
 
 # Scipy imports
 from scipy.stats import probplot, gaussian_kde, t
@@ -262,12 +262,16 @@ class GraphScatter(VectorGraph):
         :param _points: Display the scatter points.
         :param _contours: Display the density contours
         :param _boxplot_borders: Display the boxplot borders
+        :param _highlight: an array-like with points to highlight based on labels
+        :param _labels: a vector object with the graph labels
         :param _title: The title of the graph.
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._fit = kwargs['fit'] if 'fit' in kwargs else True
         self._points = kwargs['points'] if 'points' in kwargs else True
+        self._labels = kwargs['labels'] if 'labels' in kwargs else [False]
+        self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
         self._contours = kwargs['contours'] if 'contours' in kwargs else False
         self._contour_props = (31, 1.1)
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
@@ -275,6 +279,15 @@ class GraphScatter(VectorGraph):
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
+        if 'labels' in kwargs:
+            if len(kwargs['labels']) != len(xdata):
+                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
+            #error: vector object has no attribute 'index'... seems to be from xdata.index
+            #if ndarray.any(kwargs['labels'].index != xdata.index):
+                #raise AttributeError('The index of passed labels does not match the length of xdata and ydata')
+        if 'highlight' in kwargs:
+            if 'labels' not in kwargs:
+                raise AttributeError('Must include labels to highlight by')        
         if ydata is None:
             if is_vector(xdata):
                 super(GraphScatter, self).__init__(xdata, xname=xname, yname=yname)
@@ -318,12 +331,9 @@ class GraphScatter(VectorGraph):
         """
         x = self._data.data
         y = self._data.other
-        p = polyfit(x, y, 1)
-        fit = polyval(p, x)
-        if p[0] > 0:
-            return (x.min(), x.max()), (fit.min(), fit.max())
-        else:
-            return (x.min(), x.max()), (fit.max(), fit.min())
+        p = polyfit(x, y, 1, full=True)
+        fit = polyval(p[0], x)
+        return (x.min(), x.max()), (fit.min(), fit.max())
 
     def draw(self):
         """
@@ -364,7 +374,30 @@ class GraphScatter(VectorGraph):
         if self._points:
             # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
             color = (self.get_color(0),)
-            ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=0.6, zorder=1)
+            alpha_trans = 0.6
+            if self._highlight:
+                for k in x.index:
+                    if self._labels[k] in self._highlight:
+                        alpha_trans = 0.6
+                    else:
+                        alpha_trans = 0.2
+                    ax2.scatter(x[k], y[k], c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)   
+            else:
+                ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)
+
+        # Draw the point labels
+            if len(self._labels) > 1:
+                if self._highlight:
+                    for k in x.index:
+                        if self._labels[k] in self._highlight:
+                            print(self._labels[k])
+                            alpha_trans = 0.6
+                        else:
+                            alpha_trans = 0.3
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=alpha_trans)
+                else:    
+                    for k in x.ind:
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=0.6)
 
         # Draw the contours
         if self._contours:
@@ -432,21 +465,30 @@ class GraphGroupScatter(VectorGraph):
         :param xdata: The x-axis data.
         :param ydata: The y-axis data.
         :param _fit: Display the optional line fit.
+        :param _highlight: Give list of groups to highlight in scatter.
         :param _points: Display the scatter points.
         :param _contours: Display the density contours
         :param _boxplot_borders: Display the boxplot borders
+        :param _labels: a vector object with the graph labels
         :param _title: The title of the graph.
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._fit = kwargs['fit'] if 'fit' in kwargs else True
         self._points = kwargs['points'] if 'points' in kwargs else True
+        self._labels = kwargs['labels'] if 'labels' in kwargs else [False]
         self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else True
         self._title = kwargs['title'] if 'title' in kwargs else 'Group Bivariate'
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
+        if 'labels' in kwargs:
+            if len(kwargs['labels']) != len(xdata):
+                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
+            #error: vector object has no attribute 'index'... seems to be from xdata.index
+            #if ndarray.any(kwargs['labels'].index != xdata.index):
+                #raise AttributeError('The index of passed labels does not match the length of xdata and ydata')
         if ydata is None:
             if is_vector(xdata):
                 super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)
@@ -465,12 +507,9 @@ class GraphGroupScatter(VectorGraph):
         fit_coordinates : list
             A list of the min and max fit points.
         """
-        p = polyfit(x, y, 1)
-        fit = polyval(p, x)
-        if p[0] > 0:
-            return (x.min(), x.max()), (fit.min(), fit.max())
-        else:
-            return (x.min(), x.max()), (fit.max(), fit.min())
+        p = polyfit(x, y, 1, full=True)
+        fit = polyval(p[0], x)
+        return (x.min(), x.max()), (fit.min(), fit.max())
 
     def draw(self):
         """
@@ -527,6 +566,11 @@ class GraphGroupScatter(VectorGraph):
                 # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
                 color = (self.get_color(i),)
                 ax2.scatter(grp_x, grp_y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1, label=grp)
+
+            # Draw the point labels
+            if len(self._labels) > 1:
+                for k in grp_x.index:
+                    ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=alpha_trans)
 
             # Draw the fit line
             if self._fit:
