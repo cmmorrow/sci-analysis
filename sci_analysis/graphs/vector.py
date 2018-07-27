@@ -282,9 +282,8 @@ class GraphScatter(VectorGraph):
         if 'labels' in kwargs:
             if len(kwargs['labels']) != len(xdata):
                 raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
-            #error: vector object has no attribute 'index'... seems to be from xdata.index
-            #if ndarray.any(kwargs['labels'].index != xdata.index):
-                #raise AttributeError('The index of passed labels does not match the length of xdata and ydata')
+            if ndarray.any(kwargs['labels'].index != xdata.data.index):
+                raise AttributeError('The index of passed labels does not match the index of xdata and ydata')
         if 'highlight' in kwargs:
             if 'labels' not in kwargs:
                 raise AttributeError('Must include labels to highlight by')        
@@ -377,30 +376,28 @@ class GraphScatter(VectorGraph):
         if self._points:
             # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
             color = (self.get_color(0),)
-            alpha_trans = 0.6
+            alpha_trans = 0.8
             if self._highlight:
-                for k in x.index:
-                    if self._labels[k] in self._highlight:
-                        alpha_trans = 0.6
-                    else:
-                        alpha_trans = 0.2
-                    ax2.scatter(x[k], y[k], c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)   
+                #find index of the labels which are in the highlight list
+                labelmask = self._labels.isin(self._highlight)
+                #get x and y position of those labels
+                x_labels = x.loc[labelmask]
+                y_labels = y.loc[labelmask]
+                x_nolabels = x.loc[~labelmask]
+                y_nolabels = y.loc[~labelmask]
+                ax2.scatter(x_labels, y_labels, c=color, marker='o', linewidths=0, alpha=.8, zorder=1)  
+                ax2.scatter(x_nolabels, y_nolabels, c=color, marker='o', linewidths=0, alpha=.2, zorder=1) 
             else:
                 ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)
 
         # Draw the point labels
             if len(self._labels) > 1:
                 if self._highlight:
-                    for k in x.index:
-                        if self._labels[k] in self._highlight:
-                            print(self._labels[k])
-                            alpha_trans = 0.6
-                        else:
-                            alpha_trans = 0.3
-                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=alpha_trans)
+                    for k in self._labels[labelmask].index:
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=1)
                 else:    
-                    for k in x.ind:
-                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=0.6)
+                    for k in x.index:
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=1)
 
         # Draw the contours
         if self._contours:
@@ -489,9 +486,8 @@ class GraphGroupScatter(VectorGraph):
         if 'labels' in kwargs:
             if len(kwargs['labels']) != len(xdata):
                 raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
-            #error: vector object has no attribute 'index'... seems to be from xdata.index
-            #if ndarray.any(kwargs['labels'].index != xdata.index):
-                #raise AttributeError('The index of passed labels does not match the length of xdata and ydata')
+            if ndarray.any(kwargs['labels'].index != xdata.data.index):
+                raise AttributeError('The index of passed labels does not match the index of xdata and ydata')
         if ydata is None:
             if is_vector(xdata):
                 super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)
@@ -559,7 +555,7 @@ class GraphGroupScatter(VectorGraph):
             if self._highlight is not None:
                 try:
                     if grp in self._highlight:
-                        alpha_trans = 0.6
+                        alpha_trans = 0.8
                     else:
                         alpha_trans = 0.2
                 except TypeError:
@@ -575,8 +571,14 @@ class GraphGroupScatter(VectorGraph):
 
             # Draw the point labels
             if len(self._labels) > 1:
-                for k in grp_x.index:
-                    ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=alpha_trans)
+                if self._highlight is not None:
+                    if grp in self._highlight:
+                        for k in grp_x.index:
+                            ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=1)
+
+                else:
+                    for k in grp_x.index:
+                        ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=1)
 
             # Draw the fit line
             if self._fit:
