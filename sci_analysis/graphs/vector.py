@@ -1,6 +1,7 @@
 import warnings
 import six
 from math import sqrt, fabs
+import pandas as pd
 
 # matplotlib imports
 from matplotlib.pyplot import (show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks,
@@ -280,12 +281,13 @@ class GraphScatter(VectorGraph):
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
         if 'labels' in kwargs:
-            if len(kwargs['labels']) != len(xdata):
-                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
-            if ndarray.any(kwargs['labels'].index != xdata.data.index):
-                raise AttributeError('The index of passed labels does not match the index of xdata and ydata')
-        if 'highlight' in kwargs:
-            if 'labels' not in kwargs:
+            #filter out values if drop_nan was used
+            self._labels = self._labels[~xdata._dropped_vals]
+            if len(self._labels) != len(xdata):
+                raise AttributeError('The length or index of passed labels does not match the length or index of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=xdata.data.index)
+        if 'highlight' in kwargs and 'labels' not in kwargs:
                 raise AttributeError('Must include labels to highlight by')        
         if ydata is None:
             if is_vector(xdata):
@@ -484,10 +486,13 @@ class GraphGroupScatter(VectorGraph):
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
         if 'labels' in kwargs:
-            if len(kwargs['labels']) != len(xdata):
+            #filter out values if drop_nan was used
+            print(xdata)
+            self._labels = self._labels[~xdata._dropped_vals]
+            if len(self._labels) != len(xdata):
                 raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
-            if ndarray.any(kwargs['labels'].index != xdata.data.index):
-                raise AttributeError('The index of passed labels does not match the index of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=xdata.data.index)
         if ydata is None:
             if is_vector(xdata):
                 super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)

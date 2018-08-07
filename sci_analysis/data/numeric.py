@@ -103,8 +103,10 @@ class Numeric(Data):
             except ValueError:
                 raise UnequalVectorLengthError('length of data does not match length of other.')
             if any(self._values[self._dep].notnull()):
+                self._dropped_vals = (self._values[self._dep].isnull() | self._values[self._ind].isnull())
                 self._values = self.drop_nan_intersect()
             else:
+                self._dropped_vals = self._values[self._dep].isnull()
                 self._values = self.drop_nan()
             self._type = self._values[self._ind].dtype
             self._name = name

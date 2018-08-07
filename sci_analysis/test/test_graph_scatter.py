@@ -321,6 +321,36 @@ class MyTestCase(unittest.TestCase):
         input_y_array = np.array([3 - x + st.norm.rvs(0, 0.5, size=1) for x in input_x_array])
         self.assertTrue(GraphScatter(input_x_array, input_y_array, save_to='{}test_scatter_132'.format(self.save_path)))
 
+    def test_133_missing_data_labels(self):
+        """Test labels where there's missing data in both arrays"""
+        np.random.seed(987654321)
+        input_x_array = st.norm.rvs(size=2000)
+        input_y_array = st.norm.rvs(size=2000)
+        input_labels_array = np.random.choice(list('ABCDE'),  size=(2000))
+        indicies_x = list(np.random.randint(0, 1999, 200))
+        indicies_y = list(np.random.randint(0, 1999, 200))
+        for i in indicies_x:
+            input_x_array = np.insert(input_x_array, i, np.nan, axis=0)
+        for i in indicies_y:
+            input_y_array = np.insert(input_y_array, i, np.nan, axis=0)
+        self.assertTrue(GraphScatter(input_x_array, input_y_array, labels= input_labels_array, save_to='{}test_scatter_133'.format(self.save_path)))
+
+    def test_134_Graphscatter_labels(self):
+        """Generates graphscatter with labels"""
+        np.random.seed(987654321)
+        input_x_array = st.norm.rvs(size=2000)
+        input_y_array = st.norm.rvs(size=2000)
+        input_labels_array = np.random.choice(list('ABCDE'),  size=(2000))
+        self.assertTrue(GraphScatter(input_x_array, input_y_array, labels= input_labels_array, save_to='{}test_scatter_134'.format(self.save_path)))
+
+    def test_135_Graphscatter_highlights(self):
+        """Generates graphscatter with highlights"""
+        np.random.seed(987654321)
+        input_x_array = st.norm.rvs(size=2000)
+        input_y_array = st.norm.rvs(size=2000)
+        input_labels_array = np.random.choice(list('ABCDE'),  size=(2000))
+        self.assertTrue(GraphScatter(input_x_array, input_y_array, labels= input_labels_array, highlight=['E'], save_to='{}test_scatter_135'.format(self.save_path)))
+
 
 if __name__ == '__main__':
     unittest.main()
