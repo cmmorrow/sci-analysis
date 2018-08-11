@@ -209,7 +209,7 @@ class MannWhitney(Test):
     _statistic_name = 'u value'
     _h0 = "H0: Locations are matched"
     _ha = "HA: Locations are not matched"
-    _min_size = 30
+    _min_size = 20
 
     def __init__(self, a, b=None, alpha=None, display=True):
         """

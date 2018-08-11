@@ -165,7 +165,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if norm.p_value > alpha:
                 TTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TTest')
-            elif len(xdata[0]) > 25 and len(xdata[1]) > 25:
+            elif len(xdata[0]) > 20 and len(xdata[1]) > 20:
                 MannWhitney(xdata[0], xdata[1], alpha=alpha)
                 tested.append('MannWhitney')
             else:
@@ -222,7 +222,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if norm.p_value > alpha:
                 TTest(*group_data)
                 tested.append('TTest')
-            elif len(group_data[0]) > 25 and len(group_data[1]) > 25:
+            elif len(group_data[0]) > 20 and len(group_data[1]) > 20:
                 MannWhitney(*group_data)
                 tested.append('MannWhitney')
             else:
