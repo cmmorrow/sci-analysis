@@ -383,7 +383,7 @@ class MyTestCase(unittest.TestCase):
         cs_x = np.concatenate((input_1_x, input_2_x))
         cs_y = np.concatenate((input_1_y, input_2_y))
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        self.assertTrue(analyze(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
+        self.assertTrue(GraphGroupScatter(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
                                           save_to='{}test_group_scatter_28'.format(self.save_path)))
 
     def test_29_scatter_two_groups_labels_missing_data(self):
@@ -403,9 +403,17 @@ class MyTestCase(unittest.TestCase):
         for i in indicies_y:
             cs_y = np.insert(cs_y, i, np.nan, axis=0)
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        self.assertTrue(analyze(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
+        self.assertTrue(GraphGroupScatter(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
                                           save_to='{}test_group_scatter_29'.format(self.save_path)))
 
+
+    def test_30_groupscatter_dataframe(self):
+        """tests graphscater with dataframe input"""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
+        df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
+        self.assertTrue(GraphGroupScatter(df['x'], df['y'], groups=df['groups'], labels= df['labels'], save_to='{}test_scatter_135'.format(self.save_path)))
 
 if __name__ == '__main__':
     unittest.main()

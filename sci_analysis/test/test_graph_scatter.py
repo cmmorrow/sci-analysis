@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.stats as st
 from os import path, getcwd
-
+import pandas as pd
 from ..graphs import GraphScatter
 from ..data import Vector
 from ..analysis.exc import NoDataError
@@ -327,12 +327,10 @@ class MyTestCase(unittest.TestCase):
         input_x_array = st.norm.rvs(size=2000)
         input_y_array = st.norm.rvs(size=2000)
         input_labels_array = np.random.choice(list('ABCDE'),  size=(2000))
-        indicies_x = list(np.random.randint(0, 1999, 200))
-        indicies_y = list(np.random.randint(0, 1999, 200))
-        for i in indicies_x:
-            input_x_array = np.insert(input_x_array, i, np.nan, axis=0)
-        for i in indicies_y:
-            input_y_array = np.insert(input_y_array, i, np.nan, axis=0)
+        xmask = np.random.randint(0,2,size=input_x_array.shape).astype(np.bool)
+        ymask = np.random.randint(0,2,size=input_y_array.shape).astype(np.bool)
+        input_x_array[xmask] = np.nan
+        input_y_array[ymask] = np.nan
         self.assertTrue(GraphScatter(input_x_array, input_y_array, labels= input_labels_array, save_to='{}test_scatter_133'.format(self.save_path)))
 
     def test_134_Graphscatter_labels(self):
@@ -351,6 +349,12 @@ class MyTestCase(unittest.TestCase):
         input_labels_array = np.random.choice(list('ABCDE'),  size=(2000))
         self.assertTrue(GraphScatter(input_x_array, input_y_array, labels= input_labels_array, highlight=['E'], save_to='{}test_scatter_135'.format(self.save_path)))
 
+    def test_136_Graphscatter_dataframe(self):
+        """tests graphscater with dataframe input"""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
+        self.assertTrue(GraphScatter(df['x'], df['y'], labels= df['labels'], save_to='{}test_scatter_135'.format(self.save_path)))
 
 if __name__ == '__main__':
     unittest.main()

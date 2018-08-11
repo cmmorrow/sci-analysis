@@ -280,22 +280,13 @@ class GraphScatter(VectorGraph):
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
-        if 'labels' in kwargs:
-            #filter out values if drop_nan was used
-            self._labels = self._labels[~xdata._dropped_vals]
-            if len(self._labels) != len(xdata):
-                raise AttributeError('The length or index of passed labels does not match the length or index of xdata and ydata')
-            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
-            self._labels = pd.Series(data=self._labels, index=xdata.data.index)
-        if 'highlight' in kwargs and 'labels' not in kwargs:
-                raise AttributeError('Must include labels to highlight by')        
         if ydata is None:
             if is_vector(xdata):
                 super(GraphScatter, self).__init__(xdata, xname=xname, yname=yname)
             else:
                 raise AttributeError('ydata argument cannot be None.')
         else:
-            super(GraphScatter, self).__init__(Vector(xdata, other=ydata), xname=xname, yname=yname)
+            super(GraphScatter, self).__init__(Vector(xdata, other=ydata), xname=xname, yname=yname)        
 
     def calc_contours(self):
         """
@@ -347,7 +338,7 @@ class GraphScatter(VectorGraph):
         -------
         pass
         """
-
+        
         # Setup the grid variables
         x = self._data.data
         y = self._data.other
@@ -370,6 +361,17 @@ class GraphScatter(VectorGraph):
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
         else:
             gs = GridSpec(self._nrows, self._ncols)
+
+        #Setup highlight and labels
+        if pd.Series(self._labels).tolist() != [False]:
+            #filter out values if drop_nan was used
+            self._labels = self._labels[~self._data._dropped_vals]
+            if len(self._labels) != len(self._data):
+                raise AttributeError('The length or index of passed labels does not match the length or index of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=self._data.data.index)
+        if self._highlight is not None and pd.Series(self._labels).tolist() == [False]:
+            raise AttributeError('Must include labels to highlight by')
 
         # Draw the main graph
         ax2 = subplot(gs[main_plot])
@@ -485,14 +487,6 @@ class GraphGroupScatter(VectorGraph):
         self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
         yname = kwargs['yname'] if 'yname' in kwargs else 'y Data'
         xname = kwargs['xname'] if 'xname' in kwargs else 'x Data'
-        if 'labels' in kwargs:
-            #filter out values if drop_nan was used
-            print(xdata)
-            self._labels = self._labels[~xdata._dropped_vals]
-            if len(self._labels) != len(xdata):
-                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
-            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
-            self._labels = pd.Series(data=self._labels, index=xdata.data.index)
         if ydata is None:
             if is_vector(xdata):
                 super(GraphGroupScatter, self).__init__(xdata, xname=xname, yname=yname)
@@ -526,7 +520,7 @@ class GraphGroupScatter(VectorGraph):
         -------
         pass
         """
-
+        
         # Setup the grid variables
         x = self._data.data
         y = self._data.other
@@ -550,6 +544,15 @@ class GraphGroupScatter(VectorGraph):
             gs = GridSpec(self._nrows, self._ncols, height_ratios=h_ratio, width_ratios=w_ratio, hspace=0, wspace=0)
         else:
             gs = GridSpec(self._nrows, self._ncols)
+
+        #Setup highlight and labels
+        if pd.Series(self._labels).tolist()  != [False]:
+            #filter out values if drop_nan was used
+            self._labels = self._labels[~self._data._dropped_vals]
+            if len(self._labels) != len(self._data):
+                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=self._data.data.index)
 
         # Draw the main graph
         ax2 = subplot(gs[main_plot])
