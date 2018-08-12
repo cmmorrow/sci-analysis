@@ -403,10 +403,10 @@ class CategoricalStatistics(Analysis):
                    percents=self._perc,
                    ranks=self._rank)
         self.data.summary.rename(columns=col, inplace=True)
-        if self.data.num_of_groups > 1:
+        if self.data.num_of_categories > 1:
             self._results = ({
                 self._total: self.data.total,
-                self._num_of_grps: self.data.num_of_groups,
+                self._num_of_grps: self.data.num_of_categories,
             }, self.data.summary.to_dict(orient='records'))
         else:
             self._results = self.data.summary.to_dict(orient='records')

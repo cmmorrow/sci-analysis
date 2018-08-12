@@ -1,11 +1,10 @@
 # Import packages
 import pandas as pd
 import numpy as np
-import datetime
 
 # Import from local
 from .data import Data, is_data
-from .data_operations import is_iterable, flatten
+from .data_operations import flatten
 
 
 class EmptyVectorError(Exception):
@@ -186,6 +185,10 @@ class Numeric(Data):
     @property
     def auto_groups(self):
         return self._auto_groups
+
+    @property
+    def group_names(self):
+        return sorted(self._values[self._grp].unique())
 
 
 class Vector(Numeric):

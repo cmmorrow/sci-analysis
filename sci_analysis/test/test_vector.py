@@ -340,6 +340,19 @@ class MyTestCase(unittest.TestCase):
         input_array = pd.DataFrame([1, 2, 3], [4, 5, 6])
         self.assertRaises(ValueError, lambda: Vector(input_array))
 
+    def test_154_vector_group_names(self):
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=100)
+        grps = [4, 2, 1, 3] * 25
+        vector = Vector(input_array, groups=grps)
+        self.assertListEqual([1, 2, 3, 4], vector.group_names)
+
+    def test_155_vector_no_group_names(self):
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=100)
+        vector = Vector(input_array)
+        self.assertListEqual([1], vector.group_names)
+
 
 if __name__ == '__main__':
     unittest.main()

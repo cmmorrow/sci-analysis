@@ -484,7 +484,7 @@ class GraphGroupScatter(VectorGraph):
         # Setup the grid variables
         x = self._data.data
         y = self._data.other
-        groups = sorted(self._data.groups.keys())
+        groups = self._data.group_names
         h_ratio = [1, 1]
         w_ratio = [1, 1]
 
@@ -690,7 +690,7 @@ class GraphBoxplot(VectorGraph):
         if self._nqp:
             w_ratio.append(4 if self._circles else 1)
             self._ncols += 1
-        groups, data = zip(*[(g, v['ind'].reset_index(drop=True)) for g, v in self._data.values.groupby('grp')])
+        groups, data = zip(*self._data.groups.items())
 
         # Create the quantile plot arrays
         prob = [probplot(v) for v in data]

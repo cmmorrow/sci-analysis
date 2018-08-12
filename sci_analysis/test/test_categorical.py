@@ -1,7 +1,7 @@
 import unittest
 from warnings import catch_warnings, simplefilter
 import numpy as np
-from pandas import Series, MultiIndex
+from pandas import DataFrame, Series, MultiIndex
 
 from ..data import Categorical, is_categorical, is_data, NumberOfCategoriesWarning
 
@@ -27,7 +27,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
@@ -44,7 +45,8 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.order, ['d', 'c', 'b', 'a'])
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertEqual(input_array.categories.tolist(), ['d', 'c', 'b', 'a'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
@@ -63,7 +65,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertEqual(input_array.name, 'test')
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
@@ -83,8 +86,10 @@ class MyTestCase(TestWarnings):
         self.assertEqual(len(input_array.ranks), 0)
         self.assertEqual(len(input_array.categories), 0)
         self.assertEqual(input_array.total, 0)
-        self.assertEqual(input_array.num_of_groups, 0)
+        self.assertEqual(input_array.num_of_categories, 0)
+        self.assertTrue(input_array.groups.empty)
         self.assertTrue(input_array.summary.empty)
+        self.assertTrue(input_array.values.empty)
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertTrue(input_array.is_empty)
@@ -99,8 +104,10 @@ class MyTestCase(TestWarnings):
         self.assertEqual(len(input_array.ranks), 0)
         self.assertEqual(len(input_array.categories), 0)
         self.assertEqual(input_array.total, 0)
-        self.assertEqual(input_array.num_of_groups, 0)
+        self.assertEqual(input_array.num_of_categories, 0)
+        self.assertTrue(input_array.groups.empty)
         self.assertTrue(input_array.summary.empty)
+        self.assertTrue(input_array.values.empty)
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertTrue(input_array.is_empty)
@@ -114,7 +121,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
@@ -133,7 +141,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
@@ -154,7 +163,10 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertEqual(input_array.name, 'test')
         self.assertEqual(input_array.total, 7)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(
+            DataFrame({'ind': i, 'grp': [1] * len(i)}).dropna()['grp'].astype('category')
+        ))
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
@@ -172,13 +184,14 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 1)
-        self.assertEqual(input_array.num_of_groups, 1)
+        self.assertEqual(input_array.num_of_categories, 1)
+        self.assertTrue(input_array.groups.equals(Series([1])))
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'a': 100})
         self.assertListEqual(input_array.categories.tolist(), ['a'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'a': 1})
         self.assertFalse(input_array.is_empty())
-        self.assertTrue(input_array.data.equals(Series(input_array).astype('category')))
+        self.assertTrue(input_array.data.equals(Series(input_array.data).astype('category')))
 
     def test_109_create_categorical_from_a_string(self):
         """Create a Categorical object from a string"""
@@ -188,13 +201,14 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 1)
-        self.assertEqual(input_array.num_of_groups, 1)
+        self.assertEqual(input_array.num_of_categories, 1)
+        self.assertTrue(input_array.groups.equals(Series([1])))
         self.assertDictEqual(input_array.counts.to_dict(), {'abcde': 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'abcde': 100})
         self.assertListEqual(input_array.categories.tolist(), ['abcde'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'abcde': 1})
         self.assertFalse(input_array.is_empty())
-        self.assertTrue(input_array.data.equals(Series(input_array).astype('category')))
+        self.assertTrue(input_array.data.equals(Series(input_array.data).astype('category')))
 
     def test_110_create_categorical_from_numeric(self):
         """Create a Categorical object from a numpy array"""
@@ -210,13 +224,14 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.order.values.tolist(), order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 10)
-        self.assertEqual(input_array.num_of_groups, 10)
+        self.assertEqual(input_array.num_of_categories, 10)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict(zip(order, [1] * 10)))
         self.assertDictEqual(input_array.percents.to_dict(), dict(zip(order, [10] * 10)))
         self.assertDictEqual(input_array.ranks.to_dict(), dict(zip(order, [1] * 10)))
         self.assertListEqual(input_array.categories.tolist(), order)
         self.assertFalse(input_array.is_empty())
-        self.assertTrue(input_array.data.equals(Series(input_array).astype('category')))
+        self.assertTrue(input_array.data.equals(Series(input_array.data).astype('category')))
 
     def test_111_create_categorical_with_too_many_categories(self):
         """Create a Categorical object which forces the NumberOfCategoriesWarning"""
@@ -250,7 +265,8 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.order.values.tolist(), [i for i in range(-10, 10)])
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, len(input_array))
-        self.assertEqual(input_array.num_of_groups, len(categories))
+        self.assertEqual(input_array.num_of_categories, len(categories))
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict(counts))
         self.assertDictEqual(input_array.percents.to_dict(), dict(percents))
         self.assertDictEqual(input_array.ranks.to_dict(), dict(ranks))
@@ -265,7 +281,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertEqual(input_array.name, 'large')
         self.assertEqual(input_array.total, len(input_array))
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertEqual(input_array.data.tolist(), [i for _ in range(0, 5000) for i in 'abcd'])
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 5000, 'b': 5000, 'c': 5000, 'd': 5000})
         self.assertDictEqual(input_array.ranks.to_dict(), {'a': 1, 'b': 1, 'c': 1, 'd': 1})
@@ -281,7 +298,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 6)
-        self.assertEqual(input_array.num_of_groups, 6)
+        self.assertEqual(input_array.num_of_categories, 6)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1] * 6)))
         self.assertDictEqual(input_array.ranks.to_dict(), dict(zip(['a', 'b', 'c', 'd', 'e', 'f'], [1] * 6)))
         self.assertListEqual(input_array.categories.tolist(), ['a', 'b', 'c', 'd', 'e', 'f'])
@@ -303,13 +321,14 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 4)
-        self.assertEqual(input_array.num_of_groups, 3)
+        self.assertEqual(input_array.num_of_categories, 3)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {1: 1, 2: 2, 3: 1})
         self.assertDictEqual(input_array.ranks.to_dict(), {1: 2, 2: 1, 3: 2})
         self.assertDictEqual(input_array.percents.to_dict(), {1: 25, 2: 50, 3: 25})
         self.assertListEqual(input_array.categories.tolist(), [2, 1, 3])
         self.assertFalse(input_array.is_empty())
-        self.assertTrue(input_array.data.equals(Series({'a': 1, 'b': 2, 'c': 3, 'd': 2}).astype('category')))
+        self.assertTrue(input_array.data.equals(Series([1, 2, 3, 2]).astype('category')))
 
     def test_117_create_categorical_with_multiindex(self):
         """Create a Categorical object with a multiindex"""
@@ -320,13 +339,14 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.order.values.tolist(), [1, 2, 3, 4])
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 4)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {1: 1, 2: 1, 3: 1, 4: 1})
         self.assertDictEqual(input_array.ranks.to_dict(), {1: 1, 2: 1, 3: 1, 4: 1})
         self.assertDictEqual(input_array.percents.to_dict(), {1: 25, 2: 25, 3: 25, 4: 25})
         self.assertListEqual(input_array.categories.tolist(), [1, 2, 3, 4])
         self.assertFalse(input_array.is_empty())
-        self.assertTrue(input_array.data.equals(Series([1, 2, 3, 4], index=index).astype('category')))
+        self.assertTrue(input_array.data.equals(Series([1, 2, 3, 4]).astype('category')))
 
     def test_118_create_categorical_with_missing_data(self):
         """Create a Categorical object containing missing values"""
@@ -338,7 +358,8 @@ class MyTestCase(TestWarnings):
         self.assertIsNone(input_array.order)
         self.assertEqual(input_array.name, 'test')
         self.assertEqual(input_array.total, 9)
-        self.assertEqual(input_array.num_of_groups, 5)
+        self.assertEqual(input_array.num_of_categories, 5)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {np.nan: 2, 'a': 1, 'b': 3, 'c': 2, 'd': 1})
         self.assertEqual(input_array.categories.tolist(), ['b', 'c', np.nan, 'a', 'd'])
         self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3, np.nan: 2})
@@ -361,7 +382,8 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(input_array.order, order)
         self.assertIsNone(input_array.name)
         self.assertEqual(input_array.total, 8)
-        self.assertEqual(input_array.num_of_groups, 5)
+        self.assertEqual(input_array.num_of_categories, 5)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), {'a': 2, 'b': 2, 'c': 3, 'd': 1, 'e': 0})
         self.assertDictEqual(input_array.ranks.to_dict(), {'a': 2, 'b': 2, 'c': 1, 'd': 3, 'e': 4})
         self.assertDictEqual(input_array.percents.to_dict(), {'e': 0.0, 'd': 12.5, 'c': 37.5, 'b': 25.0, 'a': 25.0})
@@ -379,7 +401,8 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'z', 'y', 'x', 'w'])
         self.assertEqual(input_array.order, order)
         self.assertEqual(input_array.total, 8)
-        self.assertEqual(input_array.num_of_groups, 5)
+        self.assertEqual(input_array.num_of_categories, 5)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict([('z', 0), ('y', 0), ('x', 0), ('w', 0), (np.nan, 8)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {'z': 2, 'y': 2, 'x': 2, 'w': 2, np.nan: 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'z': 0.0, 'y': 0.0, 'x': 0.0, 'w': 0.0, np.nan: 100.0})
@@ -400,7 +423,8 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.categories.tolist(), [np.nan, 'c'])
         self.assertEqual(input_array.order, [order])
         self.assertEqual(input_array.total, 8)
-        self.assertEqual(input_array.num_of_groups, 2)
+        self.assertEqual(input_array.num_of_categories, 2)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict([('c', 3), (np.nan, 5)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {np.nan: 1, 'c': 2})
         self.assertDictEqual(input_array.percents.to_dict(), {np.nan: 62.5, 'c': 37.5})
@@ -418,7 +442,8 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.order, order)
         self.assertFalse(input_array.is_empty())
         self.assertEqual(input_array.total, 8)
-        self.assertEqual(input_array.num_of_groups, 1)
+        self.assertEqual(input_array.num_of_categories, 1)
+        self.assertTrue(input_array.groups.equals(Series([1] * len(input_array)).astype('category')))
         self.assertDictEqual(input_array.counts.to_dict(), dict([(np.nan, 8)]))
         self.assertDictEqual(input_array.percents.to_dict(), {np.nan: 100})
         self.assertDictEqual(input_array.ranks.to_dict(), {np.nan: 1})
@@ -434,12 +459,39 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.categories.tolist(), ['z', 'y', 'x', 'w'])
         self.assertEqual(input_array.order, order)
         self.assertEqual(input_array.total, 0)
-        self.assertEqual(input_array.num_of_groups, 4)
+        self.assertEqual(input_array.num_of_categories, 4)
+        ref_grp = DataFrame([[np.nan, 1]]).astype('category').dropna()[1]
+        self.assertTrue(input_array.groups.equals(ref_grp))
         self.assertDictEqual(input_array.counts.to_dict(), dict([('z', 0), ('y', 0), ('x', 0), ('w', 0)]))
         self.assertDictEqual(input_array.ranks.to_dict(), {'z': 1, 'y': 1, 'x': 1, 'w': 1})
         self.assertDictEqual(input_array.percents.to_dict(), {'z': 0.0, 'y': 0.0, 'x': 0.0, 'w': 0.0})
         self.assertTrue(input_array.data.equals(ref_array))
         self.assertTrue(input_array.is_empty())
+
+    def test_124_create_categorical_simple_with_simple_groups(self):
+        groups = [1, 2, 1, 2, 1, 2, 1]
+        input_array = Categorical(["a", "b", "c", "d", "b", "c", "b"], groups=groups)
+        self.assertTrue(is_categorical(input_array))
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertEqual(input_array.total, 7)
+        self.assertEqual(input_array.num_of_categories, 4)
+        self.assertTrue(input_array.groups.equals(Series(groups).astype('category')))
+        self.assertEqual(input_array.categories.tolist(), ['b', 'c', 'a', 'd'])
+        self.assertDictEqual(input_array.counts.to_dict(), {'a': 1, 'b': 3, 'c': 2, 'd': 1})
+        self.assertDictEqual(input_array.ranks.to_dict(), {'b': 1, 'c': 2, 'a': 3, 'd': 3})
+        self.assertDictEqual(input_array.percents.to_dict(), {'a': 14.285714285714285,
+                                                              'b': 42.857142857142854,
+                                                              'c': 28.571428571428569,
+                                                              'd': 14.285714285714285})
+
+    def test_125_unequal_group_length_shorter(self):
+        groups = [1, 2, 1, 2, 1]
+        self.assertRaises(AttributeError, lambda: Categorical(["a", "b", "c", "d", "b", "c", "b"], groups=groups))
+
+    def test_126_uequal_group_length_longer(self):
+        groups = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+        self.assertRaises(AttributeError, lambda: Categorical(["a", "b", "c", "d", "b", "c", "b"], groups=groups))
 
 
 if __name__ == '__main__':
