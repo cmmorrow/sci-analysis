@@ -383,14 +383,15 @@ class CategoricalStatistics(Analysis):
     _freq = 'Frequency'
     _perc = 'Percent'
     _total = 'Total'
-    _num_of_grps = 'Number of Groups'
+    _num_of_grps = 'Number of Categories'
 
     def __init__(self, data, **kwargs):
         order = kwargs['order'] if 'order' in kwargs else None
         dropna = kwargs['dropna'] if 'dropna' in kwargs else False
+        groups = kwargs['groups'] if 'groups' in kwargs else None
         display = kwargs['display'] if 'display' in kwargs else True
         self.ordered = True if order is not None else False
-        d = data if is_categorical(data) else Categorical(data, order=order, dropna=dropna)
+        d = data if is_categorical(data) else Categorical(data, order=order, dropna=dropna, groups=groups)
         if d.is_empty():
             raise NoDataError("Cannot perform the test because there is no data")
 
@@ -398,10 +399,12 @@ class CategoricalStatistics(Analysis):
         self.logic()
 
     def run(self):
-        col = dict(categories=self._cat,
-                   counts=self._freq,
-                   percents=self._perc,
-                   ranks=self._rank)
+        col = dict(
+            categories=self._cat,
+            counts=self._freq,
+            percents=self._perc,
+            ranks=self._rank
+        )
         self.data.summary.rename(columns=col, inplace=True)
         if self.data.num_of_categories > 1:
             self._results = ({

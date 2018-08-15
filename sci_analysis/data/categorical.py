@@ -63,10 +63,7 @@ class Categorical(Data):
         groups : list | set | tuple | np.array | pd.Series, optional
             The sequence of group names for sub-arrays
         """
-        if groups is None:
-            self._summ_col_names = (self._cnt, self._rnk, self._pct, self._cat)
-        else:
-            self._summ_col_names = (self._cnt, self._rnk, self._pct, self._cat, self._grp)
+        self._summ_col_names = (self._cnt, self._rnk, self._pct, self._cat)
         self._values = pd.DataFrame([], columns=self._col_names)
         self._summary = pd.DataFrame([], columns=self._summ_col_names)
 
@@ -107,17 +104,30 @@ class Categorical(Data):
                 self._order = None if self._values.empty else self._values[self._ind].cat.categories
             except TypeError:
                 self._order = order
-            counts = self._values[self._ind].value_counts(sort=False, dropna=False, ascending=False)
+            if len(self._values[self._grp].unique()) > 1:
+                self._values['agg'] = 1
+                counts = (
+                    self._values
+                        .groupby([self._ind, self._grp])
+                        .count()
+                        .fillna(0)
+                        .rename(columns={'agg': self._ind})[self._ind]
+                )
+            else:
+                counts = self._values[self._ind].value_counts(sort=False, dropna=False, ascending=False)
             ranks = counts.rank(method='dense', na_option='bottom', ascending=False).astype('int')
-            percents = (counts / counts.sum() * 100) if not all(counts == 0) else 0.0
+            percents = (counts / counts.sum() * 100) if not all((counts == 0).tolist()) else 0.0
             self._summary = pd.DataFrame({
                 self._cnt: counts,
                 self._rnk: ranks,
                 self._pct: percents
             })
-            self._summary[self._cat] = self._summary.index.to_series()
+            if len(self._values[self._grp].unique()) > 1:
+                self._summary[self._cat] = self._summary.index.to_series().apply(lambda c: ', '.join(map(str, c)))
+            else:
+                self._summary[self._cat] = self._summary.index.to_series()
             if order is not None:
-                self._summary.sort_index(level=self._order, inplace=True, axis=0, na_position='last')
+                self._summary.sort_index(level=0, inplace=True, axis=0, na_position='last')
             else:
                 self._summary.sort_values(self._rnk, inplace=True)
         if not self._summary.empty and len(self.categories) > NumberOfCategoriesWarning.warn_categories:
@@ -174,7 +184,14 @@ class Categorical(Data):
     def groups(self):
         return self._values[self._grp]
 
-    # TODO: This property name will need to change
+    @property
+    def group_names(self):
+        return self._values[self._grp].unique().dropna()
+
     @property
     def num_of_categories(self):
         return len(self._summary)
+
+    @property
+    def has_groups(self):
+        return len(self.group_names) > 1
