@@ -690,7 +690,9 @@ class GraphBoxplot(VectorGraph):
         if self._nqp:
             w_ratio.append(4 if self._circles else 1)
             self._ncols += 1
-        groups, data = zip(*self._data.groups.items())
+        # This needed to be overly complex to ensure reset_index is called.
+        # Apparently, violinplot() doesn't like it when the index doesn't start at zero.
+        groups, data = zip(*[(g, v.reset_index(drop=True)) for g, v in self._data.groups.items()])
 
         # Create the quantile plot arrays
         prob = [probplot(v) for v in data]

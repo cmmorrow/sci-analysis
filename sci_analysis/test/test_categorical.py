@@ -479,8 +479,8 @@ class MyTestCase(TestWarnings):
         self.assertEqual(input_array.num_of_categories, 8)
         self.assertListEqual([1, 2], input_array.group_names.tolist())
         self.assertTrue(input_array.groups.equals(Series(groups).astype('category')))
-        self.assertEqual(input_array.categories.tolist(), [('b', 1), ('a', 1), ('b', 2), ('c', 1),
-                                                           ('c', 2), ('d', 2), ('a', 2), ('d', 1)])
+        self.assertEqual(input_array.categories.tolist(), ['b, 1', 'a, 1', 'b, 2', 'c, 1',
+                                                           'c, 2', 'd, 2', 'a, 2', 'd, 1'])
         self.assertDictEqual(input_array.counts.to_dict(), {('a', 1): 1, ('a', 2): 0, ('b', 1): 2, ('b', 2): 1,
                                                             ('c', 1): 1, ('c', 2): 1, ('d', 1): 0, ('d', 2): 1})
         self.assertDictEqual(input_array.ranks.to_dict(), {('a', 1): 2, ('a', 2): 3, ('b', 1): 1, ('b', 2): 2,
@@ -515,7 +515,7 @@ class MyTestCase(TestWarnings):
         self.assertListEqual([1, 2], input_array.group_names.tolist())
         self.assertTrue(input_array.groups.equals(Series(groups).astype('category')))
         self.assertEqual(input_array.categories.tolist(), [
-            ('d', 1), ('d', 2), ('c', 1), ('c', 2), ('b', 1), ('b', 2), ('a', 1), ('a', 2)
+            'd, 1', 'd, 2', 'c, 1', 'c, 2', 'b, 1', 'b, 2', 'a, 1', 'a, 2'
         ])
         self.assertDictEqual(input_array.counts.to_dict(), {('a', 1): 1, ('a', 2): 0, ('b', 1): 2, ('b', 2): 1,
                                                             ('c', 1): 1, ('c', 2): 1, ('d', 1): 0, ('d', 2): 1})
@@ -559,14 +559,7 @@ class MyTestCase(TestWarnings):
             ('d', 2): 1,
         })
         self.assertEqual(input_array.categories.tolist(), [
-            ('b', 2),
-            ('c', 1),
-            ('a', 1),
-            ('b', 1),
-            ('d', 2),
-            ('a', 2),
-            ('c', 2),
-            ('d', 1)
+            'b, 2', 'c, 1', 'a, 1', 'b, 1', 'd, 2', 'a, 2', 'c, 2', 'd, 1'
         ])
         self.assertDictEqual(input_array.ranks.to_dict(), {
             ('a', 1): 2,
@@ -600,14 +593,7 @@ class MyTestCase(TestWarnings):
         self.assertListEqual(Series([1.0, 2.0]).tolist(), input_array.group_names.tolist())
         self.assertTrue(input_array.groups.equals(Series(groups).astype('category')))
         self.assertEqual(input_array.categories.tolist(), [
-            ('a', 1.0),
-            ('b', 1.0),
-            ('c', 1.0),
-            ('c', 2.0),
-            ('d', 2.0),
-            ('a', 2.0),
-            ('b', 2.0),
-            ('d', 1.0)
+            'a, 1.0', 'b, 1.0', 'c, 1.0', 'c, 2.0', 'd, 2.0', 'a, 2.0', 'b, 2.0', 'd, 1.0'
         ])
         self.assertDictEqual(input_array.counts.to_dict(), {
             ('a', 1.0): 1.0,
