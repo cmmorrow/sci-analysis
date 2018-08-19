@@ -413,7 +413,7 @@ class MyTestCase(unittest.TestCase):
         df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
         df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
         df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
-        self.assertTrue(GraphGroupScatter(df['x'], df['y'], groups=df['groups'], labels= df['labels'], save_to='{}test_scatter_135'.format(self.save_path)))
+        self.assertTrue(GraphGroupScatter(df['x'], df['y'], groups=df['groups'], labels= df['labels'], save_to='{}test_scatter_30'.format(self.save_path)))
 
 if __name__ == '__main__':
     unittest.main()

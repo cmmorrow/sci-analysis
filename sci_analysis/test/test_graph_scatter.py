@@ -354,7 +354,7 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
         df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
-        self.assertTrue(GraphScatter(df['x'], df['y'], labels= df['labels'], save_to='{}test_scatter_135'.format(self.save_path)))
+        self.assertTrue(GraphScatter(df['x'], df['y'], labels= df['labels'], save_to='{}test_scatter_136'.format(self.save_path)))
 
 if __name__ == '__main__':
     unittest.main()
