@@ -1,6 +1,7 @@
 import warnings
 import six
 from math import sqrt, fabs
+import pandas as pd
 
 # matplotlib imports
 from matplotlib.pyplot import (show, subplot, yticks, xlabel, ylabel, figure, setp, savefig, close, xticks,
@@ -9,7 +10,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Circle
 
 # Numpy imports
-from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median
+from numpy import polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median, ndarray
 
 # Scipy imports
 from scipy.stats import probplot, gaussian_kde, t
@@ -262,12 +263,16 @@ class GraphScatter(VectorGraph):
         :param _points: Display the scatter points.
         :param _contours: Display the density contours
         :param _boxplot_borders: Display the boxplot borders
+        :param _highlight: an array-like with points to highlight based on labels
+        :param _labels: a vector object with the graph labels
         :param _title: The title of the graph.
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._fit = kwargs['fit'] if 'fit' in kwargs else True
         self._points = kwargs['points'] if 'points' in kwargs else True
+        self._labels = kwargs['labels'] if 'labels' in kwargs else [False]
+        self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
         self._contours = kwargs['contours'] if 'contours' in kwargs else False
         self._contour_props = (31, 1.1)
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else False
@@ -281,7 +286,7 @@ class GraphScatter(VectorGraph):
             else:
                 raise AttributeError('ydata argument cannot be None.')
         else:
-            super(GraphScatter, self).__init__(Vector(xdata, other=ydata), xname=xname, yname=yname)
+            super(GraphScatter, self).__init__(Vector(xdata, other=ydata), xname=xname, yname=yname)        
 
     def calc_contours(self):
         """
@@ -333,7 +338,7 @@ class GraphScatter(VectorGraph):
         -------
         pass
         """
-
+        
         # Setup the grid variables
         x = self._data.data
         y = self._data.other
@@ -357,6 +362,17 @@ class GraphScatter(VectorGraph):
         else:
             gs = GridSpec(self._nrows, self._ncols)
 
+        #Setup highlight and labels
+        if pd.Series(self._labels).tolist() != [False]:
+            #filter out values if drop_nan was used
+            self._labels = self._labels[~self._data._dropped_vals]
+            if len(self._labels) != len(self._data):
+                raise AttributeError('The length or index of passed labels does not match the length or index of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=self._data.data.index)
+        if self._highlight is not None and pd.Series(self._labels).tolist() == [False]:
+            raise AttributeError('Must include labels to highlight by')
+
         # Draw the main graph
         ax2 = subplot(gs[main_plot])
 
@@ -364,7 +380,28 @@ class GraphScatter(VectorGraph):
         if self._points:
             # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
             color = (self.get_color(0),)
-            ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=0.6, zorder=1)
+            alpha_trans = 0.8
+            if self._highlight:
+                #find index of the labels which are in the highlight list
+                labelmask = self._labels.isin(self._highlight)
+                #get x and y position of those labels
+                x_labels = x.loc[labelmask]
+                y_labels = y.loc[labelmask]
+                x_nolabels = x.loc[~labelmask]
+                y_nolabels = y.loc[~labelmask]
+                ax2.scatter(x_labels, y_labels, c=color, marker='o', linewidths=0, alpha=.8, zorder=1)  
+                ax2.scatter(x_nolabels, y_nolabels, c=color, marker='o', linewidths=0, alpha=.2, zorder=1) 
+            else:
+                ax2.scatter(x, y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)
+
+        # Draw the point labels
+            if len(self._labels) > 1:
+                if self._highlight:
+                    for k in self._labels[labelmask].index:
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=1)
+                else:    
+                    for k in x.index:
+                        ax2.annotate(self._labels[k], xy=(x[k], y[k]), alpha=1)
 
         # Draw the contours
         if self._contours:
@@ -432,15 +469,18 @@ class GraphGroupScatter(VectorGraph):
         :param xdata: The x-axis data.
         :param ydata: The y-axis data.
         :param _fit: Display the optional line fit.
+        :param _highlight: Give list of groups to highlight in scatter.
         :param _points: Display the scatter points.
         :param _contours: Display the density contours
         :param _boxplot_borders: Display the boxplot borders
+        :param _labels: a vector object with the graph labels
         :param _title: The title of the graph.
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
         self._fit = kwargs['fit'] if 'fit' in kwargs else True
         self._points = kwargs['points'] if 'points' in kwargs else True
+        self._labels = kwargs['labels'] if 'labels' in kwargs else [False]
         self._highlight = kwargs['highlight'] if 'highlight' in kwargs else None
         self._boxplot_borders = kwargs['boxplot_borders'] if 'boxplot_borders' in kwargs else True
         self._title = kwargs['title'] if 'title' in kwargs else 'Group Bivariate'
@@ -480,7 +520,7 @@ class GraphGroupScatter(VectorGraph):
         -------
         pass
         """
-
+        
         # Setup the grid variables
         x = self._data.data
         y = self._data.other
@@ -505,6 +545,15 @@ class GraphGroupScatter(VectorGraph):
         else:
             gs = GridSpec(self._nrows, self._ncols)
 
+        #Setup highlight and labels
+        if pd.Series(self._labels).tolist()  != [False]:
+            #filter out values if drop_nan was used
+            self._labels = self._labels[~self._data._dropped_vals]
+            if len(self._labels) != len(self._data):
+                raise AttributeError('The length of passed labels does not match the length of xdata and ydata')
+            #converts to series, in case passedlabels is a list or numpy array, sets index same as ind
+            self._labels = pd.Series(data=self._labels, index=self._data.data.index)
+
         # Draw the main graph
         ax2 = subplot(gs[main_plot])
 
@@ -514,7 +563,7 @@ class GraphGroupScatter(VectorGraph):
             if self._highlight is not None:
                 try:
                     if grp in self._highlight:
-                        alpha_trans = 0.6
+                        alpha_trans = 0.8
                     else:
                         alpha_trans = 0.2
                 except TypeError:
@@ -527,6 +576,17 @@ class GraphGroupScatter(VectorGraph):
                 # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
                 color = (self.get_color(i),)
                 ax2.scatter(grp_x, grp_y, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1, label=grp)
+
+            # Draw the point labels
+            if len(self._labels) > 1:
+                if self._highlight is not None:
+                    if grp in self._highlight:
+                        for k in grp_x.index:
+                            ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=1)
+
+                else:
+                    for k in grp_x.index:
+                        ax2.annotate(self._labels[k], xy=(grp_x[k], grp_y[k]), alpha=1)
 
             # Draw the fit line
             if self._fit:

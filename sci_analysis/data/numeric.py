@@ -142,6 +142,7 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
+        self._dropped_vals = self._values[self._ind].isnull()
         return self._values.dropna(how='any', subset=[self._ind])
 
     def drop_nan_intersect(self):
@@ -154,6 +155,7 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
+        self._dropped_vals = (self._values[self._dep].isnull() | self._values[self._ind].isnull())
         return self._values.dropna(how='any', subset=[self._ind, self._dep])
 
     @property
