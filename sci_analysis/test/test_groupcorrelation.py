@@ -123,7 +123,7 @@ n             r value       p value       Group
                               exp.r_value)
         self.assertTupleEqual((0.007932793279327931, 0.014029402940294028, -0.12266426642664265, 0.9005940594059406),
                               exp.statistic)
-        self.assertTupleEqual((0.9375641178035645, 0.8898160391011217, 0.22405419866382636, 3.0794115586718083e-37),
+        self.assertTupleEqual((0.9375641178035644, 0.8898160391011217, 0.22405419866382636, 3.0794115586718083e-37),
                               exp.p_value)
         self.assertEqual(str(exp), output)
 
@@ -139,11 +139,11 @@ n             r value       p value       Group
         cs_y = np.concatenate((input_1[1], input_2[1], input_3[1], input_4[1]))
         grp = [1] * 100 + [2] * 100 + [3] * 100 + [4] * 100
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        input_array['a'][24] = np.nan
-        input_array['a'][256] = np.nan
-        input_array['b'][373] = np.nan
-        input_array['b'][24] = np.nan
-        input_array['b'][128] = np.nan
+        input_array.at[24, 'a'] = np.nan
+        input_array.at[256, 'a'] = np.nan
+        input_array.at[24, 'b'] = np.nan
+        input_array.at[128, 'b'] = np.nan
+        input_array.at[373, 'b'] = np.nan
         output = """
 
 Pearson Correlation Coefficient
