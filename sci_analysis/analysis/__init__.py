@@ -198,11 +198,11 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([out_stats, e, corr_data])
             else:
-                return None
+                return tested if debug else None
         if df_out:
             return output_df([out_stats, corr_data])
         else:
-            return None
+            return tested if debug else None
 
     if ydata is not None:
         _data = determine_analysis_type(xdata, other=ydata, groups=groups)
@@ -221,7 +221,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([linreg_data, corr_data])
             else:
-                return None
+                return tested if debug else None
         else:
             tested.append('Bivariate')
 
@@ -232,7 +232,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([linreg_data, corr_data])
             else:
-                return None
+                return tested if debug else None
     elif is_vector(_data) and len(_data.groups) > 1:
         # Compare Stacked Group Means and Variance
         tested.append('Stacked Oneway')
@@ -265,11 +265,11 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([out_stats, e, corr_data])
             else:
-                return None
+                return tested if debug else None
         if df_out:
             return output_df([out_stats, corr_data])
         else:
-            return None
+            return tested if debug else None
 
     else:
         # Histogram and Basic Stats or Categories and Frequencies
@@ -299,7 +299,7 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([out_stats, fit])
             else:
-                return None
+                return tested if debug else None
         else:
             tested.append('Frequencies')
 
@@ -309,4 +309,4 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
             if df_out:
                 return output_df([out_stats, fit])
             else:
-                return None
+                return tested if debug else None
