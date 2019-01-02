@@ -432,7 +432,7 @@ class MyTestCase(TestWarnings):
                          ['Stacked Oneway', 'Kruskal'])
 
     def test_139_stacked_two_group_mann_whitney(self):
-        np.random.seed(987654321)
+        np.random.seed(self._seed)
         size = 42
         df = pd.DataFrame({'input': st.weibull_max.rvs(1.2, size=size),
                            'Condition': ['Group A', 'Group B'] * (size // 2)})
@@ -440,6 +440,22 @@ class MyTestCase(TestWarnings):
                                  debug=True,
                                  save_to='{}test_analyze_139'.format(self.save_path)),
                          ['Stacked Oneway', 'MannWhitney'])
+
+    def test_140_scatter_highlight_labels(self):
+        """"""
+        np.random.seed(self._seed)
+        df = pd.DataFrame(np.random.randn(200, 2), columns=list('xy'))
+        df['labels'] = np.random.randint(10000, 50000, size=200)
+        self.assertEqual(
+            analyze(
+                df['x'],
+                df['y'],
+                labels=df['labels'],
+                highlight=[39407, 11205],
+                save_to='{}test_analyze_140'.format(self.save_path),
+                debug=True,
+            ), ['Bivariate']
+        )
 
 
 if __name__ == '__main__':

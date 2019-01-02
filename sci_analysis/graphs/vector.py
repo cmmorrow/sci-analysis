@@ -404,6 +404,7 @@ class GraphScatter(VectorGraph):
             if self._highlight is not None:
                 # Find index of the labels which are in the highlight list
                 labelmask = self._data.labels.isin(self._highlight)
+
                 # Get x and y position of those labels
                 x_labels = x.loc[labelmask]
                 y_labels = y.loc[labelmask]
