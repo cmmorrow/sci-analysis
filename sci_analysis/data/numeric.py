@@ -1,11 +1,10 @@
 # Import packages
 import pandas as pd
 import numpy as np
-import datetime
 
 # Import from local
 from .data import Data, is_data
-from .data_operations import is_iterable, flatten
+from .data_operations import flatten
 
 
 class EmptyVectorError(Exception):
@@ -62,9 +61,10 @@ class Numeric(Data):
     _ind = 'ind'
     _dep = 'dep'
     _grp = 'grp'
-    _col_names = (_ind, _dep, _grp)
+    _lbl = 'lbl'
+    _col_names = (_ind, _dep, _grp, _lbl)
 
-    def __init__(self, sequence=None, other=None, groups=None, name=None):
+    def __init__(self, sequence=None, other=None, groups=None, labels=None, name=None):
         """Takes an array-like object and converts it to a pandas Series with any non-numeric values converted to NaN.
 
         Parameters
@@ -75,6 +75,8 @@ class Numeric(Data):
             The secondary input object
         groups : list | set | tuple | np.array | pd.Series, optional
             The sequence of group names for sub-arrays
+        labels : list | set | tuple | np.array | pd.Series, optional
+            The sequence of data point labels
         name : str, optional
             The name of the Numeric object
         """
@@ -100,6 +102,8 @@ class Numeric(Data):
                 self._values[self._dep] = other
                 self._values[self._grp] = groups
                 self._values.loc[:, self._grp] = self._values[self._grp].astype('category')
+                if labels is not None:
+                    self._values[self._lbl] = labels
             except ValueError:
                 raise UnequalVectorLengthError('length of data does not match length of other.')
             if any(self._values[self._dep].notnull()):
@@ -142,7 +146,6 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
-        self._dropped_vals = self._values[self._ind].isnull()
         return self._values.dropna(how='any', subset=[self._ind])
 
     def drop_nan_intersect(self):
@@ -155,7 +158,6 @@ class Numeric(Data):
         arr : pandas.DataFrame
             A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
         """
-        self._dropped_vals = (self._values[self._dep].isnull() | self._values[self._ind].isnull())
         return self._values.dropna(how='any', subset=[self._ind, self._dep])
 
     @property
@@ -172,14 +174,22 @@ class Numeric(Data):
 
     @property
     def groups(self):
-        return {grp: seq[self._ind].rename(grp)
-                for grp, seq in self._values.groupby(self._grp)
-                if not seq.empty}
+        groups = self._values.groupby(self._grp)
+        return {grp: seq[self._ind].rename(grp) for grp, seq in groups if not seq.empty}
+
+    @property
+    def labels(self):
+        return self._values[self._lbl].fillna('None')
 
     @property
     def paired_groups(self):
-        return {grp: (df[self._ind], df[self._dep])
-                for grp, df in self._values.groupby(self._grp) if not df.empty}
+        groups = self._values.groupby(self._grp)
+        return {grp: (df[self._ind], df[self._dep]) for grp, df in groups if not df.empty}
+
+    @property
+    def group_labels(self):
+        groups = self._values.groupby(self._grp)
+        return {grp: df[self._lbl] for grp, df in groups if not df.empty}
 
     @property
     def values(self):
@@ -189,13 +199,17 @@ class Numeric(Data):
     def auto_groups(self):
         return self._auto_groups
 
+    @property
+    def has_labels(self):
+        return any(pd.notna(self._values[self._lbl]))
+
 
 class Vector(Numeric):
     """
     The sci_analysis representation of continuous, numeric data.
     """
 
-    def __init__(self, sequence=None, other=None, groups=None, name=None):
+    def __init__(self, sequence=None, other=None, groups=None, labels=None, name=None):
         """
         Takes an array-like object and converts it to a pandas Series of
         dtype float64, with any non-numeric values converted to NaN.
@@ -208,11 +222,13 @@ class Vector(Numeric):
             The secondary input object
         groups : array-like
             The sequence of group names for sub-arrays
+        labels : list | set | tuple | np.array | pd.Series, optional
+            The sequence of data point labels
         name : str, optional
             The name of the Vector object
         """
 
-        super(Vector, self).__init__(sequence=sequence, other=other, groups=groups, name=name)
+        super(Vector, self).__init__(sequence=sequence, other=other, groups=groups, labels=labels, name=name)
         if not self._values.empty:
             self._values[self._ind] = self._values[self._ind].astype('float')
             self._values[self._dep] = self._values[self._dep].astype('float')
