@@ -31,6 +31,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='statistics data EDA graphing visualization analysis scientific',
     install_requires=['numpy', 'scipy', 'pandas', 'matplotlib', 'six'],
