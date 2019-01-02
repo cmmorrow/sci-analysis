@@ -50,6 +50,8 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(test_obj, Vector)
         self.assertIsInstance(test_obj.data, pd.Series)
         self.assertEqual(test_obj.data_type, np.dtype('float64'))
+        self.assertTrue(all(pd.isna(test_obj._values['lbl'])))
+        self.assertEqual(['None'] * 100, test_obj.labels.tolist())
 
     def test_107_create_vector_array_large(self):
         """Test vector creation from a large array"""
@@ -66,8 +68,6 @@ class MyTestCase(unittest.TestCase):
         np.random.seed(987654321)
         input_array = Vector(st.norm.rvs(size=100))
         second_array = Vector(input_array)
-        # print(id(input_array))
-        # print(id(second_array))
         self.assertEqual(second_array.data_type, np.dtype('float64'))
 
     def test_109_create_vector_2dim_list(self):
@@ -287,14 +287,14 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(Vector(input_array).append(Vector(None)).data.equals(pd.Series(input_array).astype('float')))
 
     def test_149_vector_paired_groups(self):
-        """Test paired groups."""
+        """Test that paired groups doesn't return empty groups.."""
         ind_x_1 = [0, 1, 2, 3, 4]
         ind_y_1 = [5, 6, 7, 8, 9]
         ind_x_2 = [10, 11, 12, 13, 14]
         ind_y_2 = [15, 16, 17, 18, 19]
         input1 = Vector(ind_x_1, other=ind_y_1)
         input2 = Vector(ind_x_2, other=ind_y_2)
-        new_input = input1.append(input2)
+        new_input = input1.append(Vector(pd.Series([]))).append(input2)
         groups = new_input.paired_groups
         self.assertTrue(groups[1][0].equals(pd.Series([0., 1., 2., 3., 4.])))
         self.assertTrue(groups[1][1].equals(pd.Series([5., 6., 7., 8., 9.])))
@@ -337,8 +337,122 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(input_array.paired_groups[2][1].equals(input_array.flatten()[3]))
 
     def test_153_vector_data_frame(self):
+        """Test that a ValueError is raised when the input array is a pandas DataFrame."""
         input_array = pd.DataFrame([1, 2, 3], [4, 5, 6])
         self.assertRaises(ValueError, lambda: Vector(input_array))
+
+    def test_154_vector_with_labels(self):
+        """Test that labels are created correctly and available with the labels property."""
+        np.random.seed(987654321)
+        input_array = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=100)
+        test_obj = Vector(input_array, labels=labels)
+        self.assertListEqual(pd.Series(labels).tolist(), test_obj.labels.tolist())
+        self.assertIsInstance(test_obj.labels, pd.Series)
+
+    def test_155_vector_drop_nan_with_labels(self):
+        """Test to make sure labels are properly dropped when drop_nan is called."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=100)
+        input_array_1[8] = np.nan
+        input_array_1[16] = np.nan
+        input_array_1[32] = np.nan
+        input_array_1[64] = np.nan
+        input_array_1[17] = np.nan
+        input_array_1[22] = np.nan
+        input_array_1[43] = np.nan
+        input_array_1[89] = np.nan
+        test_obj = Vector(input_array_1, labels=labels)
+        self.assertEqual(len(test_obj.labels), 92)
+        self.assertRaises(KeyError, lambda: test_obj.labels[32])
+
+    def test_156_vector_drop_nan_intersect_with_labels(self):
+        """Test to make sure labels are properly dropped when drop_nan_intersect is called."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=100)
+        input_array_1[8] = np.nan
+        input_array_1[16] = np.nan
+        input_array_1[32] = np.nan
+        input_array_1[64] = np.nan
+        input_array_2[1] = np.nan
+        input_array_2[2] = np.nan
+        input_array_2[4] = np.nan
+        input_array_2[8] = np.nan
+        test_obj = Vector(input_array_1, input_array_2, labels=labels)
+        self.assertEqual(len(test_obj.labels), 93)
+        self.assertRaises(KeyError, lambda: test_obj.labels[32])
+        self.assertRaises(KeyError, lambda: test_obj.labels[8])
+
+    def test_157_vector_labels_single_value(self):
+        """Test that if a single value is passed in to labels, the value is applied to all rows."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        labels = 42
+        test_obj = Vector(input_array_1, input_array_2, labels=labels)
+        self.assertListEqual([42] * 100, test_obj.labels.tolist())
+
+    def test_158_vector_label_as_None(self):
+        """Test that missing label values are converted to the string 'None'."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=100).astype('str')
+        input_array_1[8] = np.nan
+        input_array_1[16] = np.nan
+        input_array_1[32] = np.nan
+        input_array_1[64] = np.nan
+        input_array_2[1] = np.nan
+        input_array_2[2] = np.nan
+        input_array_2[4] = np.nan
+        input_array_2[8] = np.nan
+        labels[24] = None
+        labels[48] = None
+        labels[72] = None
+        labels[96] = None
+        test_obj = Vector(input_array_1, input_array_2, labels=labels)
+        self.assertEqual(len(test_obj.labels), 93)
+        self.assertEqual('None', test_obj.labels[24])
+
+    def test_159_vector_unequal_labels_length(self):
+        """Test to make sure that an error is raised if the length of labels is unequal to the input data."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=50)
+        self.assertRaises(UnequalVectorLengthError, lambda: Vector(input_array_1, input_array_2, labels=labels))
+
+    def test_160_vector_groups_with_labels(self):
+        """Test to make sure group_labels returns the expected output."""
+        ind_x_1 = [0, 1, 2, 3, 4]
+        ind_y_1 = [5, 6, 7, 8, 9]
+        ind_x_2 = [10, 11, 12, 13, 14]
+        ind_y_2 = [15, 16, 17, 18, 19]
+        labels_1 = ['A', 'B', 'C', 'D', 'E']
+        labels_2 = ['AA', 'BB', 'CC', 'DD', 'EE']
+        input1 = Vector(ind_x_1, other=ind_y_1, labels=labels_1)
+        input2 = Vector(ind_x_2, other=ind_y_2, labels=labels_2)
+        new_input = input1.append(Vector(pd.Series([]))).append(input2)
+        groups = new_input.group_labels
+        self.assertDictEqual({1: labels_1, 2: labels_2}, {grp: l.tolist() for grp, l in groups.items()})
+        self.assertListEqual([1, 2], list(groups.keys()))
+
+    def test_161_vector_has_labels(self):
+        """Test to verify the logic for the has_labels property is working as expected."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        labels = np.random.randint(10000, 50000, size=100).astype(str)
+        self.assertTrue(Vector(input_array_1, labels=labels).has_labels)
+        self.assertFalse(Vector(input_array_1).has_labels)
+        labels[5] = None
+        labels[10] = None
+        self.assertTrue(Vector(input_array_1, labels=labels).has_labels)
+        labels = [None] * 100
+        labels[5] = 'hi'
+        self.assertTrue(Vector(input_array_1, labels=labels).has_labels)
 
 
 if __name__ == '__main__':

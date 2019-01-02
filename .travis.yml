@@ -1,9 +1,12 @@
 sudo: required
+os: linux
+dist: xenial
 language: python
 python:
 - '2.7'
 - '3.5'
 - '3.6'
+- '3.7'
 before_install:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start

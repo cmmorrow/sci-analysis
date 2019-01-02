@@ -373,26 +373,36 @@ class MyTestCase(unittest.TestCase):
                                           save_to='{}test_group_scatter_27'.format(self.save_path)))
 
     def test_28_scatter_two_groups_labels(self):
+        """Test the case where labels are provided."""
         np.random.seed(987654321)
         input_1_x = st.norm.rvs(size=100)
         input_1_y = [x + st.norm.rvs(0, 0.5, size=1)[0] for x in input_1_x]
         input_2_x = st.norm.rvs(size=100)
         input_2_y = [(x / 2) + st.norm.rvs(0, 0.2, size=1)[0] for x in input_2_x]
-        input_labels_array = np.random.choice(list('ABCDE'),  size=(200))
+        input_labels_array = np.random.choice(list('ABCDE'), size=200)
         grp = [1] * 100 + [2] * 100
         cs_x = np.concatenate((input_1_x, input_2_x))
         cs_y = np.concatenate((input_1_y, input_2_y))
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        self.assertTrue(GraphGroupScatter(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
-                                          save_to='{}test_group_scatter_28'.format(self.save_path)))
+        self.assertTrue(
+            GraphGroupScatter(
+                input_array['a'],
+                input_array['b'],
+                groups=input_array['c'],
+                labels=input_labels_array,
+                highlight=['A'],
+                save_to='{}test_group_scatter_28'.format(self.save_path)
+            )
+        )
 
-    def test_29_scatter_two_groups_labels_missing_data(self):
+    def test_29_scatter_two_groups_labels_and_group_highlight(self):
+        """Test the case where labels and groups are highlighted."""
         np.random.seed(987654321)
         input_1_x = st.norm.rvs(size=100)
         input_1_y = [x + st.norm.rvs(0, 0.5, size=1)[0] for x in input_1_x]
         input_2_x = st.norm.rvs(size=100)
         input_2_y = [(x / 2) + st.norm.rvs(0, 0.2, size=1)[0] for x in input_2_x]
-        input_labels_array = np.random.choice(list('ABCDE'),  size=(220))
+        input_labels_array = np.random.choice(list('ABCDE'),  size=220)
         grp = [1] * 110 + [2] * 110
         cs_x = np.concatenate((input_1_x, input_2_x))
         cs_y = np.concatenate((input_1_y, input_2_y))
@@ -403,17 +413,102 @@ class MyTestCase(unittest.TestCase):
         for i in indicies_y:
             cs_y = np.insert(cs_y, i, np.nan, axis=0)
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        self.assertTrue(GraphGroupScatter(input_array['a'], input_array['b'], groups=input_array['c'], labels=input_labels_array,
-                                          save_to='{}test_group_scatter_29'.format(self.save_path)))
-
+        self.assertTrue(
+            GraphGroupScatter(
+                input_array['a'],
+                input_array['b'],
+                groups=input_array['c'],
+                labels=input_labels_array,
+                highlight=[1],
+                save_to='{}test_group_scatter_29'.format(self.save_path)
+            )
+        )
 
     def test_30_groupscatter_dataframe(self):
-        """tests graphscater with dataframe input"""
+        """Tests graphscater with dataframe input."""
         np.random.seed(987654321)
         df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
         df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
         df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
-        self.assertTrue(GraphGroupScatter(df['x'], df['y'], groups=df['groups'], labels= df['labels'], save_to='{}test_scatter_30'.format(self.save_path)))
+        self.assertTrue(
+            GraphGroupScatter(
+                df['x'],
+                df['y'],
+                groups=df['groups'],
+                labels=df['labels'],
+                highlight=['A'],
+                save_to='{}test_group_scatter_30'.format(self.save_path)
+            )
+        )
+
+    def test_31_groupscatter_labels_no_highlight(self):
+        """Test the case where labels are given, but no highlights specified."""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
+        df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
+        self.assertTrue(
+            GraphGroupScatter(
+                df['x'],
+                df['y'],
+                groups=df['groups'],
+                labels=df['labels'],
+                save_to='{}test_group_scatter_31'.format(self.save_path)
+            )
+        )
+
+    def test_32_groupscatter_labels_invalid_labels_and_groups(self):
+        """Test the case where all the highlights are not in groups or labels."""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.choice(list('ABCDE'), len(df)).tolist()
+        df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
+        self.assertTrue(
+            GraphGroupScatter(
+                df['x'],
+                df['y'],
+                groups=df['groups'],
+                labels=df['labels'],
+                highlight=['XX', 2, 34],
+                save_to='{}test_group_scatter_32'.format(self.save_path)
+            )
+        )
+
+    def test_33_groupscatter_labels_individual_highlight(self):
+        """Test the case where individual points are highlighted with one overrunning."""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.randint(10000, 50000, size=100)
+        df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
+        self.assertTrue(
+            GraphGroupScatter(
+                df['x'],
+                df['y'],
+                groups=df['groups'],
+                labels=df['labels'],
+                highlight=df[df['x'] > 2]['labels'].tolist(),
+                save_to='{}test_group_scatter_33'.format(self.save_path)
+            )
+        )
+
+    def test_34_groupscatter_labels_individual_no_borders(self):
+        """Test the case where individual points are highlighted with one overrunning and no boxplot borders."""
+        np.random.seed(987654321)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['labels'] = np.random.randint(10000, 50000, size=100)
+        df['groups'] = np.random.choice(list('XYZ'), len(df)).tolist()
+        self.assertTrue(
+            GraphGroupScatter(
+                df['x'],
+                df['y'],
+                boxplot_borders=False,
+                groups=df['groups'],
+                labels=df['labels'],
+                highlight=df[df['x'] > 2]['labels'].tolist(),
+                save_to='{}test_group_scatter_34'.format(self.save_path)
+            )
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

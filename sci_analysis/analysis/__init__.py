@@ -8,7 +8,7 @@ from .comparison import LinearRegression, Correlation, GroupCorrelation, GroupLi
 from .stats import VectorStatistics, GroupStatistics, GroupStatisticsStacked, CategoricalStatistics
 
 
-def determine_analysis_type(data, other=None, groups=None):
+def determine_analysis_type(data, other=None, groups=None, labels=None):
     """Attempts to determine the type of data and returns the corresponding sci_analysis Data object.
 
     Parameters
@@ -19,6 +19,8 @@ def determine_analysis_type(data, other=None, groups=None):
         A second sequence of unknown data type.
     groups : array-like or None
         The group names to include if data is determined to be a Vector.
+    labels : array-like or None
+        The sequence of data point labels.
 
     Returns
     -------
@@ -32,8 +34,7 @@ def determine_analysis_type(data, other=None, groups=None):
     from pandas import Series
     from ..data import is_iterable, is_vector, is_categorical, Vector, Categorical
     from .exc import NoDataError
-    numeric_types = [float16, float32, float64,
-                     int8, int16, int32, int64]
+    numeric_types = [float16, float32, float64, int8, int16, int32, int64]
     if not is_iterable(data):
         raise ValueError('data cannot be a scalar value.')
     elif len(data) == 0:
@@ -51,19 +52,19 @@ def determine_analysis_type(data, other=None, groups=None):
         if data.dtype in numeric_types:
             if other is not None and other.dtype in numeric_types:
                 if groups is not None:
-                    return Vector(data, other=other, groups=groups)
+                    return Vector(data, other=other, groups=groups, labels=labels)
                 else:
-                    return Vector(data, other=other)
+                    return Vector(data, other=other, labels=labels)
             else:
                 if groups is not None:
-                    return Vector(data, groups=groups)
+                    return Vector(data, groups=groups, labels=labels)
                 else:
-                    return Vector(data)
+                    return Vector(data, labels=labels)
         else:
             return Categorical(data)
 
 
-def analyse(xdata, ydata=None, groups=None, **kwargs):
+def analyse(xdata, ydata=None, groups=None, labels=None, **kwargs):
     """
     Alias for analyze.
 
@@ -75,6 +76,8 @@ def analyse(xdata, ydata=None, groups=None, **kwargs):
         The response or secondary set of data.
     groups : array-like
         The group names used for location testing or Bivariate analysis.
+    labels : array-like or None
+        The sequence of data point labels.
     alpha : float
         The sensitivity to use for hypothesis tests.
 
@@ -94,10 +97,10 @@ def analyse(xdata, ydata=None, groups=None, **kwargs):
     xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
     xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
     """
-    return analyze(xdata, ydata=ydata, groups=groups, **kwargs)
+    return analyze(xdata, ydata=ydata, groups=groups, labels=labels, **kwargs)
 
 
-def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
+def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.
 
@@ -109,6 +112,8 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         The response or secondary set of data.
     groups : array-like
         The group names used for location testing or Bivariate analysis.
+    labels : array-like or None
+        The sequence of data point labels.
     alpha : float
         The sensitivity to use for hypothesis tests.
 
@@ -185,9 +190,9 @@ def analyze(xdata, ydata=None, groups=None, alpha=0.05, **kwargs):
         return tested if debug else None
 
     if ydata is not None:
-        _data = determine_analysis_type(xdata, other=ydata, groups=groups)
+        _data = determine_analysis_type(xdata, other=ydata, groups=groups, labels=labels)
     else:
-        _data = determine_analysis_type(xdata, groups=groups)
+        _data = determine_analysis_type(xdata, groups=groups, labels=labels)
 
     if is_vector(_data) and not _data.other.empty:
         # Correlation and Linear Regression
