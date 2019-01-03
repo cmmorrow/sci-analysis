@@ -79,22 +79,18 @@ class GraphHisto(VectorGraph):
         :param _save_to: Save the graph to the specified path.
         :return: pass
         """
-        self._bins = kwargs['bins'] if 'bins' in kwargs else 20
-        self._distribution = kwargs['distribution'] if 'distribution' in kwargs else 'norm'
-        self._box_plot = kwargs['boxplot'] if 'boxplot' in kwargs else True
-        self._cdf = kwargs['cdf'] if 'cdf' in kwargs else False
-        self._fit = kwargs['fit'] if 'fit' in kwargs else False
-        self._mean = kwargs['mean'] if 'mean' in kwargs else None
-        self._std = kwargs['std_dev'] if 'std_dev' in kwargs else None
-        self._sample = kwargs['sample'] if 'sample' in kwargs else True
-        self._title = kwargs['title'] if 'title' in kwargs else 'Distribution'
-        self._save_to = kwargs['save_to'] if 'save_to' in kwargs else None
-        yname = "Probability"
-        name = 'Data'
-        if 'name' in kwargs:
-            name = kwargs['name']
-        elif 'xname' in kwargs:
-            name = kwargs['xname']
+        self._bins = kwargs.get('bins', 20)
+        self._distribution = kwargs.get('distribution', 'norm')
+        self._box_plot = kwargs.get('boxplot', True)
+        self._cdf = kwargs.get('cdf', False)
+        self._fit = kwargs.get('fit', False)
+        self._mean = kwargs.get('mean')
+        self._std = kwargs.get('std_dev')
+        self._sample = kwargs.get('sample', False)
+        self._title = kwargs.get('title', 'Distribution')
+        self._save_to = kwargs.get('save_to')
+        yname = kwargs.get('yname', 'Probability')
+        name = kwargs.get('name') or kwargs.get('xname') or 'Data'
 
         super(GraphHisto, self).__init__(data, xname=name, yname=yname)
 
@@ -110,10 +106,16 @@ class GraphHisto(VectorGraph):
             Third value - The cdf y-axis points
 
         """
-        distro_class = getattr(__import__('scipy.stats',
-                                          globals(),
-                                          locals(),
-                                          [self._distribution], 0), self._distribution)
+        distro_class = getattr(
+            __import__(
+                'scipy.stats',
+                globals(),
+                locals(),
+                [self._distribution],
+                0,
+            ),
+            self._distribution
+        )
         parms = distro_class.fit(self._data.data)
         distro = linspace(distro_class.ppf(0.001, *parms), distro_class.ppf(0.999, *parms), 100)
         distro_pdf = distro_class.pdf(distro, *parms)
@@ -167,7 +169,7 @@ class GraphHisto(VectorGraph):
 
         # Set the title
         title = self._title
-        if self._mean is not None and self._std is not None:
+        if self._mean and self._std:
             if self._sample:
                 title = r"{}{}$\bar x = {:.4f},  s = {:.4f}$".format(title, "\n", self._mean, self._std)
             else:
