@@ -23,15 +23,15 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  4976.0000
-p value =  0.9542
+u value =  5024.0000
+p value =  1.0477
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
-        self.assertAlmostEqual(exp.statistic, 4976.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
-        self.assertAlmostEqual(exp.u_value, 4976.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
+        self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_unmatched(self):
@@ -75,8 +75,8 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  219.0000
-p value =  0.9799
+u value =  222.0000
+p value =  1.0401
 
 H0: Locations are matched
 """
@@ -144,15 +144,15 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  4976.0000
-p value =  0.9542
+u value =  5024.0000
+p value =  1.0477
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
-        self.assertAlmostEqual(exp.statistic, 4976.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
-        self.assertAlmostEqual(exp.u_value, 4976.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
+        self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_missing_second_arg(self):

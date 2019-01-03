@@ -156,8 +156,8 @@ class GroupStatistics(Analysis):
     _num_of_groups = 'Number of Groups'
 
     def __init__(self, *args, **kwargs):
-        groups = kwargs['groups'] if 'groups' in kwargs else None
-        display = kwargs['display'] if 'display' in kwargs else True
+        groups = kwargs.get('groups', None)
+        display = kwargs.get('display', False)
         if is_dict(args[0]):
             _data, = args
         elif is_group(args,):

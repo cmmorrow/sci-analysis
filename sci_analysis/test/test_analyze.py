@@ -261,13 +261,13 @@ class MyTestCase(TestWarnings):
                                  save_to='{}test_analyze_124'.format(self.save_path)),
                          ['Distribution', 'NormTest'])
 
-    def test_125_distribution_population(self):
-        """Perform a distribution analysis with population set"""
+    def test_125_distribution_sample(self):
+        """Perform a distribution analysis with sample set"""
         np.random.seed(self._seed)
         input_array = st.norm.rvs(size=200)
         self.assertEqual(analyze(input_array,
-                                 sample=False,
-                                 title='Population Stats',
+                                 sample=True,
+                                 title='Sample Stats',
                                  debug=True,
                                  save_to='{}test_analyze_125'.format(self.save_path)),
                          ['Distribution', 'NormTest'])

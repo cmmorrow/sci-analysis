@@ -248,16 +248,19 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
             tested.append('Distribution')
 
             # Show the histogram and stats
-            if 'sample' in kwargs:
-                out_stats = VectorStatistics(_data, sample=kwargs['sample'], display=False)
-            else:
-                out_stats = VectorStatistics(_data, display=False)
+            out_stats = VectorStatistics(_data, sample=kwargs.get('sample', False), display=False)
             if 'distribution' in kwargs:
                 distro = kwargs['distribution']
-                distro_class = getattr(__import__('scipy.stats',
-                                                  globals(),
-                                                  locals(),
-                                                  [distro], 0), distro)
+                distro_class = getattr(
+                    __import__(
+                        'scipy.stats',
+                        globals(),
+                        locals(),
+                        [distro],
+                        0,
+                    ),
+                    distro,
+                )
                 parms = distro_class.fit(xdata)
                 fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
                 tested.append('KSTest')
