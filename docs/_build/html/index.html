@@ -1,38 +1,37 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>What is sci_analysis? &#8212; sci_analysis 1.4.4 documentation</title>
-    
+    <title>sci-analysis &#8212; sci_analysis 2.0.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.4.4',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sci_analysis 1.4.4 documentation" href="#" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">sci_analysis 1.4.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">sci_analysis 2.0.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -41,154 +40,249 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="what-is-sci-analysis">
-<h1>What is sci_analysis?<a class="headerlink" href="#what-is-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data and also performs the statistical analysis. sci_analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data or number of arguments you provide, as well as how the data is distributed.</p>
-<p>Currently, sci_analysis can only be used for analyzing numeric data. Categorical data analysis is planned for a future version. The three types of analysis that can be performed are histograms of single vectors, correlation between two vectors and a comparison of means between multiple vectors.</p>
+  <div class="section" id="sci-analysis">
+<h1>sci-analysis<a class="headerlink" href="#sci-analysis" title="Permalink to this headline">¶</a></h1>
+<p>An easy to use and powerful python-based data exploration and analysis tool</p>
+<div class="section" id="current-version">
+<h2>Current Version<a class="headerlink" href="#current-version" title="Permalink to this headline">¶</a></h2>
+<p>2.2 — Released January 5, 2019</p>
+<div class="section" id="what-is-sci-analysis">
+<h3>What is sci-analysis?<a class="headerlink" href="#what-is-sci-analysis" title="Permalink to this headline">¶</a></h3>
+<p>sci-analysis is a python package for quickly performing exploratory data analysis (EDA). It aims to make performing EDA easier for newcomers and experienced data analysts alike by abstracting away the specific SciPy, NumPy, and Matplotlib commands. This is accomplished by using sci-analysis’s <code class="docutils literal"><span class="pre">analyze()</span></code> function.</p>
+<p>The main features of sci-analysis are:</p>
+<ul class="simple">
+<li>Fast EDA with the analyze() function.</li>
+<li>Great looking graphs without writing several lines of matplotlib code.</li>
+<li>Automatic use of the most appropriate hypothesis test for the supplied data.</li>
+<li>Automatic handling of missing values.</li>
+</ul>
+<p>Currently, sci-analysis is capable of performing four common statistical analysis techniques:</p>
+<ul class="simple">
+<li>Histograms and summary of numeric data</li>
+<li>Histograms and frequency of categorical data</li>
+<li>Bivariate and linear regression analysis</li>
+<li>Location testing</li>
+</ul>
 </div>
-<div class="section" id="what-s-new-in-sci-analysis-version-1-4">
-<h1>What&#8217;s new in sci_analysis version 1.4?<a class="headerlink" href="#what-s-new-in-sci-analysis-version-1-4" title="Permalink to this headline">¶</a></h1>
-<p>In version 1.4, sci_analysis was re-written to be more pythonic and to support python 3. A ton of new graphing options have been added to histograms, scatter plots and oneway plots. Histograms can now display an accompanying cumulative distribution plot and fit lines to a specified distribution which are displayed on both the histogram and cumulative distribution plot. Scatter plots can now overlay density contour lines and display boxplot borders. Boxplots have been revamped and are now overlayed on top of a kernel density estimation, which provides a much better representation of distribution density. New tests have been added for comparing two distributions &#8211; Student&#8217;s T Test for normally distributed data, the Mann Whitney U Test for non-parametric data and the two-sample Kolmogorov-Smirnov Test for small non-parametric samples. The Kolmogorov-Smirnov Test has been added for determining goodness-of-fit to a specified distribution as well.</p>
+<div class="section" id="what-s-new-in-sci-analysis-version-2-2">
+<h3>What’s new in sci-analysis version 2.2?<a class="headerlink" href="#what-s-new-in-sci-analysis-version-2-2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Version 2.2 adds the ability to add data labels to scatter plots.</li>
+<li>The default behavior of the histogram and statistics was changed from assuming a sample, to assuming a population.</li>
+<li>Fixed a bug involving the Mann Whitney U test, where the minimum size was set incorrectly.</li>
+<li>Verified compatibility with python 3.7.</li>
+</ul>
 </div>
 <div class="section" id="getting-started-with-sci-analysis">
-<h1>Getting started with sci_analysis<a class="headerlink" href="#getting-started-with-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis requires python 2.7 or 3.5.</p>
-<p>If you use OS X or Linux, python should already be installed. You can check by opening a terminal window and typing <code class="docutils literal"><span class="pre">which</span> <span class="pre">python</span></code> on the command line. To verify what version of python you have installed, type <code class="docutils literal"><span class="pre">python</span> <span class="pre">--version</span></code> at the command line. If the version is 2.7.x or 3.5.x, where x is any number, sci_analysis should work properly.</p>
-<p>If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing <code class="docutils literal"><span class="pre">cmd</span></code> in the run text box, then type <code class="docutils literal"><span class="pre">python.exe</span></code> on the command line. If you receive an error message, you need to install python. The easiest way to install python is by installing Anaconda or Mini-conda from this page:</p>
+<h3>Getting started with sci-analysis<a class="headerlink" href="#getting-started-with-sci-analysis" title="Permalink to this headline">¶</a></h3>
+<p>sci-analysis requires python 2.7, 3.5, 3.6, or 3.7.</p>
+<p>If one of these four version of python is already installed then this section can be skipped.</p>
+<p>If you use MacOS or Linux, python should already be installed. You can check by opening a terminal window and typing <code class="docutils literal"><span class="pre">which</span> <span class="pre">python</span></code> on the command line. To verify what version of python you have installed, type <code class="docutils literal"><span class="pre">python</span> <span class="pre">--version</span></code> at the command line. If the version is 2.7.x, 3.5.x, 3.6.x, or 3.7.x where x is any number, sci-analysis should work properly.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is not recommended to use sci-analysis with the system installed python. This is because the version of python that comes with your OS will require root permission to manage, might be changed when upgrading the OS, and can break your OS if critical packages are accidentally removed. More info on why the system python should not be used can be found here: <a class="reference external" href="https://github.com/MacPython/wiki/wiki/Which-Python">https://github.com/MacPython/wiki/wiki/Which-Python</a></p>
+</div>
+<p>If you are on Windows, you might need to install python. You can check to see if python is installed by clicking the Start button, typing <code class="docutils literal"><span class="pre">cmd</span></code> in the run text box, then type <code class="docutils literal"><span class="pre">python.exe</span></code> on the command line. If you receive an error message, you need to install python.</p>
+<p>The easiest way to install python on any OS is by installing Anaconda or Mini-conda from this page:</p>
 <p><a class="reference external" href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a></p>
-<p>Alternatively, you can download the python binary from the following page, but be warned that installing the required packages can be difficult using this method:</p>
+<p>If you are on MacOS and have GCC installed, python can be installed with homebrew using the command:</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>brew install python
+</pre></div>
+</div>
+<p>If you are on Linux, python can be installed with pyenv using the instructions here:
+<a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p>
+<p>If you are on Windows, you can download the python binary from the following page, but be warned that compiling the required packages will be required using this method:</p>
 <p><a class="reference external" href="https://www.python.org/downloads/windows/">https://www.python.org/downloads/windows/</a></p>
 </div>
 <div class="section" id="installing-sci-analysis">
-<h1>Installing sci_analysis<a class="headerlink" href="#installing-sci-analysis" title="Permalink to this headline">¶</a></h1>
-<p>sci_analysis can be installed with pip by typing the following:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">sci_analysis</span>
+<h3>Installing sci-analysis<a class="headerlink" href="#installing-sci-analysis" title="Permalink to this headline">¶</a></h3>
+<p>sci-analysis can be installed with pip by typing the following:</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>pip install sci-analysis
 </pre></div>
 </div>
 <p>On Linux, you can install pip from your OS package manager. If you have Anaconda or Mini-conda, pip should already be installed. Otherwise, you can download pip from the following page:</p>
 <p><a class="reference external" href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a></p>
-<p>sci_analysis works best in conjunction with the excellent pandas and jupyter notebook python packages. If you don&#8217;t have either of these packages installed, you can install them by typing the following:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">jupyter</span>
+<p>sci-analysis works best in conjunction with the excellent pandas and jupyter notebook python packages. If you don’t have either of these packages installed, you can install them by typing the following:</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>pip install pandas
+pip install jupyter
 </pre></div>
 </div>
 </div>
 <div class="section" id="using-sci-analysis">
-<h1>Using sci_analysis<a class="headerlink" href="#using-sci-analysis" title="Permalink to this headline">¶</a></h1>
+<h3>Using sci-analysis<a class="headerlink" href="#using-sci-analysis" title="Permalink to this headline">¶</a></h3>
 <p>From the python interpreter or in the first cell of a Jupyter notebook, type:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sci_analysis</span> <span class="k">as</span> <span class="nn">a</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">sci_analysis</span> <span class="kn">import</span> <span class="n">analyze</span>
 </pre></div>
 </div>
+<p>This will tell python to import the sci-analysis function <code class="docutils literal"><span class="pre">analyze()</span></code>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The package name is <code class="docutils literal"><span class="pre">sci_analysis</span></code> with an underscore.</p>
+<p class="last">Alternatively, the function <code class="docutils literal"><span class="pre">analyse()</span></code> can be imported instead, as it is an alias for <code class="docutils literal"><span class="pre">analyze()</span></code>. For the case of this documentation, <code class="docutils literal"><span class="pre">analyze()</span></code> will be used for consistency.</p>
 </div>
-<p>This will tell python to import sci_analysis to your project as the object <code class="docutils literal"><span class="pre">a</span></code>.</p>
-<p>If you are using the Jupyter notebook, you may also need to use the following code instead to enable inline plots:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="kn">import</span> <span class="nn">sci_analysis</span> <span class="k">as</span> <span class="nn">a</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
+<p>If you are using sci-analysis in a Jupyter notebook, you need to use the following code instead to enable inline plots:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">sci_analysis</span> <span class="kn">import</span> <span class="n">analyze</span>
 </pre></div>
 </div>
-<p>Now, sci_analysis should be ready to use. Try the following code:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
+<p>Now, sci-analysis should be ready to use. Try the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<span class="n">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">analyze</span><span class="p">(</span><span class="n">xdata</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>A histogram and box plot of the data should appear, as well as printed output similar to that below:</p>
-<img alt="_images/histo1.png" src="_images/histo1.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Statistics</span>
-<span class="o">----------</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_19_0.png"><img alt="png" src="_images/sci_analysis_main_19_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Statistics</span>
+<span class="gh">----------</span>
 
-<span class="n">Count</span>     <span class="o">=</span>  <span class="mi">1000</span>
-<span class="n">Mean</span>      <span class="o">=</span>  <span class="mf">0.0551</span>
-<span class="n">Std</span> <span class="n">Dev</span>   <span class="o">=</span>  <span class="mf">1.0287</span>
-<span class="n">Std</span> <span class="n">Error</span> <span class="o">=</span>  <span class="mf">0.0325</span>
-<span class="n">Skewness</span>  <span class="o">=</span> <span class="o">-</span><span class="mf">0.1439</span>
-<span class="n">Kurtosis</span>  <span class="o">=</span> <span class="o">-</span><span class="mf">0.0931</span>
-<span class="n">Maximum</span>   <span class="o">=</span>  <span class="mf">3.4087</span>
-<span class="mi">75</span><span class="o">%</span>       <span class="o">=</span>  <span class="mf">0.7763</span>
-<span class="mi">50</span><span class="o">%</span>       <span class="o">=</span>  <span class="mf">0.0897</span>
-<span class="mi">25</span><span class="o">%</span>       <span class="o">=</span> <span class="o">-</span><span class="mf">0.6324</span>
-<span class="n">Minimum</span>   <span class="o">=</span> <span class="o">-</span><span class="mf">3.1586</span>
-<span class="n">IQR</span>       <span class="o">=</span>  <span class="mf">1.4087</span>
-<span class="n">Range</span>     <span class="o">=</span>  <span class="mf">6.5673</span>
+n         =  1000
+Mean      =  0.0551
+Std Dev   =  1.0282
+Std Error =  0.0325
+Skewness  = -0.1439
+Kurtosis  = -0.0931
+Maximum   =  3.4087
+75%       =  0.7763
+50%       =  0.0897
+25%       = -0.6324
+Minimum   = -3.1586
+IQR       =  1.4087
+Range     =  6.5673
 
 
-<span class="n">Shapiro</span><span class="o">-</span><span class="n">Wilk</span> <span class="n">test</span> <span class="k">for</span> <span class="n">normality</span>
-<span class="o">-------------------------------</span>
+<span class="gh">Shapiro-Wilk test for normality</span>
+<span class="gh">-------------------------------</span>
 
-<span class="n">W</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.9979</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.2591</span>
+alpha   =  0.0500
+W value =  0.9979
+p value =  0.2591
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Data</span> <span class="ow">is</span> <span class="n">normally</span> <span class="n">distributed</span>
+H0: Data is normally distributed
 </pre></div>
 </div>
-<p>If <code class="docutils literal"><span class="pre">data</span></code> contains missing values or strings, they will be ignored when generating the statistics and graphing the histogram.</p>
+<p>A histogram, box plot, summary stats, and test for normality of the data should appear above.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">numpy and scipy.stats were only imported for the purpose of the above example. sci_analysis uses numpy and scipy internally, so it isn&#8217;t necessary to import them unless you want to explicitly use them.</p>
+<p class="last">numpy and scipy.stats were only imported for the purpose of the above example. sci-analysis uses numpy and scipy internally, so it isn’t necessary to import them unless you want to explicitly use them.</p>
 </div>
-<p>Let&#8217;s examine the <code class="docutils literal"><span class="pre">analyze</span></code> function in more detail. Here&#8217;s the signature for the <code class="docutils literal"><span class="pre">analyze</span></code> function:</p>
-<dl class="function">
-<dt id="analyze">
-<code class="descname">analyze</code><span class="sig-paren">(</span><em>*data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#analyze" title="Permalink to this definition">¶</a></dt>
-<dd><p>Automatically performs a statistical analysis based on the input arguments.</p>
-<dl class="docutils">
-<dt>xdata</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">array-like or list(array-like) or dict(array-like)</span><dd>The primary set of data.</dd>
-<dt>ydata</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span><dd>The response data set.</dd>
-<dt>groups</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span><dd>The group names used for a oneway analysis.</dd>
-</dl>
-</dd></dl>
+<p>A histogram and statistics for categorical data can be performed with the following command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pets</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;rat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;rabbit&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;hamster&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;rabbit&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">]</span>
+<span class="n">analyze</span><span class="p">(</span><span class="n">pets</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="./img/sci_analysis_main_21_0.png"><img alt="png" src="_images/sci_analysis_main_21_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
 
-<p><code class="docutils literal"><span class="pre">analyze</span></code> will detect the desired type of data analysis to perform based on whether the <code class="docutils literal"><span class="pre">ydata</span></code> argument is supplied, and whether the <code class="docutils literal"><span class="pre">xdata</span></code> argument is a two-dimensional array-like object.</p>
-<p>The <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> arguments can accept most python array-like objects, with the exception of strings. For example, <code class="docutils literal"><span class="pre">xdata</span></code> will accept a python list, tuple, numpy array, or a pandas Series object. Internally, iterable objects are converted to a Vector object, which is a numpy array of type <code class="docutils literal"><span class="pre">float64</span></code>.</p>
-<p>If only the <code class="docutils literal"><span class="pre">xdata</span></code> argument is passed and it is a one-dimensional vector, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector.</p>
-<p>If <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> are supplied and are both one-dimensional vectors, an x, y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following vectors will yield:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">example1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.52</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]</span>
-<span class="n">example2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.49</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">]</span>
+Total            =  11
+Number of Groups =  5
+
+
+<span class="gh">Statistics</span>
+<span class="gh">----------</span>
+
+<span class="gh">Rank          Frequency     Percent       Category</span>
+<span class="gh">--------------------------------------------------------</span>
+1             4              36.3636      dog
+2             3              27.2727      cat
+3             2              18.1818      rabbit
+4             1              9.0909       hamster
+4             1              9.0909       rat
+</pre></div>
+</div>
+<p>Let’s examine the <code class="docutils literal"><span class="pre">analyze()</span></code> function in more detail. Here’s the signature for the <code class="docutils literal"><span class="pre">analyze()</span></code> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">signature</span>
+<span class="k">print</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">signature</span><span class="p">(</span><span class="n">analyze</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>analyze (xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs)
+
+    Automatically performs a statistical analysis based on the input arguments.
+
+    Parameters
+    ----------
+    xdata : array-like
+        The primary set of data.
+    ydata : array-like
+        The response or secondary set of data.
+    groups : array-like
+        The group names used for location testing or Bivariate analysis.
+    labels : array-like or None
+        The sequence of data point labels.
+    alpha : float
+        The sensitivity to use for hypothesis tests.
+
+    Returns
+    -------
+    xdata, ydata : tuple(array-like, array-like)
+        The input xdata and ydata.
+
+    Notes
+    -----
+    xdata : array-like(num), ydata : None --- Distribution
+    xdata : array-like(str), ydata : None --- Frequencies
+    xdata : array-like(num), ydata : array-like(num) --- Bivariate
+    xdata : array-like(num), ydata : array-like(num), groups : array-like --- Group Bivariate
+    xdata : list(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : list(array-like(num)), ydata : None, groups : array-like --- Location Test(unstacked)
+    xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
+    xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">analyze()</span></code> will detect the desired type of data analysis to perform based on whether the <code class="docutils literal"><span class="pre">ydata</span></code> argument is supplied, and whether the <code class="docutils literal"><span class="pre">xdata</span></code> argument is a two-dimensional array-like object.</p>
+<p>The <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> arguments can accept most python array-like objects, with the exception of strings. For example, <code class="docutils literal"><span class="pre">xdata</span></code> will accept a python list, tuple, numpy array, or a pandas Series object. Internally, iterable objects are converted to a Vector object, which is a pandas Series of type <code class="docutils literal"><span class="pre">float64</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A one-dimensional list, tuple, numpy array, or pandas Series object will all be referred to as a vector throughout the documentation.</p>
+</div>
+<p>If only the <code class="docutils literal"><span class="pre">xdata</span></code> argument is passed and it is a one-dimensional vector of numeric values, the analysis performed will be a histogram of the vector with basic statistics and Shapiro-Wilk normality test. This is useful for visualizing the distribution of the vector. If only the <code class="docutils literal"><span class="pre">xdata</span></code> argument is passed and it is a one-dimensional vector of categorical (string) values, the analysis performed will be a histogram of categories with rank, frequencies and percentages displayed.</p>
+<p>If <code class="docutils literal"><span class="pre">xdata</span></code> and <code class="docutils literal"><span class="pre">ydata</span></code> are supplied and are both equal length one-dimensional vectors of numeric data, an x/y scatter plot with line fit will be graphed and the correlation between the two vectors will be calculated. If there are non-numeric or missing values in either vector, they will be ignored. Only values that are numeric in each vector, at the same index will be included in the correlation. For example, the two following two vectors will yield:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">example1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.52</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]</span>
+<span class="n">example2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.49</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">]</span>
 <span class="n">analyze</span><span class="p">(</span><span class="n">example1</span><span class="p">,</span> <span class="n">example2</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/corr1.png" src="_images/corr1.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Linear</span> <span class="n">Regression</span>
-<span class="o">-----------------</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_25_0.png"><img alt="png" src="_images/sci_analysis_main_25_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
 
-<span class="n">count</span>     <span class="o">=</span> <span class="mi">11</span>
-<span class="n">slope</span>     <span class="o">=</span> <span class="mf">0.8467</span>
-<span class="n">intercept</span> <span class="o">=</span> <span class="mf">0.0601</span>
-<span class="n">R</span><span class="o">^</span><span class="mi">2</span>       <span class="o">=</span> <span class="mf">0.9836</span>
-<span class="n">std</span> <span class="n">err</span>   <span class="o">=</span> <span class="mf">0.0518</span>
-<span class="n">p</span> <span class="n">value</span>   <span class="o">=</span> <span class="mf">0.0000</span>
+n         =  11
+Slope     =  0.8467
+Intercept =  0.0601
+r         =  0.9836
+r^2       =  0.9674
+Std Err   =  0.0518
+p value   =  0.0000
 
-<span class="n">HA</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
 
 
-<span class="n">Correlation</span>
-<span class="o">-----------</span>
+<span class="gh">Pearson Correlation Coefficient</span>
+<span class="gh">-------------------------------</span>
 
-<span class="n">Pearson</span> <span class="n">Coeff</span><span class="p">:</span>
-<span class="n">r</span> <span class="o">=</span> <span class="mf">0.9836</span>
-<span class="n">p</span> <span class="o">=</span> <span class="mf">0.0000</span>
+alpha   =  0.0500
+r value =  0.9836
+p value =  0.0000
 
-<span class="n">HA</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
+HA: There is a significant relationship between predictor and response
 </pre></div>
 </div>
-<p>If <code class="docutils literal"><span class="pre">xdata</span></code> is a sequence or dictionary of vectors, summary statistics will be reported for each vector. If each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.</p>
+<p>If <code class="docutils literal"><span class="pre">xdata</span></code> is a sequence or dictionary of vectors, a location test and summary statistics for each vector will be performed. If each vector is normally distributed and they all have equal variance, a one-way ANOVA is performed. If the data is not normally distributed or the vectors do not have equal variance, a non-parametric Kruskal-Wallis test will be performed instead of a one-way ANOVA.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Vectors should be independent from one another &#8212; that is to say, there should not be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results.</p>
+<p class="last">Vectors should be independent from one another — that is to say, there shouldn’t be values in one vector that are derived from or some how related to a value in another vector. These dependencies can lead to weird and often unpredictable results.</p>
 </div>
-<p>For example, a proper use case would be if you had a table with measurement data for multiple groups, such as test scores per class, average height per country or measurements per trial run, where the classes, countries and trials are the groups. In this case, each group should be represented by it&#8217;s own vector, which are then all wrapped in a dictionary or sequence.</p>
-<p>If <code class="docutils literal"><span class="pre">xdata</span></code> is supplied as a dictionary, the keys are the names of the groups and the values are the array-like objects that represent the vectors. Alternatively, <code class="docutils literal"><span class="pre">xdata</span></code> can be a python sequence of the vectors and the <code class="docutils literal"><span class="pre">groups</span></code> argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to <code class="docutils literal"><span class="pre">xdata</span></code>. For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
+<p>A proper use case for a location test would be if you had a table with measurement data for multiple groups, such as test scores per class, average height per country or measurements per trial run, where the classes, countries, and trials are the groups. In this case, each group should be represented by it’s own vector, which are then all wrapped in a dictionary or sequence.</p>
+<p>If <code class="docutils literal"><span class="pre">xdata</span></code> is supplied as a dictionary, the keys are the names of the groups and the values are the array-like objects that represent the vectors. Alternatively, <code class="docutils literal"><span class="pre">xdata</span></code> can be a python sequence of the vectors and the <code class="docutils literal"><span class="pre">groups</span></code> argument a list of strings of the group names. The order of the group names should match the order of the vectors passed to <code class="docutils literal"><span class="pre">xdata</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Passing the data for each group into <code class="docutils literal"><span class="pre">xdata</span></code> as a sequence or dictionary is often referred to as “unstacked” data. With unstacked data, the values for each group are in their own vector. Alternatively, if values are in one vector and group names in another vector of equal length, this format is referred to as “stacked” data. The <code class="docutils literal"><span class="pre">analyze()</span></code> function can handle either stacked or unstacked data depending on which is most convenient.</p>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
 <span class="n">group_a</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -196,37 +290,51 @@
 <span class="n">analyze</span><span class="p">({</span><span class="s2">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s2">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s2">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s2">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
-<img alt="_images/comp4.png" src="_images/comp4.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_27_0.png"><img alt="png" src="_images/sci_analysis_main_27_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
 
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">40</span>             <span class="mf">0.2159</span>        <span class="mf">1.1629</span>       <span class="o">-</span><span class="mf">2.2678</span>        <span class="mf">0.1747</span>        <span class="mf">3.1400</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">25</span>             <span class="mf">0.2403</span>        <span class="mf">0.9181</span>       <span class="o">-</span><span class="mf">1.8853</span>        <span class="mf">0.3791</span>        <span class="mf">1.6715</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">30</span>            <span class="o">-</span><span class="mf">0.1282</span>        <span class="mf">1.0652</span>       <span class="o">-</span><span class="mf">2.4718</span>       <span class="o">-</span><span class="mf">0.0266</span>        <span class="mf">1.7617</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">50</span>            <span class="o">-</span><span class="mf">0.0891</span>        <span class="mf">1.1473</span>       <span class="o">-</span><span class="mf">2.4036</span>       <span class="o">-</span><span class="mf">0.2490</span>        <span class="mf">2.2466</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">1.8588</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6022</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
+Number of Groups =  4
+Total            =  145
+Grand Mean       =  0.0598
+Pooled Std Dev   =  1.0992
+Grand Median     =  0.0741
 
 
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
 
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">1.0813</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.3591</span>
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+25             0.2403        0.9181       -1.8853        0.3791        1.6715       Group B
+30            -0.1282        1.0652       -2.4718       -0.0266        1.7617       Group C
+40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+
+<span class="gh">Bartlett Test</span>
+<span class="gh">-------------</span>
+
+alpha   =  0.0500
+T value =  1.8588
+p value =  0.6022
+
+H0: Variances are equal
+
+
+
+<span class="gh">Oneway ANOVA</span>
+<span class="gh">------------</span>
+
+alpha   =  0.0500
+f value =  1.0813
+p value =  0.3591
+
+H0: Group means are matched
 </pre></div>
 </div>
-<p>In the example above, sci_analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let&#8217;s try another example, but this time change the variance of group B:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
+<p>In the example above, sci-analysis is telling us the four groups are normally distributed (by use of the Bartlett Test, Oneway ANOVA and the near straight line fit on the quantile plot), the groups have equal variance and the groups have matching means. The only significant difference between the four groups is the sample size we specified. Let’s try another example, but this time change the variance of group B:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
 <span class="n">group_a</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -234,38 +342,52 @@
 <span class="n">analyze</span><span class="p">({</span><span class="s2">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s2">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s2">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s2">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
-<img alt="_images/comp5.png" src="_images/comp5.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_29_0.png"><img alt="png" src="_images/sci_analysis_main_29_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
 
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">40</span>             <span class="mf">0.2159</span>        <span class="mf">1.1629</span>       <span class="o">-</span><span class="mf">2.2678</span>        <span class="mf">0.1747</span>        <span class="mf">3.1400</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">25</span>             <span class="mf">0.7209</span>        <span class="mf">2.7543</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">1.1374</span>        <span class="mf">5.0146</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">30</span>            <span class="o">-</span><span class="mf">0.0282</span>        <span class="mf">1.0652</span>       <span class="o">-</span><span class="mf">2.3718</span>        <span class="mf">0.0734</span>        <span class="mf">1.8617</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">50</span>            <span class="o">-</span><span class="mf">0.0891</span>        <span class="mf">1.1473</span>       <span class="o">-</span><span class="mf">2.4036</span>       <span class="o">-</span><span class="mf">0.2490</span>        <span class="mf">2.2466</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">42.7597</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0000</span>
-
-<span class="n">HA</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">equal</span>
+Number of Groups =  4
+Total            =  145
+Grand Mean       =  0.2049
+Pooled Std Dev   =  1.5350
+Grand Median     =  0.1241
 
 
-<span class="n">Kruskal</span><span class="o">-</span><span class="n">Wallis</span>
-<span class="o">--------------</span>
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
 
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0660</span>
-<span class="n">h</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">7.1942</span>
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B
+30            -0.0282        1.0652       -2.3718        0.0734        1.8617       Group C
+40             0.2159        1.1629       -2.2678        0.1747        3.1400       Group D
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+
+<span class="gh">Bartlett Test</span>
+<span class="gh">-------------</span>
+
+alpha   =  0.0500
+T value =  42.7597
+p value =  0.0000
+
+HA: Variances are not equal
+
+
+
+<span class="gh">Kruskal-Wallis</span>
+<span class="gh">--------------</span>
+
+alpha   =  0.0500
+h value =  7.1942
+p value =  0.0660
+
+H0: Group means are matched
 </pre></div>
 </div>
 <p>In the example above, group B has a standard deviation of 2.75 compared to the other groups that are approximately 1. The quantile plot on the right also shows group B has a much steeper slope compared to the other groups, implying a larger variance. Also, the Kruskal-Wallis test was used instead of the Oneway ANOVA because the pre-requisite of equal variance was not met.</p>
-<p>In another example, let&#8217;s compare groups that have different distibutions and different means:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
+<p>In another example, let’s compare groups that have different distributions and different means:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
 <span class="n">group_a</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">group_b</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">group_c</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">weibull_max</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -273,383 +395,1078 @@
 <span class="n">analyze</span><span class="p">({</span><span class="s2">&quot;Group A&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span> <span class="s2">&quot;Group B&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span> <span class="s2">&quot;Group C&quot;</span><span class="p">:</span> <span class="n">group_c</span><span class="p">,</span> <span class="s2">&quot;Group D&quot;</span><span class="p">:</span> <span class="n">group_d</span><span class="p">})</span>
 </pre></div>
 </div>
-<img alt="_images/comp6.png" src="_images/comp6.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_31_0.png"><img alt="png" src="_images/sci_analysis_main_31_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
 
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">40</span>             <span class="mf">0.1246</span>        <span class="mf">1.1081</span>       <span class="o">-</span><span class="mf">1.9334</span>        <span class="mf">0.0193</span>        <span class="mf">3.1400</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">25</span>             <span class="mf">0.7209</span>        <span class="mf">2.7543</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">1.1374</span>        <span class="mf">5.0146</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">30</span>            <span class="o">-</span><span class="mf">1.0340</span>        <span class="mf">0.8029</span>       <span class="o">-</span><span class="mf">2.7632</span>       <span class="o">-</span><span class="mf">0.7856</span>       <span class="o">-</span><span class="mf">0.0606</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">50</span>            <span class="o">-</span><span class="mf">0.0891</span>        <span class="mf">1.1473</span>       <span class="o">-</span><span class="mf">2.4036</span>       <span class="o">-</span><span class="mf">0.2490</span>        <span class="mf">2.2466</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Levene</span> <span class="n">Test</span>
-<span class="o">-----------</span>
-
-<span class="n">W</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">10.1675</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0000</span>
-
-<span class="n">HA</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">equal</span>
+Number of Groups =  4
+Total            =  145
+Grand Mean       = -0.0694
+Pooled Std Dev   =  1.4903
+Grand Median     = -0.1148
 
 
-<span class="n">Kruskal</span><span class="o">-</span><span class="n">Wallis</span>
-<span class="o">--------------</span>
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
 
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0000</span>
-<span class="n">h</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">23.8694</span>
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+50            -0.0891        1.1473       -2.4036       -0.2490        2.2466       Group A
+25             0.7209        2.7543       -5.6558        1.1374        5.0146       Group B
+30            -1.0340        0.8029       -2.7632       -0.7856       -0.0606       Group C
+40             0.1246        1.1081       -1.9334        0.0193        3.1400       Group D
 
-<span class="n">HA</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">matched</span>
+
+<span class="gh">Levene Test</span>
+<span class="gh">-----------</span>
+
+alpha   =  0.0500
+W value =  10.1675
+p value =  0.0000
+
+HA: Variances are not equal
+
+
+
+<span class="gh">Kruskal-Wallis</span>
+<span class="gh">--------------</span>
+
+alpha   =  0.0500
+h value =  23.8694
+p value =  0.0000
+
+HA: Group means are not matched
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">If a dict is passed to the analyze function, the groups are reported in arbitrary order. This will be fixed in a future release.</p>
-</div>
-<p>The above example models group C as a Weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the one-sided tail on the group C boxplot, and the curved shape of group C on the quantile plot. Group B has the highest mean at 0.72, which can be seen in the quantile plot and indicated by the Kruskal-Wallis test.</p>
-<p>Alternatively, the above example can be repeated where the groups are in the specified order by setting <code class="docutils literal"><span class="pre">xdata</span></code> as a list and the <code class="docutils literal"><span class="pre">groups</span></code> argument as a list of the group names.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
-<span class="n">group_a</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="n">group_b</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-<span class="n">group_c</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">weibull_max</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">group_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">analyze</span><span class="p">([</span><span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span><span class="p">,</span> <span class="n">group_c</span><span class="p">,</span> <span class="n">group_d</span><span class="p">],</span> <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Group A&#39;</span><span class="p">,</span> <span class="s1">&#39;Group B&#39;</span><span class="p">,</span> <span class="s1">&#39;Group C&#39;</span><span class="p">,</span> <span class="s1">&#39;Group D&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-<img alt="_images/comp7.png" src="_images/comp7.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
-
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">40</span>             <span class="mf">0.1246</span>        <span class="mf">1.1081</span>       <span class="o">-</span><span class="mf">1.9334</span>        <span class="mf">0.0193</span>        <span class="mf">3.1400</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">25</span>             <span class="mf">0.7209</span>        <span class="mf">2.7543</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">1.1374</span>        <span class="mf">5.0146</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">30</span>            <span class="o">-</span><span class="mf">1.0340</span>        <span class="mf">0.8029</span>       <span class="o">-</span><span class="mf">2.7632</span>       <span class="o">-</span><span class="mf">0.7856</span>       <span class="o">-</span><span class="mf">0.0606</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">50</span>            <span class="o">-</span><span class="mf">0.0891</span>        <span class="mf">1.1473</span>       <span class="o">-</span><span class="mf">2.4036</span>       <span class="o">-</span><span class="mf">0.2490</span>        <span class="mf">2.2466</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Levene</span> <span class="n">Test</span>
-<span class="o">-----------</span>
-
-<span class="n">W</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">10.1675</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0000</span>
-
-<span class="n">HA</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">equal</span>
-
-
-<span class="n">Kruskal</span><span class="o">-</span><span class="n">Wallis</span>
-<span class="o">--------------</span>
-
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0000</span>
-<span class="n">h</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">23.8694</span>
-
-<span class="n">HA</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">matched</span>
-</pre></div>
-</div>
+<p>The above example models group C as a Weibull distribution, while the other groups are normally distributed. You can see the difference in the distributions by the one-sided tail on the group C boxplot, and the curved shape of group C on the quantile plot. Group C also has significantly the lowest mean as indicated by the Tukey-Kramer circles and the Kruskal-Wallis test.</p>
 </div>
 <div class="section" id="using-sci-analysis-with-pandas">
-<h1>Using sci_analysis with pandas<a class="headerlink" href="#using-sci-analysis-with-pandas" title="Permalink to this headline">¶</a></h1>
-<p>Pandas is a python package that simplifies working with tabular or relational data. Sci_analysis does not depend on or installs pandas, but the two packages work well together. Because columns and rows of data in a pandas DataFrame are naturally array-like, using pandas with sci_analysis is the prefered way to use sci_analysis.</p>
-<p>Let&#8217;s create a pandas DataFrame to use for analysis:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<h3>Using sci-analysis with pandas<a class="headerlink" href="#using-sci-analysis-with-pandas" title="Permalink to this headline">¶</a></h3>
+<p>Pandas is a python package that simplifies working with tabular or relational data. Because columns and rows of data in a pandas DataFrame are naturally array-like, using pandas with sci-analysis is the preferred way to use sci-analysis.</p>
+<p>Let’s create a pandas DataFrame to use for analysis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">987654321</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;One&#39;</span>   <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
-                   <span class="s1">&#39;Two&#39;</span>   <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
-                   <span class="s1">&#39;Three&#39;</span> <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">weibull_max</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
-                   <span class="s1">&#39;Four&#39;</span>  <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
-                   <span class="s1">&#39;Month&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
-                   <span class="s1">&#39;Condition&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Group A&#39;</span><span class="p">,</span> <span class="s1">&#39;Group B&#39;</span><span class="p">,</span> <span class="s1">&#39;Group C&#39;</span><span class="p">,</span> <span class="s1">&#39;Group D&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">15</span><span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s1">&#39;ID&#39;</span>        <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">50000</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;One&#39;</span>       <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+        <span class="s1">&#39;Two&#39;</span>       <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+        <span class="s1">&#39;Three&#39;</span>     <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">weibull_max</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+        <span class="s1">&#39;Four&#39;</span>      <span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+        <span class="s1">&#39;Month&#39;</span>     <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s1">&#39;Condition&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Group A&#39;</span><span class="p">,</span> <span class="s1">&#39;Group B&#39;</span><span class="p">,</span> <span class="s1">&#39;Group C&#39;</span><span class="p">,</span> <span class="s1">&#39;Group D&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">15</span>
+    <span class="p">}</span>
+<span class="p">)</span>
 <span class="n">df</span>
 </pre></div>
 </div>
-<p>This will create a table (pandas DataFrame object) with 6 columns and an index which is the row id. The following command can be used to analyze the distribution of the column titled &#8216;One&#8217;:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Distribution from pandas&#39;</span><span class="p">)</span>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ID</th>
+      <th>One</th>
+      <th>Two</th>
+      <th>Three</th>
+      <th>Four</th>
+      <th>Month</th>
+      <th>Condition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>33815</td>
+      <td>-1.199973</td>
+      <td>-0.051015</td>
+      <td>-0.556609</td>
+      <td>-1.145177</td>
+      <td>Jan</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>49378</td>
+      <td>-0.142682</td>
+      <td>3.522920</td>
+      <td>-1.424446</td>
+      <td>-0.880138</td>
+      <td>Feb</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21015</td>
+      <td>-1.746777</td>
+      <td>-7.415294</td>
+      <td>-1.804494</td>
+      <td>-0.487270</td>
+      <td>Mar</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>15552</td>
+      <td>-0.437626</td>
+      <td>0.805884</td>
+      <td>-1.235840</td>
+      <td>0.416363</td>
+      <td>Apr</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>38833</td>
+      <td>-1.205166</td>
+      <td>-0.105672</td>
+      <td>-1.683723</td>
+      <td>-0.151296</td>
+      <td>May</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>13561</td>
+      <td>-0.610066</td>
+      <td>-1.842630</td>
+      <td>-1.280547</td>
+      <td>0.645674</td>
+      <td>Jun</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>36967</td>
+      <td>-0.203453</td>
+      <td>2.323542</td>
+      <td>-1.326379</td>
+      <td>1.014516</td>
+      <td>Jul</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>43379</td>
+      <td>0.085310</td>
+      <td>-2.053241</td>
+      <td>-0.503970</td>
+      <td>-1.349427</td>
+      <td>Aug</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>36113</td>
+      <td>1.853726</td>
+      <td>-5.176661</td>
+      <td>-1.935414</td>
+      <td>0.513536</td>
+      <td>Sep</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>18422</td>
+      <td>-0.614827</td>
+      <td>1.266392</td>
+      <td>-0.292610</td>
+      <td>-2.234853</td>
+      <td>Oct</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>24986</td>
+      <td>0.091151</td>
+      <td>-5.721601</td>
+      <td>-0.330216</td>
+      <td>1.269432</td>
+      <td>Nov</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>27743</td>
+      <td>0.367027</td>
+      <td>1.929861</td>
+      <td>-0.388752</td>
+      <td>-0.807231</td>
+      <td>Dec</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>29620</td>
+      <td>0.337290</td>
+      <td>3.160379</td>
+      <td>-0.139480</td>
+      <td>0.917287</td>
+      <td>Jan</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>16982</td>
+      <td>-2.403575</td>
+      <td>1.846666</td>
+      <td>-0.689486</td>
+      <td>-0.406160</td>
+      <td>Feb</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>49184</td>
+      <td>-1.008465</td>
+      <td>-0.148862</td>
+      <td>-1.620799</td>
+      <td>0.707101</td>
+      <td>Mar</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>35850</td>
+      <td>-0.352184</td>
+      <td>5.654610</td>
+      <td>-0.966809</td>
+      <td>0.927546</td>
+      <td>Apr</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>47386</td>
+      <td>0.598030</td>
+      <td>-2.689915</td>
+      <td>-1.253860</td>
+      <td>0.570852</td>
+      <td>May</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>19963</td>
+      <td>0.573027</td>
+      <td>1.372438</td>
+      <td>-0.690340</td>
+      <td>-0.798698</td>
+      <td>Jun</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>25412</td>
+      <td>0.215652</td>
+      <td>4.065310</td>
+      <td>-2.168703</td>
+      <td>-1.567035</td>
+      <td>Jul</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>38630</td>
+      <td>-0.436220</td>
+      <td>-2.193357</td>
+      <td>-0.821331</td>
+      <td>0.071891</td>
+      <td>Aug</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>29330</td>
+      <td>0.209028</td>
+      <td>-0.720595</td>
+      <td>-1.019263</td>
+      <td>0.798486</td>
+      <td>Sep</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>15612</td>
+      <td>0.406017</td>
+      <td>0.221715</td>
+      <td>-2.252922</td>
+      <td>-0.006731</td>
+      <td>Oct</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>42431</td>
+      <td>-0.112333</td>
+      <td>3.377393</td>
+      <td>-1.023559</td>
+      <td>0.813721</td>
+      <td>Nov</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>38265</td>
+      <td>0.341139</td>
+      <td>2.775356</td>
+      <td>-0.434224</td>
+      <td>3.408679</td>
+      <td>Dec</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>38936</td>
+      <td>-1.435777</td>
+      <td>-3.183457</td>
+      <td>-2.417681</td>
+      <td>0.994073</td>
+      <td>Jan</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>22402</td>
+      <td>0.719249</td>
+      <td>-2.281663</td>
+      <td>-0.419681</td>
+      <td>0.025585</td>
+      <td>Feb</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>10490</td>
+      <td>1.022446</td>
+      <td>-0.884773</td>
+      <td>-0.962212</td>
+      <td>0.532781</td>
+      <td>Mar</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>15452</td>
+      <td>1.463633</td>
+      <td>-1.052140</td>
+      <td>-0.316955</td>
+      <td>0.135338</td>
+      <td>Apr</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>20401</td>
+      <td>1.375250</td>
+      <td>-3.150916</td>
+      <td>-0.842319</td>
+      <td>1.060090</td>
+      <td>May</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>24927</td>
+      <td>-1.885277</td>
+      <td>-1.824083</td>
+      <td>-0.368665</td>
+      <td>-0.636261</td>
+      <td>Jun</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>27535</td>
+      <td>0.379140</td>
+      <td>4.224249</td>
+      <td>-1.415238</td>
+      <td>1.940782</td>
+      <td>Jul</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>28809</td>
+      <td>0.427183</td>
+      <td>9.419918</td>
+      <td>-0.730669</td>
+      <td>-1.345587</td>
+      <td>Aug</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>42130</td>
+      <td>1.671549</td>
+      <td>3.501617</td>
+      <td>-2.043236</td>
+      <td>1.939640</td>
+      <td>Sep</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>43074</td>
+      <td>0.933478</td>
+      <td>-0.262629</td>
+      <td>-0.523070</td>
+      <td>-0.551311</td>
+      <td>Oct</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>37342</td>
+      <td>-0.986482</td>
+      <td>-1.544095</td>
+      <td>-1.795220</td>
+      <td>-0.523349</td>
+      <td>Nov</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>16932</td>
+      <td>-0.121223</td>
+      <td>4.431819</td>
+      <td>-0.554931</td>
+      <td>-1.387899</td>
+      <td>Dec</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>46045</td>
+      <td>-0.121785</td>
+      <td>3.704645</td>
+      <td>-0.555530</td>
+      <td>-0.610390</td>
+      <td>Jan</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>13717</td>
+      <td>-1.303516</td>
+      <td>-3.525625</td>
+      <td>-0.268351</td>
+      <td>0.220075</td>
+      <td>Feb</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>26979</td>
+      <td>0.167418</td>
+      <td>1.754883</td>
+      <td>-0.570240</td>
+      <td>-0.258519</td>
+      <td>Mar</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>32178</td>
+      <td>0.379428</td>
+      <td>-2.980751</td>
+      <td>-1.046118</td>
+      <td>-1.266934</td>
+      <td>Apr</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>22586</td>
+      <td>1.528444</td>
+      <td>3.847906</td>
+      <td>-0.564254</td>
+      <td>0.168995</td>
+      <td>May</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>30676</td>
+      <td>0.579101</td>
+      <td>1.481665</td>
+      <td>-2.000617</td>
+      <td>-1.136057</td>
+      <td>Jun</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>12145</td>
+      <td>-0.512085</td>
+      <td>-5.800311</td>
+      <td>-0.703269</td>
+      <td>1.309943</td>
+      <td>Jul</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>33851</td>
+      <td>0.329299</td>
+      <td>-4.168787</td>
+      <td>-1.832158</td>
+      <td>2.626034</td>
+      <td>Aug</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>20004</td>
+      <td>1.761672</td>
+      <td>6.218044</td>
+      <td>-0.903584</td>
+      <td>0.052300</td>
+      <td>Sep</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>48903</td>
+      <td>-0.391426</td>
+      <td>3.600225</td>
+      <td>-0.390644</td>
+      <td>-1.282138</td>
+      <td>Oct</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>11760</td>
+      <td>-0.153558</td>
+      <td>0.022388</td>
+      <td>-0.882584</td>
+      <td>0.461477</td>
+      <td>Nov</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>21061</td>
+      <td>-0.765411</td>
+      <td>-1.856080</td>
+      <td>-0.967070</td>
+      <td>-0.169594</td>
+      <td>Dec</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>18232</td>
+      <td>-1.983058</td>
+      <td>3.544743</td>
+      <td>-1.246127</td>
+      <td>1.408816</td>
+      <td>Jan</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>29927</td>
+      <td>-0.017905</td>
+      <td>-6.803385</td>
+      <td>-0.043450</td>
+      <td>-0.192027</td>
+      <td>Feb</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>30740</td>
+      <td>-0.772090</td>
+      <td>0.826426</td>
+      <td>-0.875306</td>
+      <td>0.074382</td>
+      <td>Mar</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>41741</td>
+      <td>-1.017919</td>
+      <td>4.670395</td>
+      <td>-0.080428</td>
+      <td>0.408054</td>
+      <td>Apr</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>45287</td>
+      <td>1.721927</td>
+      <td>7.581574</td>
+      <td>-0.395787</td>
+      <td>0.114241</td>
+      <td>May</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>39581</td>
+      <td>-0.860012</td>
+      <td>3.638375</td>
+      <td>-0.530987</td>
+      <td>0.019394</td>
+      <td>Jun</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>19179</td>
+      <td>0.441536</td>
+      <td>3.921498</td>
+      <td>-0.001505</td>
+      <td>0.373191</td>
+      <td>Jul</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>17116</td>
+      <td>0.604572</td>
+      <td>2.716440</td>
+      <td>-0.580509</td>
+      <td>-0.157461</td>
+      <td>Aug</td>
+      <td>Group D</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <td>34913</td>
+      <td>1.635415</td>
+      <td>2.587376</td>
+      <td>-0.463056</td>
+      <td>-0.189674</td>
+      <td>Sep</td>
+      <td>Group A</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>13794</td>
+      <td>0.623878</td>
+      <td>-5.834247</td>
+      <td>-1.710010</td>
+      <td>-0.232304</td>
+      <td>Oct</td>
+      <td>Group B</td>
+    </tr>
+    <tr>
+      <th>58</th>
+      <td>28453</td>
+      <td>-0.349846</td>
+      <td>-0.703319</td>
+      <td>-1.094846</td>
+      <td>-0.238145</td>
+      <td>Nov</td>
+      <td>Group C</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>25158</td>
+      <td>0.097128</td>
+      <td>-3.303646</td>
+      <td>-0.508852</td>
+      <td>0.112469</td>
+      <td>Dec</td>
+      <td>Group D</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>This creates a table (pandas DataFrame object) with 6 columns and an index which is the row id. The following command can be used to analyze the distribution of the column titled <strong>One</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Distribution from pandas&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/histo2.png" src="_images/histo2.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Statistics</span>
-<span class="o">----------</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_37_0.png"><img alt="png" src="_images/sci_analysis_main_37_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Statistics</span>
+<span class="gh">----------</span>
 
-<span class="n">Count</span>     <span class="o">=</span>  <span class="mi">60</span>
-<span class="n">Mean</span>      <span class="o">=</span> <span class="o">-</span><span class="mf">0.0562</span>
-<span class="n">Std</span> <span class="n">Dev</span>   <span class="o">=</span>  <span class="mf">1.0779</span>
-<span class="n">Std</span> <span class="n">Error</span> <span class="o">=</span>  <span class="mf">0.1392</span>
-<span class="n">Skewness</span>  <span class="o">=</span>  <span class="mf">0.1879</span>
-<span class="n">Kurtosis</span>  <span class="o">=</span> <span class="o">-</span><span class="mf">0.5109</span>
-<span class="n">Maximum</span>   <span class="o">=</span>  <span class="mf">2.2466</span>
-<span class="mi">75</span><span class="o">%</span>       <span class="o">=</span>  <span class="mf">0.5793</span>
-<span class="mi">50</span><span class="o">%</span>       <span class="o">=</span> <span class="o">-</span><span class="mf">0.0228</span>
-<span class="mi">25</span><span class="o">%</span>       <span class="o">=</span> <span class="o">-</span><span class="mf">0.9999</span>
-<span class="n">Minimum</span>   <span class="o">=</span> <span class="o">-</span><span class="mf">2.4036</span>
-<span class="n">IQR</span>       <span class="o">=</span>  <span class="mf">1.5792</span>
-<span class="n">Range</span>     <span class="o">=</span>  <span class="mf">4.6501</span>
+n         =  60
+Mean      = -0.0035
+Std Dev   =  0.9733
+Std Error =  0.1257
+Skewness  = -0.1472
+Kurtosis  = -0.2412
+Maximum   =  1.8537
+75%       =  0.5745
+50%       =  0.0882
+25%       = -0.6113
+Minimum   = -2.4036
+IQR       =  1.1858
+Range     =  4.2573
 
 
-<span class="n">Shapiro</span><span class="o">-</span><span class="n">Wilk</span> <span class="n">test</span> <span class="k">for</span> <span class="n">normality</span>
-<span class="o">-------------------------------</span>
+<span class="gh">Shapiro-Wilk test for normality</span>
+<span class="gh">-------------------------------</span>
 
-<span class="n">W</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.9796</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.4131</span>
+alpha   =  0.0500
+W value =  0.9804
+p value =  0.4460
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Data</span> <span class="ow">is</span> <span class="n">normally</span> <span class="n">distributed</span>
+H0: Data is normally distributed
 </pre></div>
 </div>
-<p>The following command can be used to analyze the correlation between columns &#8216;One&#8217; and &#8216;Three&#8217;:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
-        <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
-        <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate from pandas&#39;</span><span class="p">)</span>
+<p>Anywhere you use a python list or numpy Array in sci-analysis, you can use a column or row of a pandas DataFrame (known in pandas terms as a Series). This is because a pandas Series has much of the same behavior as a numpy Array, causing sci-analysis to handle a pandas Series as if it were a numpy Array.</p>
+<p>By passing two array-like arguments to the <code class="docutils literal"><span class="pre">analyze()</span></code> function, the correlation can be determined between the two array-like arguments. The following command can be used to analyze the correlation between columns <strong>One</strong> and <strong>Three</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
+    <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate Analysis between Column One and Column Three&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/corr2.png" src="_images/corr2.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Linear</span> <span class="n">Regression</span>
-<span class="o">-----------------</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_39_0.png"><img alt="png" src="_images/sci_analysis_main_39_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
 
-<span class="n">Count</span>     <span class="o">=</span>  <span class="mi">60</span>
-<span class="n">Slope</span>     <span class="o">=</span> <span class="o">-</span><span class="mf">0.1807</span>
-<span class="n">Intercept</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.9249</span>
-<span class="n">R</span><span class="o">^</span><span class="mi">2</span>       <span class="o">=</span> <span class="o">-</span><span class="mf">0.2742</span>
-<span class="n">Std</span> <span class="n">Err</span>   <span class="o">=</span>  <span class="mf">0.0832</span>
-<span class="n">p</span> <span class="n">value</span>   <span class="o">=</span>  <span class="mf">0.0340</span>
+n         =  60
+Slope     =  0.0281
+Intercept = -0.9407
+r         =  0.0449
+r^2       =  0.0020
+Std Err   =  0.0820
+p value   =  0.7332
 
-<span class="n">HA</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
 
 
-<span class="n">Spearman</span> <span class="n">Correlation</span> <span class="n">Coefficient</span>
-<span class="o">--------------------------------</span>
+<span class="gh">Spearman Correlation Coefficient</span>
+<span class="gh">--------------------------------</span>
 
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.0785</span>
-<span class="n">r</span> <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.2289</span>
+alpha   =  0.0500
+r value =  0.0316
+p value =  0.8105
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">There</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">significant</span> <span class="n">relationship</span> <span class="n">between</span> <span class="n">predictor</span> <span class="ow">and</span> <span class="n">response</span>
+H0: There is no significant relationship between predictor and response
 </pre></div>
 </div>
-<p>Anywhere you use a python list or numpy Array in sci_analysis, you can use a column or row of a pandas DataFrame (known in pandas terms as a Series). This is because a pandas Series has much of the same behavior as a numpy Array, causing sci_analysis to handle a pandas Series as if it were a numpy Array.</p>
-<p>Performing a Oneway analysis on data in a pandas DataFrame requires some explanation. The simplist way to perform a Oneway analysis is to iterate over a pandas groupby object in a list comprehension. You can find a great explanation of what list comprehensions are and how to use them here:</p>
-<p><a class="reference external" href="http://treyhunner.com/2015/12/python-list-comprehensions-now-in-color/">http://treyhunner.com/2015/12/python-list-comprehensions-now-in-color/</a></p>
-<p>Let&#8217;s start with an example. The following code will perform a Oneway analysis using each of the four values in the &#8216;Conditions&#8217; column:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">([</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">])],</span>
-         <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Group A&#39;</span><span class="p">,</span> <span class="s1">&#39;Group B&#39;</span><span class="p">,</span> <span class="s1">&#39;Group C&#39;</span><span class="p">,</span> <span class="s1">&#39;Group D&#39;</span><span class="p">],</span>
-         <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Groups&#39;</span><span class="p">,</span>
-         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-         <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<p>Since there isn’t a correlation between columns <strong>One</strong> and <strong>Three</strong>, it might be useful to see where most of the data is concentrated. This can be done by adding the argument <code class="docutils literal"><span class="pre">contours=True</span></code> and turning off the best fit line with <code class="docutils literal"><span class="pre">fit=False</span></code>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
+    <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
+    <span class="n">contours</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate Analysis between Column One and Column Three&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/comp8.png" src="_images/comp8.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_41_0.png"><img alt="png" src="_images/sci_analysis_main_41_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
 
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">15</span>            <span class="o">-</span><span class="mf">0.1906</span>        <span class="mf">2.6335</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">0.2217</span>        <span class="mf">3.5229</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">15</span>             <span class="mf">0.7406</span>        <span class="mf">2.4806</span>       <span class="o">-</span><span class="mf">3.0538</span>        <span class="mf">0.9879</span>        <span class="mf">5.6546</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">15</span>             <span class="mf">0.9334</span>        <span class="mf">3.9554</span>       <span class="o">-</span><span class="mf">5.9492</span>       <span class="o">-</span><span class="mf">0.0510</span>        <span class="mf">5.2850</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">15</span>            <span class="o">-</span><span class="mf">0.3873</span>        <span class="mf">3.2660</span>       <span class="o">-</span><span class="mf">7.4153</span>       <span class="o">-</span><span class="mf">0.1489</span>        <span class="mf">4.0653</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">3.7931</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.2847</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
+n         =  60
+Slope     =  0.0281
+Intercept = -0.9407
+r         =  0.0449
+r^2       =  0.0020
+Std Err   =  0.0820
+p value   =  0.7332
 
 
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
 
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6628</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.5784</span>
+<span class="gh">Spearman Correlation Coefficient</span>
+<span class="gh">--------------------------------</span>
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+alpha   =  0.0500
+r value =  0.0316
+p value =  0.8105
+
+H0: There is no significant relationship between predictor and response
 </pre></div>
 </div>
-<p>From the graph, there are four groups: Group A, Group B, Group C and Group D. The data being analyzed is from column &#8216;Two&#8217;, the variances are equal and there is no significant difference in the means. So how does this work? The argument is a single list comprehension with group names passed to the <code class="docutils literal"><span class="pre">groups</span></code> argument. The list comprehension can be thought of this way:</p>
-<p>&#8220;For each unique value in the DataFrame&#8217;s &#8216;Condition&#8217; column, make a new list containing the values in column &#8216;Two&#8217; where all the values in the &#8216;Condition&#8217; column are the same&#8221;.</p>
-<p>Let&#8217;s start by working from right to left. <code class="docutils literal"><span class="pre">df.groupby(df['Condition'])</span></code> splits the DataFrame <code class="docutils literal"><span class="pre">df</span></code> into four parts, where each part has all the rows where the &#8216;Condition&#8217; column is &#8216;Group A&#8217;, &#8216;Group B&#8217;, &#8216;Group C&#8217; and &#8216;Group D&#8217;. <code class="docutils literal"><span class="pre">for</span> <span class="pre">name,</span> <span class="pre">group</span> <span class="pre">in</span></code> loops over each part where &#8216;name&#8217; is &#8216;Group A&#8217;, &#8216;Group B&#8217;, &#8216;Group C&#8217; and &#8216;Group D&#8217; and &#8216;group&#8217; is the part of <code class="docutils literal"><span class="pre">df</span></code> that corresponds to &#8216;name&#8217;. Note that &#8216;name&#8217; is not used in this example. A little more on this later. Last, <code class="docutils literal"><span class="pre">group['Two']</span></code> returns just column &#8216;Two&#8217; for each part. Running the list comprehension by itself shows that it&#8217;s a list with four lists, where each inner list is the column &#8216;Two&#8217; for each group.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">])]</span>
+<p>With a few point below -2.0, it might be useful to know which data point they are. This can be done by passing the <strong>ID</strong> column to the <code class="docutils literal"><span class="pre">labels</span></code> argument and then selecting which labels to highlight with the <code class="docutils literal"><span class="pre">highlight</span></code> argument:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">],</span>
+    <span class="n">highlight</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">][</span><span class="s1">&#39;ID&#39;</span><span class="p">],</span>
+    <span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate Analysis between Column One and Column Three&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">])},</span>
-         <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Groups from Dictionary&#39;</span><span class="p">,</span>
-         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-         <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_43_0.png"><img alt="png" src="_images/sci_analysis_main_43_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
+
+n         =  60
+Slope     =  0.0281
+Intercept = -0.9407
+r         =  0.0449
+r^2       =  0.0020
+Std Err   =  0.0820
+p value   =  0.7332
+
+
+
+<span class="gh">Spearman Correlation Coefficient</span>
+<span class="gh">--------------------------------</span>
+
+alpha   =  0.0500
+r value =  0.0316
+p value =  0.8105
+
+H0: There is no significant relationship between predictor and response
 </pre></div>
 </div>
-<img alt="_images/corr9.png" src="_images/corr9.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
-
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">15</span>            <span class="o">-</span><span class="mf">0.1906</span>        <span class="mf">2.6335</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">0.2217</span>        <span class="mf">3.5229</span>       <span class="n">Group</span> <span class="n">D</span>
-<span class="mi">15</span>             <span class="mf">0.7406</span>        <span class="mf">2.4806</span>       <span class="o">-</span><span class="mf">3.0538</span>        <span class="mf">0.9879</span>        <span class="mf">5.6546</span>       <span class="n">Group</span> <span class="n">B</span>
-<span class="mi">15</span>             <span class="mf">0.9334</span>        <span class="mf">3.9554</span>       <span class="o">-</span><span class="mf">5.9492</span>       <span class="o">-</span><span class="mf">0.0510</span>        <span class="mf">5.2850</span>       <span class="n">Group</span> <span class="n">C</span>
-<span class="mi">15</span>            <span class="o">-</span><span class="mf">0.3873</span>        <span class="mf">3.2660</span>       <span class="o">-</span><span class="mf">7.4153</span>       <span class="o">-</span><span class="mf">0.1489</span>        <span class="mf">4.0653</span>       <span class="n">Group</span> <span class="n">A</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">3.7931</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.2847</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
-
-
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
-
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6628</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.5784</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+<p>To check whether an individual <strong>Condition</strong> correlates between Column <strong>One</strong> and Column <strong>Three</strong>, the same analysis can be done, but this time by passing the <strong>Condition</strong> column to the groups argument. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
+    <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
+    <span class="n">groups</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">],</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate Analysis between Column One and Column Three&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>Notice that the dictionary comprehension produces the same results but in a different order, and did not require the &#8216;groups&#8217; argument to be set. In this situation, &#8216;name&#8217; in the dictionary comprehension represents the group names to be used, making the &#8216;groups&#8217; argument unnecessary to set. Using a dictionary comprehension is fine when the groups are unknown, but not ideal if the boxplots should be shown in a particular order.</p>
-<p>Let&#8217;s consider an example where the data is grouped by the &#8216;Month&#8217; column instead of &#8216;Condition&#8217;:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-<span class="n">months</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">]):</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">])</span>
-    <span class="n">months</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_45_0.png"><img alt="png" src="_images/sci_analysis_main_45_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
 
-<span class="n">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-        <span class="n">groups</span><span class="o">=</span><span class="n">months</span><span class="p">,</span>
-        <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Months from List&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<span class="gh">n             Slope         Intercept     r^2           Std Err       p value       Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+15             0.1113       -1.1181        0.0487        0.1364        0.4293       Group A
+15            -0.2586       -0.9348        0.1392        0.1784        0.1708       Group B
+15             0.3688       -1.0182        0.1869        0.2134        0.1076       Group C
+15             0.0611       -0.7352        0.0075        0.1952        0.7591       Group D
+
+
+<span class="gh">Spearman Correlation Coefficient</span>
+<span class="gh">--------------------------------</span>
+
+<span class="gh">n             r value       p value       Group</span>
+<span class="gh">--------------------------------------------------------</span>
+15             0.1357        0.6296       Group A
+15            -0.3643        0.1819       Group B
+15             0.3714        0.1728       Group C
+15             0.1786        0.5243       Group D
 </pre></div>
 </div>
-<img alt="_images/corr10.png" src="_images/corr10.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
-
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">5</span>              <span class="mf">2.2163</span>        <span class="mf">3.4431</span>       <span class="o">-</span><span class="mf">2.6899</span>        <span class="mf">4.1257</span>        <span class="mf">5.1658</span>       <span class="n">Mar</span>
-<span class="mi">5</span>              <span class="mf">1.7872</span>        <span class="mf">3.4116</span>       <span class="o">-</span><span class="mf">3.0538</span>        <span class="mf">1.1383</span>        <span class="mf">5.6546</span>       <span class="n">Feb</span>
-<span class="mi">5</span>              <span class="mf">0.9972</span>        <span class="mf">1.5334</span>       <span class="o">-</span><span class="mf">1.1743</span>        <span class="mf">1.2664</span>        <span class="mf">2.8004</span>       <span class="n">Aug</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.3628</span>        <span class="mf">3.3515</span>       <span class="o">-</span><span class="mf">5.7216</span>       <span class="o">-</span><span class="mf">1.0495</span>        <span class="mf">3.3774</span>       <span class="n">Sep</span>
-<span class="mi">5</span>              <span class="mf">1.4629</span>        <span class="mf">2.0392</span>       <span class="o">-</span><span class="mf">1.5363</span>        <span class="mf">1.3246</span>        <span class="mf">4.0653</span>       <span class="n">May</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">0.0327</span>        <span class="mf">1.9319</span>       <span class="o">-</span><span class="mf">2.1934</span>        <span class="mf">0.9879</span>        <span class="mf">1.8137</span>       <span class="n">Jun</span>
-<span class="mi">5</span>              <span class="mf">1.8617</span>        <span class="mf">4.6673</span>       <span class="o">-</span><span class="mf">5.1767</span>        <span class="mf">4.9062</span>        <span class="mf">5.2850</span>       <span class="n">Jul</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.2622</span>        <span class="mf">3.9392</span>       <span class="o">-</span><span class="mf">7.4153</span>       <span class="o">-</span><span class="mf">0.1489</span>        <span class="mf">3.0673</span>       <span class="n">Jan</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.3938</span>        <span class="mf">3.0508</span>       <span class="o">-</span><span class="mf">5.6558</span>       <span class="o">-</span><span class="mf">1.8426</span>        <span class="mf">1.7373</span>       <span class="n">Apr</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.2777</span>        <span class="mf">3.4456</span>       <span class="o">-</span><span class="mf">5.9492</span>       <span class="o">-</span><span class="mf">0.3654</span>        <span class="mf">3.1604</span>       <span class="n">Nov</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">0.1753</span>        <span class="mf">3.0070</span>       <span class="o">-</span><span class="mf">3.9105</span>       <span class="o">-</span><span class="mf">0.0537</span>        <span class="mf">3.5229</span>       <span class="n">Dec</span>
-<span class="mi">5</span>              <span class="mf">0.4673</span>        <span class="mf">1.9890</span>       <span class="o">-</span><span class="mf">2.2962</span>        <span class="mf">0.2914</span>        <span class="mf">2.7754</span>       <span class="n">Oct</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">8.1523</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6996</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
-
-
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
-
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.9875</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.4709</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+<p>The borders of the graph have boxplots for all the data points on the x-axis and y-axis, regardless of which group they belong to. The borders can be removed by adding the argument <code class="docutils literal"><span class="pre">boxplot_borders=False</span></code>.</p>
+<p>According to the Spearman Correlation, there is no significant correlation among the groups. Group B is the only group with a negative slope, but it can be difficult to see the data points for Group B with so many colors on the graph. The Group B data points can be highlighted by using the argument <code class="docutils literal"><span class="pre">highlight=['Group</span> <span class="pre">B']</span></code>. In fact, any number of groups can be highlighted by passing a list of the group names using the <code class="docutils literal"><span class="pre">highlight</span></code> argument.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span>
+    <span class="n">xname</span><span class="o">=</span><span class="s1">&#39;Column One&#39;</span><span class="p">,</span>
+    <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;Column Three&#39;</span><span class="p">,</span>
+    <span class="n">groups</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">],</span>
+    <span class="n">boxplot_borders</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">highlight</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Group B&#39;</span><span class="p">],</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Bivariate Analysis between Column One and Column Three&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>In this example, a for loop is used to build the data and month lists. This method works well, but the months are graphed out of order. Since the possible months are known in advance, it&#8217;s possible to set the months in the order they should appear in. This is done by creating a list called months with the ordered months, a dictionary comprehension called data and list comprehension that puts the values in data in the order of the months list:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">months</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">month</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">month</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">])}</span>
-<span class="n">analyze</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="n">months</span><span class="p">],</span>
-        <span class="n">groups</span><span class="o">=</span><span class="n">months</span><span class="p">,</span>
-        <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Ordered Months from Dictionary&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_47_0.png"><img alt="png" src="_images/sci_analysis_main_47_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Linear Regression</span>
+<span class="gh">-----------------</span>
+
+<span class="gh">n             Slope         Intercept     r^2           Std Err       p value       Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+15             0.1113       -1.1181        0.0487        0.1364        0.4293       Group A
+15            -0.2586       -0.9348        0.1392        0.1784        0.1708       Group B
+15             0.3688       -1.0182        0.1869        0.2134        0.1076       Group C
+15             0.0611       -0.7352        0.0075        0.1952        0.7591       Group D
+
+
+<span class="gh">Spearman Correlation Coefficient</span>
+<span class="gh">--------------------------------</span>
+
+<span class="gh">n             r value       p value       Group</span>
+<span class="gh">--------------------------------------------------------</span>
+15             0.1357        0.6296       Group A
+15            -0.3643        0.1819       Group B
+15             0.3714        0.1728       Group C
+15             0.1786        0.5243       Group D
 </pre></div>
 </div>
-<img alt="_images/comp11.png" src="_images/comp11.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
-
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">5</span>              <span class="mf">2.2163</span>        <span class="mf">3.4431</span>       <span class="o">-</span><span class="mf">2.6899</span>        <span class="mf">4.1257</span>        <span class="mf">5.1658</span>       <span class="n">Mar</span>
-<span class="mi">5</span>              <span class="mf">1.7872</span>        <span class="mf">3.4116</span>       <span class="o">-</span><span class="mf">3.0538</span>        <span class="mf">1.1383</span>        <span class="mf">5.6546</span>       <span class="n">Feb</span>
-<span class="mi">5</span>              <span class="mf">0.9972</span>        <span class="mf">1.5334</span>       <span class="o">-</span><span class="mf">1.1743</span>        <span class="mf">1.2664</span>        <span class="mf">2.8004</span>       <span class="n">Aug</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.3628</span>        <span class="mf">3.3515</span>       <span class="o">-</span><span class="mf">5.7216</span>       <span class="o">-</span><span class="mf">1.0495</span>        <span class="mf">3.3774</span>       <span class="n">Sep</span>
-<span class="mi">5</span>              <span class="mf">1.4629</span>        <span class="mf">2.0392</span>       <span class="o">-</span><span class="mf">1.5363</span>        <span class="mf">1.3246</span>        <span class="mf">4.0653</span>       <span class="n">May</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">0.0327</span>        <span class="mf">1.9319</span>       <span class="o">-</span><span class="mf">2.1934</span>        <span class="mf">0.9879</span>        <span class="mf">1.8137</span>       <span class="n">Jun</span>
-<span class="mi">5</span>              <span class="mf">1.8617</span>        <span class="mf">4.6673</span>       <span class="o">-</span><span class="mf">5.1767</span>        <span class="mf">4.9062</span>        <span class="mf">5.2850</span>       <span class="n">Jul</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.2622</span>        <span class="mf">3.9392</span>       <span class="o">-</span><span class="mf">7.4153</span>       <span class="o">-</span><span class="mf">0.1489</span>        <span class="mf">3.0673</span>       <span class="n">Jan</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.3938</span>        <span class="mf">3.0508</span>       <span class="o">-</span><span class="mf">5.6558</span>       <span class="o">-</span><span class="mf">1.8426</span>        <span class="mf">1.7373</span>       <span class="n">Apr</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.2777</span>        <span class="mf">3.4456</span>       <span class="o">-</span><span class="mf">5.9492</span>       <span class="o">-</span><span class="mf">0.3654</span>        <span class="mf">3.1604</span>       <span class="n">Nov</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">0.1753</span>        <span class="mf">3.0070</span>       <span class="o">-</span><span class="mf">3.9105</span>       <span class="o">-</span><span class="mf">0.0537</span>        <span class="mf">3.5229</span>       <span class="n">Dec</span>
-<span class="mi">5</span>              <span class="mf">0.4673</span>        <span class="mf">1.9890</span>       <span class="o">-</span><span class="mf">2.2962</span>        <span class="mf">0.2914</span>        <span class="mf">2.7754</span>       <span class="n">Oct</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">8.1523</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6996</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
-
-
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
-
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.9875</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.4709</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+<p>Performing a location test on data in a pandas DataFrame requires some explanation. A location test can be performed with stacked or unstacked data. One method will be easier than the other depending on how the data to be analyzed is stored. In the example DataFrame used so far, to perform a location test between the groups in the <strong>Condition</strong> column, the stacked method will be easier to use.</p>
+<p>Let’s start with an example. The following code will perform a location test using each of the four values in the <strong>Condition</strong> column:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">],</span>
+    <span class="n">groups</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Condition&#39;</span><span class="p">],</span>
+    <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Condition&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>In the last example, the months list was used to specify the order the box plots should be graphed in. The same technique can be applied for selecting particular groups, such as only comparing months that have 31 days.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">months</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">month</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">month</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">])}</span>
-<span class="n">analyze</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="n">months</span><span class="p">],</span>
-        <span class="n">groups</span><span class="o">=</span><span class="n">months</span><span class="p">,</span>
-        <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Months with 31 Days&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_49_0.png"><img alt="png" src="_images/sci_analysis_main_49_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
+
+Number of Groups =  4
+Total            =  60
+Grand Mean       =  0.4456
+Pooled Std Dev   =  3.6841
+Grand Median     =  0.5138
+
+
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
+
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+15             1.2712        3.7471       -5.1767        2.5874        7.5816       Group A
+15            -0.3616        3.2792       -6.8034        0.2217        3.6384       Group B
+15            -0.1135        3.7338       -7.4153        0.0224        4.2242       Group C
+15             0.9864        3.9441       -4.1688        0.8059        9.4199       Group D
+
+
+<span class="gh">Bartlett Test</span>
+<span class="gh">-------------</span>
+
+alpha   =  0.0500
+T value =  0.4868
+p value =  0.9218
+
+H0: Variances are equal
+
+
+
+<span class="gh">Oneway ANOVA</span>
+<span class="gh">------------</span>
+
+alpha   =  0.0500
+f value =  0.7140
+p value =  0.5477
+
+H0: Group means are matched
 </pre></div>
 </div>
-<img alt="_images/comp12.png" src="_images/comp12.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
-
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">1.2622</span>        <span class="mf">3.9392</span>       <span class="o">-</span><span class="mf">7.4153</span>       <span class="o">-</span><span class="mf">0.1489</span>        <span class="mf">3.0673</span>       <span class="n">Jan</span>
-<span class="mi">5</span>              <span class="mf">2.2163</span>        <span class="mf">3.4431</span>       <span class="o">-</span><span class="mf">2.6899</span>        <span class="mf">4.1257</span>        <span class="mf">5.1658</span>       <span class="n">Mar</span>
-<span class="mi">5</span>              <span class="mf">0.9972</span>        <span class="mf">1.5334</span>       <span class="o">-</span><span class="mf">1.1743</span>        <span class="mf">1.2664</span>        <span class="mf">2.8004</span>       <span class="n">Aug</span>
-<span class="mi">5</span>              <span class="mf">1.4629</span>        <span class="mf">2.0392</span>       <span class="o">-</span><span class="mf">1.5363</span>        <span class="mf">1.3246</span>        <span class="mf">4.0653</span>       <span class="n">May</span>
-<span class="mi">5</span>             <span class="o">-</span><span class="mf">0.1753</span>        <span class="mf">3.0070</span>       <span class="o">-</span><span class="mf">3.9105</span>       <span class="o">-</span><span class="mf">0.0537</span>        <span class="mf">3.5229</span>       <span class="n">Dec</span>
-<span class="mi">5</span>              <span class="mf">0.4673</span>        <span class="mf">1.9890</span>       <span class="o">-</span><span class="mf">2.2962</span>        <span class="mf">0.2914</span>        <span class="mf">2.7754</span>       <span class="n">Oct</span>
-<span class="mi">5</span>              <span class="mf">1.8617</span>        <span class="mf">4.6673</span>       <span class="o">-</span><span class="mf">5.1767</span>        <span class="mf">4.9062</span>        <span class="mf">5.2850</span>       <span class="n">Jul</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">6.6838</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.3511</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
-
-
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
-
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.7583</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.6085</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+<p>From the graph, there are four groups: Group A, Group B, Group C and Group D in Column <strong>Two</strong>. The analysis shows that the variances are equal and there is no significant difference in the means. Noting the tests that are being performed, the Bartlett test is being used to check for equal variance because all four groups are normally distributed, and the Oneway ANOVA is being used to test if all means are equal because all four groups are normally distributed and the variances are equal. However, if not all the groups are normally distributed, the Levene Test will be used to check for equal variance instead of the Bartlett Test. Also, if the groups are not normally distributed or the variances are not equal, the Kruskal-Wallis test will be used instead of the Oneway ANOVA.</p>
+<p>If instead the four columns <strong>One</strong>, <strong>Two</strong>, <strong>Three</strong> and <strong>Four</strong> are to be analyzed, the easier way to perform the analysis is with the unstacked method. The following code will perform a location test of the four columns:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Four&#39;</span><span class="p">]],</span>
+    <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">,</span> <span class="s1">&#39;Two&#39;</span><span class="p">,</span> <span class="s1">&#39;Three&#39;</span><span class="p">,</span> <span class="s1">&#39;Four&#39;</span><span class="p">],</span>
+    <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Columns&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Unstacked Oneway&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>With pandas, it&#8217;s possible to perform advanced aggregation and filtering functions using the GroupBy object&#8217;s <code class="docutils literal"><span class="pre">apply</span></code> method. Since the sample sizes were small for each month in the above examples, it might be helpful to group the data by annual quarters instead. First, let&#8217;s create a function that adds a column called &#8216;Quarter&#8217; to the DataFrame where the value is either Q1, Q2, Q3 or Q4 depending on the month.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_quarter</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_51_0.png"><img alt="png" src="_images/sci_analysis_main_51_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
+
+Number of Groups =  4
+Total            =  240
+Grand Mean       = -0.0995
+Pooled Std Dev   =  1.9859
+Grand Median     =  0.0752
+
+
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
+
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+60             0.1007        1.0294       -2.2349        0.0621        3.4087       Four
+60            -0.0035        0.9815       -2.4036        0.0882        1.8537       One
+60            -0.9408        0.6133       -2.4177       -0.8318       -0.0015       Three
+60             0.4456        3.6572       -7.4153        0.5138        9.4199       Two
+
+
+<span class="gh">Levene Test</span>
+<span class="gh">-----------</span>
+
+alpha   =  0.0500
+W value =  64.7684
+p value =  0.0000
+
+HA: Variances are not equal
+
+
+
+<span class="gh">Kruskal-Wallis</span>
+<span class="gh">--------------</span>
+
+alpha   =  0.0500
+h value =  33.8441
+p value =  0.0000
+
+HA: Group means are not matched
+</pre></div>
+</div>
+<p>To perform a location test using the unstacked method, the columns to be analyzed are passed in a list or tuple, and the groups argument needs to be a list or tuple of the group names. One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;One&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;One&#39;</span><span class="p">],</span> <span class="s1">&#39;Two&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">],</span> <span class="s1">&#39;Three&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Three&#39;</span><span class="p">],</span> <span class="s1">&#39;Four&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Four&#39;</span><span class="p">]},</span>
+    <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Columns&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Unstacked Oneway Using a Dictionary&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="./img/sci_analysis_main_53_0.png"><img alt="png" src="_images/sci_analysis_main_53_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
+
+Number of Groups =  4
+Total            =  240
+Grand Mean       = -0.0995
+Pooled Std Dev   =  1.9859
+Grand Median     =  0.0752
+
+
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
+
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+60             0.1007        1.0294       -2.2349        0.0621        3.4087       Four
+60            -0.0035        0.9815       -2.4036        0.0882        1.8537       One
+60            -0.9408        0.6133       -2.4177       -0.8318       -0.0015       Three
+60             0.4456        3.6572       -7.4153        0.5138        9.4199       Two
+
+
+<span class="gh">Levene Test</span>
+<span class="gh">-----------</span>
+
+alpha   =  0.0500
+W value =  64.7684
+p value =  0.0000
+
+HA: Variances are not equal
+
+
+
+<span class="gh">Kruskal-Wallis</span>
+<span class="gh">--------------</span>
+
+alpha   =  0.0500
+h value =  33.8441
+p value =  0.0000
+
+HA: Group means are not matched
+</pre></div>
+</div>
+<p>The output will be identical to the previous example. The analysis also shows that the variances are not equal, and the means are not matched. Also, because the data in column <strong>Three</strong> is not normally distributed, the Levene Test is used to test for equal variance instead of the Bartlett Test, and the Kruskal-Wallis Test is used instead of the Oneway ANOVA.</p>
+<p>With pandas, it’s possible to perform advanced aggregation and filtering functions using the GroupBy object’s <code class="docutils literal"><span class="pre">apply()</span></code> method. Since the sample sizes were small for each month in the above examples, it might be helpful to group the data by annual quarters instead. First, let’s create a function that adds a column called <strong>Quarter</strong> to the DataFrame where the value is either Q1, Q2, Q3 or Q4 depending on the month.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_quarter</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="n">month</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">month</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">):</span>
         <span class="n">quarter</span> <span class="o">=</span> <span class="s1">&#39;Q1&#39;</span>
@@ -665,46 +1482,64 @@
     <span class="k">return</span> <span class="n">data</span>
 </pre></div>
 </div>
-<p>This function will take a GroupBy object called data, where data&#8217;s DataFrame object was grouped by month, and set the variable quarter based off the month. Then, a new column called &#8216;Quarter&#8217; is added to data where the value of each row is equal to quarter. Finally, the resulting DataFrame object is returned.</p>
-<p>Using the new function is simple. The same techniques from previous examples are used, but this time, a new DataFrame object called df2 is created by first grouping by the &#8216;Month&#8217; column then calling the <code class="docutils literal"><span class="pre">apply</span></code> method which will run the set_quarter function.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">quarters</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Q2&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Q4&#39;</span><span class="p">]</span>
+<p>This function will take a GroupBy object called <em>data</em>, where <em>data</em>’s DataFrame object was grouped by month, and set the variable <em>quarter</em> based off the month. Then, a new column called <strong>Quarter</strong> is added to <em>data</em> where the value of each row is equal to <em>quarter</em>. Finally, the resulting DataFrame object is returned.</p>
+<p>Using the new function is simple. The same techniques from previous examples are used, but this time, a new DataFrame object called <em>df2</em> is created by first grouping by the <strong>Month</strong> column then calling the <code class="docutils literal"><span class="pre">apply()</span></code> method which will run the <code class="docutils literal"><span class="pre">set_quarter()</span></code> function.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">quarters</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Q2&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Q4&#39;</span><span class="p">)</span>
 <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">set_quarter</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">quarter</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Two&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">quarter</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="s1">&#39;Quarter&#39;</span><span class="p">])}</span>
-<span class="n">analyze</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">quarter</span><span class="p">]</span> <span class="k">for</span> <span class="n">quarter</span> <span class="ow">in</span> <span class="n">quarters</span><span class="p">],</span>
-        <span class="n">groups</span><span class="o">=</span><span class="n">quarters</span><span class="p">,</span>
-        <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Quarters&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway from pandas&#39;</span><span class="p">)</span>
+<span class="n">analyze</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">quarter</span><span class="p">]</span> <span class="k">for</span> <span class="n">quarter</span> <span class="ow">in</span> <span class="n">quarters</span><span class="p">],</span>
+    <span class="n">groups</span><span class="o">=</span><span class="n">quarters</span><span class="p">,</span>
+    <span class="n">categories</span><span class="o">=</span><span class="s1">&#39;Quarters&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Column Two&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Oneway of Annual Quarters&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/comp13.png" src="_images/comp13.png" />
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Group</span> <span class="n">Statistics</span>
+<a class="reference external image-reference" href="./img/sci_analysis_main_57_0.png"><img alt="png" src="_images/sci_analysis_main_57_0.png" /></a>
+<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="gh">Overall Statistics</span>
+<span class="gh">------------------</span>
 
-<span class="n">Count</span>         <span class="n">Mean</span>          <span class="n">Std</span> <span class="n">Dev</span>       <span class="n">Min</span>           <span class="n">Median</span>        <span class="n">Max</span>           <span class="n">Group</span>
-<span class="o">--------------------------------------------------------------------------------------------------</span>
-<span class="mi">15</span>             <span class="mf">0.9138</span>        <span class="mf">3.7034</span>       <span class="o">-</span><span class="mf">7.4153</span>        <span class="mf">0.8059</span>        <span class="mf">5.6546</span>       <span class="n">Q1</span>
-<span class="mi">15</span>             <span class="mf">0.4987</span>        <span class="mf">3.4778</span>       <span class="o">-</span><span class="mf">5.7216</span>        <span class="mf">0.2217</span>        <span class="mf">5.2850</span>       <span class="n">Q3</span>
-<span class="mi">15</span>             <span class="mf">0.0122</span>        <span class="mf">2.5243</span>       <span class="o">-</span><span class="mf">5.6558</span>        <span class="mf">1.1374</span>        <span class="mf">4.0653</span>       <span class="n">Q2</span>
-<span class="mi">15</span>            <span class="o">-</span><span class="mf">0.3286</span>        <span class="mf">2.7681</span>       <span class="o">-</span><span class="mf">5.9492</span>       <span class="o">-</span><span class="mf">0.0537</span>        <span class="mf">3.5229</span>       <span class="n">Q4</span>
-
-
-<span class="n">Bartlett</span> <span class="n">Test</span>
-<span class="o">-------------</span>
-
-<span class="n">T</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">2.6544</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.4480</span>
-
-<span class="n">H0</span><span class="p">:</span> <span class="n">Variances</span> <span class="n">are</span> <span class="n">equal</span>
+Number of Groups =  4
+Total            =  60
+Grand Mean       =  0.4456
+Pooled Std Dev   =  3.6815
+Grand Median     =  0.4141
 
 
-<span class="n">Oneway</span> <span class="n">ANOVA</span>
-<span class="o">------------</span>
+<span class="gh">Group Statistics</span>
+<span class="gh">----------------</span>
 
-<span class="n">f</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.4474</span>
-<span class="n">p</span> <span class="n">value</span> <span class="o">=</span>  <span class="mf">0.7201</span>
+<span class="gh">n             Mean          Std Dev       Min           Median        Max           Group</span>
+<span class="gh">--------------------------------------------------------------------------------------------------</span>
+15            -0.3956        3.6190       -7.4153       -0.0510        3.7046       Q1
+15             1.0271        3.4028       -3.1509        0.8059        7.5816       Q2
+15             1.2577        4.4120       -5.8003        2.5874        9.4199       Q3
+15            -0.1067        3.1736       -5.8342        0.0224        4.4318       Q4
 
-<span class="n">H0</span><span class="p">:</span> <span class="n">Group</span> <span class="n">means</span> <span class="n">are</span> <span class="n">matched</span>
+
+<span class="gh">Bartlett Test</span>
+<span class="gh">-------------</span>
+
+alpha   =  0.0500
+T value =  1.7209
+p value =  0.6323
+
+H0: Variances are equal
+
+
+
+<span class="gh">Oneway ANOVA</span>
+<span class="gh">------------</span>
+
+alpha   =  0.0500
+f value =  0.7416
+p value =  0.5318
+
+H0: Group means are matched
 </pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -716,18 +1551,24 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">What is sci_analysis?</a></li>
-<li><a class="reference internal" href="#what-s-new-in-sci-analysis-version-1-4">What&#8217;s new in sci_analysis version 1.4?</a></li>
-<li><a class="reference internal" href="#getting-started-with-sci-analysis">Getting started with sci_analysis</a></li>
-<li><a class="reference internal" href="#installing-sci-analysis">Installing sci_analysis</a></li>
-<li><a class="reference internal" href="#using-sci-analysis">Using sci_analysis</a></li>
-<li><a class="reference internal" href="#using-sci-analysis-with-pandas">Using sci_analysis with pandas</a></li>
+<li><a class="reference internal" href="#">sci-analysis</a><ul>
+<li><a class="reference internal" href="#current-version">Current Version</a><ul>
+<li><a class="reference internal" href="#what-is-sci-analysis">What is sci-analysis?</a></li>
+<li><a class="reference internal" href="#what-s-new-in-sci-analysis-version-2-2">What’s new in sci-analysis version 2.2?</a></li>
+<li><a class="reference internal" href="#getting-started-with-sci-analysis">Getting started with sci-analysis</a></li>
+<li><a class="reference internal" href="#installing-sci-analysis">Installing sci-analysis</a></li>
+<li><a class="reference internal" href="#using-sci-analysis">Using sci-analysis</a></li>
+<li><a class="reference internal" href="#using-sci-analysis-with-pandas">Using sci-analysis with pandas</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
+      <li><a href="_sources/index.md.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -751,12 +1592,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">sci_analysis 1.4.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">sci_analysis 2.0.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2015-2016, Chris Morrow.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+        &#169; Copyright 2015-2017, Chris Morrow.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
