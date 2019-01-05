@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as readme:
 
 setup(
     name='sci_analysis',
-    version='2.1.2',
+    version='2.2.0.rc1',
     description='An easy to use and powerful python-based data exploration and analysis tool',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -31,6 +31,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='statistics data EDA graphing visualization analysis scientific',
     install_requires=['numpy', 'scipy', 'pandas', 'matplotlib', 'six'],

@@ -235,7 +235,10 @@ class GroupComparison(Analysis):
 
 class GroupCorrelation(GroupComparison):
 
-    _names = {'pearson': 'Pearson Correlation Coefficient', 'spearman': 'Spearman Correlation Coefficient'}
+    _names = {
+        'pearson': 'Pearson Correlation Coefficient',
+        'spearman': 'Spearman Correlation Coefficient',
+    }
     _min_size = 2
     _r_value = 'r value'
     _p_value = 'p value'

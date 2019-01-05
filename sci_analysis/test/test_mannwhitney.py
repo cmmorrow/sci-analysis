@@ -23,15 +23,15 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  4976.0000
-p value =  0.9542
+u value =  5024.0000
+p value =  1.0477
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
-        self.assertAlmostEqual(exp.statistic, 4976.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
-        self.assertAlmostEqual(exp.u_value, 4976.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
+        self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_unmatched(self):
@@ -65,8 +65,8 @@ HA: Locations are not matched
         np.random.seed(987654321)
         x_parms = [1.7]
         y_parms = [1.7]
-        x_input = st.weibull_min.rvs(*x_parms, size=31)
-        y_input = st.weibull_min.rvs(*y_parms, size=31)
+        x_input = st.weibull_min.rvs(*x_parms, size=21)
+        y_input = st.weibull_min.rvs(*y_parms, size=21)
         alpha = 0.05
         exp = MannWhitney(x_input, y_input, alpha=alpha, display=False)
         output = """
@@ -75,8 +75,8 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  469.0000
-p value =  0.8769
+u value =  222.0000
+p value =  1.0401
 
 H0: Locations are matched
 """
@@ -89,7 +89,7 @@ H0: Locations are matched
         x_parms = [1.7]
         y_parms = [8.2]
         x_input = st.weibull_min.rvs(*x_parms, size=50)
-        y_input = st.weibull_min.rvs(*y_parms, size=31)
+        y_input = st.weibull_min.rvs(*y_parms, size=21)
         alpha = 0.1
         exp = MannWhitney(x_input, y_input, alpha=alpha, display=False)
         output = """
@@ -98,12 +98,12 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.1000
-u value =  597.0000
-p value =  0.0846
+u value =  440.0000
+p value =  0.2871
 
-HA: Locations are not matched
+H0: Locations are matched
 """
-        self.assertLess(exp.p_value, alpha, "FAIL: ManWhitney unmatched just above min size")
+        self.assertGreater(exp.p_value, alpha, "FAIL: ManWhitney unmatched just above min size")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_matched_at_min_size(self):
@@ -112,7 +112,7 @@ HA: Locations are not matched
         x_parms = [1.7]
         y_parms = [1.7]
         x_input = st.weibull_min.rvs(*x_parms, size=45)
-        y_input = st.weibull_min.rvs(*y_parms, size=30)
+        y_input = st.weibull_min.rvs(*y_parms, size=20)
         alpha = 0.05
         self.assertRaises(MinimumSizeError, lambda: MannWhitney(x_input, y_input, alpha=alpha, display=False))
 
@@ -144,15 +144,15 @@ Mann Whitney U Test
 -------------------
 
 alpha   =  0.0500
-u value =  4976.0000
-p value =  0.9542
+u value =  5024.0000
+p value =  1.0477
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
-        self.assertAlmostEqual(exp.statistic, 4976.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
-        self.assertAlmostEqual(exp.u_value, 4976.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
+        self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_missing_second_arg(self):

@@ -5,17 +5,15 @@ An easy to use and powerful python-based data exploration and analysis tool
 
 ## Current Version
 
-2.2 --- Released January 5, 2019
+2.1 --- Released March 30, 2018
 
 ### What is sci-analysis?
 
-sci-analysis is a python package for quickly performing exploratory data analysis (EDA). It aims to make performing EDA easier for newcomers and experienced data analysts alike by abstracting away the specific SciPy, NumPy, and Matplotlib commands. This is accomplished by using sci-analysis's ``analyze()`` function.
+sci-analysis is a python package for quickly performing statistical data analysis. It aims to make performing Exploratory Data Analysis (EDA) easier for newcomers and experienced data analysts alike by abstracting away the specific SciPy, NumPy, and Matplotlib commands. This is accomplished by using sci-analysis's ``analyze()`` function.
 
-The main features of sci-analysis are:
-* Fast EDA with the analyze() function.
-* Great looking graphs without writing several lines of matplotlib code.
-* Automatic use of the most appropriate hypothesis test for the supplied data.
-* Automatic handling of missing values.
+With EDA, using summary statistics and tables alone can produce misleading results. Likewise, analysis of statistical graphs alone can be interpreted differently from user to user. For this reason, sci-analysis provides a graphical representation of the supplied data as well as performs the statistical analysis. 
+
+What makes sci-analysis unique and easy to use is the ``analyze()`` function, which is smart enough to determine the correct analysis and tests to perform based on the shape of the data or number of arguments you provide, as well as how the data is distributed.
 
 Currently, sci-analysis is capable of performing four common statistical analysis techniques:
 * Histograms and summary of numeric data
@@ -23,20 +21,22 @@ Currently, sci-analysis is capable of performing four common statistical analysi
 * Bivariate and linear regression analysis
 * Location testing
 
-### What's new in sci-analysis version 2.2?
+### What's new in sci-analysis version 2.1?
 
-* Version 2.2 adds the ability to add data labels to scatter plots.
-* The default behavior of the histogram and statistics was changed from assuming a sample, to assuming a population.
-* Fixed a bug involving the Mann Whitney U test, where the minimum size was set incorrectly.
-* Verified compatibility with python 3.7.
+* Version 2.1 makes improvements to Statistical output and plots.
+* Tukey-Kramer circles were added to the Oneway analysis plot.
+* Grand Mean and Grand Median were added to the Oneway analysis plot.
+* Overall Statistics were added to Oneway analysis.
+* Overall Statistics were added to Categorical analysis.
+* The Categorical analysis graph was changed to improve the appearance.
 
 ### Getting started with sci-analysis
 
-sci-analysis requires python 2.7, 3.5, 3.6, or 3.7.
+sci-analysis requires python 2.7, 3.5, or 3.6.
 
-If one of these four version of python is already installed then this section can be skipped.
+If one of these three version of python is already installed then this section can be skipped.
 
-If you use MacOS or Linux, python should already be installed. You can check by opening a terminal window and typing ``which python`` on the command line. To verify what version of python you have installed, type ``python --version`` at the command line. If the version is 2.7.x, 3.5.x, 3.6.x, or 3.7.x where x is any number, sci-analysis should work properly.
+If you use MacOS or Linux, python should already be installed. You can check by opening a terminal window and typing ``which python`` on the command line. To verify what version of python you have installed, type ``python --version`` at the command line. If the version is 2.7.x, 3.5.x or 3.6.x, where x is any number, sci-analysis should work properly.
 
 .. note:: It is not recommended to use sci-analysis with the system installed python. This is because the version of python that comes with your OS will require root permission to manage, might be changed when upgrading the OS, and can break your OS if critical packages are accidentally removed. More info on why the system python should not be used can be found here: https://github.com/MacPython/wiki/wiki/Which-Python
 
@@ -63,8 +63,10 @@ If you are on Windows, you can download the python binary from the following pag
 sci-analysis can be installed with pip by typing the following:
 
 ```
-pip install sci-analysis
+pip install sci_analysis
 ```
+
+.. note:: The package name is ``sci_analysis`` with an underscore.
 
 On Linux, you can install pip from your OS package manager. If you have Anaconda or Mini-conda, pip should already be installed. Otherwise, you can download pip from the following page:
 
@@ -124,7 +126,7 @@ analyze(xdata=data)
     
     n         =  1000
     Mean      =  0.0551
-    Std Dev   =  1.0282
+    Std Dev   =  1.0287
     Std Error =  0.0325
     Skewness  = -0.1439
     Kurtosis  = -0.0931
@@ -194,7 +196,7 @@ print(analyze.__name__, signature(analyze))
 print(analyze.__doc__)
 ```
 
-    analyze (xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs)
+    analyze (xdata, ydata=None, groups=None, alpha=0.05, **kwargs)
     
         Automatically performs a statistical analysis based on the input arguments.
     
@@ -206,8 +208,6 @@ print(analyze.__doc__)
             The response or secondary set of data.
         groups : array-like
             The group names used for location testing or Bivariate analysis.
-        labels : array-like or None
-            The sequence of data point labels.
         alpha : float
             The sensitivity to use for hypothesis tests.
     
@@ -484,17 +484,12 @@ Let's create a pandas DataFrame to use for analysis:
 ```python
 import pandas as pd
 np.random.seed(987654321)
-df = pd.DataFrame(
-    {
-        'ID'        : np.random.randint(10000, 50000, size=60).astype(str),
-        'One'       : st.norm.rvs(0.0, 1, size=60),
-        'Two'       : st.norm.rvs(0.0, 3, size=60),
-        'Three'     : st.weibull_max.rvs(1.2, size=60),
-        'Four'      : st.norm.rvs(0.0, 1, size=60),
-        'Month'     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] * 5,
-        'Condition' : ['Group A', 'Group B', 'Group C', 'Group D'] * 15
-    }
-)
+df = pd.DataFrame({'One'   : st.norm.rvs(0.0, 1, size=60),
+                   'Two'   : st.norm.rvs(0.0, 3, size=60),
+                   'Three' : st.weibull_max.rvs(1.2, size=60),
+                   'Four'  : st.norm.rvs(0.0, 1, size=60),
+                   'Month' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] * 5,
+                   'Condition' : ['Group A', 'Group B', 'Group C', 'Group D'] * 15})
 df
 ```
 
@@ -519,615 +514,554 @@ df
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>ID</th>
-      <th>One</th>
-      <th>Two</th>
-      <th>Three</th>
+      <th>Condition</th>
       <th>Four</th>
       <th>Month</th>
-      <th>Condition</th>
+      <th>One</th>
+      <th>Three</th>
+      <th>Two</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>33815</td>
-      <td>-1.199973</td>
-      <td>-0.051015</td>
-      <td>-0.556609</td>
-      <td>-1.145177</td>
-      <td>Jan</td>
       <td>Group A</td>
+      <td>0.058648</td>
+      <td>Jan</td>
+      <td>2.246551</td>
+      <td>-1.773298</td>
+      <td>3.067338</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>49378</td>
-      <td>-0.142682</td>
-      <td>3.522920</td>
-      <td>-1.424446</td>
-      <td>-0.880138</td>
-      <td>Feb</td>
       <td>Group B</td>
+      <td>0.882809</td>
+      <td>Feb</td>
+      <td>-0.645918</td>
+      <td>-1.507548</td>
+      <td>4.390899</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>21015</td>
-      <td>-1.746777</td>
-      <td>-7.415294</td>
-      <td>-1.804494</td>
-      <td>-0.487270</td>
-      <td>Mar</td>
       <td>Group C</td>
+      <td>-0.393765</td>
+      <td>Mar</td>
+      <td>-1.183577</td>
+      <td>-1.098097</td>
+      <td>4.125750</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>15552</td>
-      <td>-0.437626</td>
-      <td>0.805884</td>
-      <td>-1.235840</td>
-      <td>0.416363</td>
-      <td>Apr</td>
       <td>Group D</td>
+      <td>-1.115985</td>
+      <td>Apr</td>
+      <td>1.929493</td>
+      <td>-1.484530</td>
+      <td>-5.655830</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>38833</td>
-      <td>-1.205166</td>
-      <td>-0.105672</td>
-      <td>-1.683723</td>
-      <td>-0.151296</td>
-      <td>May</td>
       <td>Group A</td>
+      <td>0.201746</td>
+      <td>May</td>
+      <td>0.066814</td>
+      <td>-0.695673</td>
+      <td>1.137421</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>13561</td>
-      <td>-0.610066</td>
-      <td>-1.842630</td>
-      <td>-1.280547</td>
-      <td>0.645674</td>
-      <td>Jun</td>
       <td>Group B</td>
+      <td>-1.739743</td>
+      <td>Jun</td>
+      <td>-0.997060</td>
+      <td>-0.718185</td>
+      <td>1.281548</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>36967</td>
-      <td>-0.203453</td>
-      <td>2.323542</td>
-      <td>-1.326379</td>
-      <td>1.014516</td>
-      <td>Jul</td>
       <td>Group C</td>
+      <td>-0.088919</td>
+      <td>Jul</td>
+      <td>0.815330</td>
+      <td>-0.784834</td>
+      <td>5.014646</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>43379</td>
-      <td>0.085310</td>
-      <td>-2.053241</td>
-      <td>-0.503970</td>
-      <td>-1.349427</td>
-      <td>Aug</td>
       <td>Group D</td>
+      <td>-0.813064</td>
+      <td>Aug</td>
+      <td>-1.340937</td>
+      <td>-0.214690</td>
+      <td>2.800435</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>36113</td>
-      <td>1.853726</td>
-      <td>-5.176661</td>
-      <td>-1.935414</td>
-      <td>0.513536</td>
-      <td>Sep</td>
       <td>Group A</td>
+      <td>-0.605264</td>
+      <td>Sep</td>
+      <td>1.910637</td>
+      <td>-0.345766</td>
+      <td>-2.959447</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>18422</td>
-      <td>-0.614827</td>
-      <td>1.266392</td>
-      <td>-0.292610</td>
-      <td>-2.234853</td>
-      <td>Oct</td>
       <td>Group B</td>
+      <td>-0.198116</td>
+      <td>Oct</td>
+      <td>0.709583</td>
+      <td>-0.907204</td>
+      <td>-0.363670</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>24986</td>
-      <td>0.091151</td>
-      <td>-5.721601</td>
-      <td>-0.330216</td>
-      <td>1.269432</td>
-      <td>Nov</td>
       <td>Group C</td>
+      <td>1.379706</td>
+      <td>Nov</td>
+      <td>1.129347</td>
+      <td>-1.081587</td>
+      <td>-0.365354</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>27743</td>
-      <td>0.367027</td>
-      <td>1.929861</td>
-      <td>-0.388752</td>
-      <td>-0.807231</td>
-      <td>Dec</td>
       <td>Group D</td>
+      <td>-1.020806</td>
+      <td>Dec</td>
+      <td>-1.139548</td>
+      <td>-0.459009</td>
+      <td>-3.910547</td>
     </tr>
     <tr>
       <th>12</th>
-      <td>29620</td>
-      <td>0.337290</td>
-      <td>3.160379</td>
-      <td>-0.139480</td>
-      <td>0.917287</td>
-      <td>Jan</td>
       <td>Group A</td>
+      <td>0.128327</td>
+      <td>Jan</td>
+      <td>0.309055</td>
+      <td>-1.522231</td>
+      <td>0.502254</td>
     </tr>
     <tr>
       <th>13</th>
-      <td>16982</td>
-      <td>-2.403575</td>
-      <td>1.846666</td>
-      <td>-0.689486</td>
-      <td>-0.406160</td>
-      <td>Feb</td>
       <td>Group B</td>
+      <td>-0.281124</td>
+      <td>Feb</td>
+      <td>-0.594467</td>
+      <td>-0.449248</td>
+      <td>1.138284</td>
     </tr>
     <tr>
       <th>14</th>
-      <td>49184</td>
-      <td>-1.008465</td>
-      <td>-0.148862</td>
-      <td>-1.620799</td>
-      <td>0.707101</td>
-      <td>Mar</td>
       <td>Group C</td>
+      <td>1.319009</td>
+      <td>Mar</td>
+      <td>-1.091333</td>
+      <td>-0.552761</td>
+      <td>4.585332</td>
     </tr>
     <tr>
       <th>15</th>
-      <td>35850</td>
-      <td>-0.352184</td>
-      <td>5.654610</td>
-      <td>-0.966809</td>
-      <td>0.927546</td>
-      <td>Apr</td>
       <td>Group D</td>
+      <td>-0.547517</td>
+      <td>Apr</td>
+      <td>0.366702</td>
+      <td>-0.298619</td>
+      <td>1.737304</td>
     </tr>
     <tr>
       <th>16</th>
-      <td>47386</td>
-      <td>0.598030</td>
-      <td>-2.689915</td>
-      <td>-1.253860</td>
-      <td>0.570852</td>
-      <td>May</td>
       <td>Group A</td>
+      <td>1.638618</td>
+      <td>May</td>
+      <td>-0.387678</td>
+      <td>-0.869620</td>
+      <td>-1.536255</td>
     </tr>
     <tr>
       <th>17</th>
-      <td>19963</td>
-      <td>0.573027</td>
-      <td>1.372438</td>
-      <td>-0.690340</td>
-      <td>-0.798698</td>
-      <td>Jun</td>
       <td>Group B</td>
+      <td>-0.389347</td>
+      <td>Jun</td>
+      <td>-1.637016</td>
+      <td>-0.926374</td>
+      <td>0.987896</td>
     </tr>
     <tr>
       <th>18</th>
-      <td>25412</td>
-      <td>0.215652</td>
-      <td>4.065310</td>
-      <td>-2.168703</td>
-      <td>-1.567035</td>
-      <td>Jul</td>
       <td>Group C</td>
+      <td>0.018815</td>
+      <td>Jul</td>
+      <td>1.725978</td>
+      <td>-2.258327</td>
+      <td>5.285016</td>
     </tr>
     <tr>
       <th>19</th>
-      <td>38630</td>
-      <td>-0.436220</td>
-      <td>-2.193357</td>
-      <td>-0.821331</td>
-      <td>0.071891</td>
-      <td>Aug</td>
       <td>Group D</td>
+      <td>-1.519705</td>
+      <td>Aug</td>
+      <td>0.785090</td>
+      <td>-0.099053</td>
+      <td>-1.174279</td>
     </tr>
     <tr>
       <th>20</th>
-      <td>29330</td>
-      <td>0.209028</td>
-      <td>-0.720595</td>
-      <td>-1.019263</td>
-      <td>0.798486</td>
-      <td>Sep</td>
       <td>Group A</td>
+      <td>0.246948</td>
+      <td>Sep</td>
+      <td>-0.836660</td>
+      <td>-0.255706</td>
+      <td>-0.460675</td>
     </tr>
     <tr>
       <th>21</th>
-      <td>15612</td>
-      <td>0.406017</td>
-      <td>0.221715</td>
-      <td>-2.252922</td>
-      <td>-0.006731</td>
-      <td>Oct</td>
       <td>Group B</td>
+      <td>-0.760512</td>
+      <td>Oct</td>
+      <td>0.486172</td>
+      <td>-0.159479</td>
+      <td>-2.296232</td>
     </tr>
     <tr>
       <th>22</th>
-      <td>42431</td>
-      <td>-0.112333</td>
-      <td>3.377393</td>
-      <td>-1.023559</td>
-      <td>0.813721</td>
-      <td>Nov</td>
       <td>Group C</td>
+      <td>0.297368</td>
+      <td>Nov</td>
+      <td>0.819392</td>
+      <td>-0.635424</td>
+      <td>-5.949174</td>
     </tr>
     <tr>
       <th>23</th>
-      <td>38265</td>
-      <td>0.341139</td>
-      <td>2.775356</td>
-      <td>-0.434224</td>
-      <td>3.408679</td>
-      <td>Dec</td>
       <td>Group D</td>
+      <td>-0.986769</td>
+      <td>Dec</td>
+      <td>1.556978</td>
+      <td>-0.566483</td>
+      <td>-0.053715</td>
     </tr>
     <tr>
       <th>24</th>
-      <td>38936</td>
-      <td>-1.435777</td>
-      <td>-3.183457</td>
-      <td>-2.417681</td>
-      <td>0.994073</td>
-      <td>Jan</td>
       <td>Group A</td>
+      <td>1.205519</td>
+      <td>Jan</td>
+      <td>0.483678</td>
+      <td>-2.557816</td>
+      <td>-2.316271</td>
     </tr>
     <tr>
       <th>25</th>
-      <td>22402</td>
-      <td>0.719249</td>
-      <td>-2.281663</td>
-      <td>-0.419681</td>
-      <td>0.025585</td>
-      <td>Feb</td>
       <td>Group B</td>
+      <td>0.423745</td>
+      <td>Feb</td>
+      <td>-1.832651</td>
+      <td>-0.727140</td>
+      <td>-3.053756</td>
     </tr>
     <tr>
       <th>26</th>
-      <td>10490</td>
-      <td>1.022446</td>
-      <td>-0.884773</td>
-      <td>-0.962212</td>
-      <td>0.532781</td>
-      <td>Mar</td>
       <td>Group C</td>
+      <td>-1.674542</td>
+      <td>Mar</td>
+      <td>-1.083556</td>
+      <td>-0.901519</td>
+      <td>5.165781</td>
     </tr>
     <tr>
       <th>27</th>
-      <td>15452</td>
-      <td>1.463633</td>
-      <td>-1.052140</td>
-      <td>-0.316955</td>
-      <td>0.135338</td>
-      <td>Apr</td>
       <td>Group D</td>
+      <td>1.109368</td>
+      <td>Apr</td>
+      <td>-1.332366</td>
+      <td>-0.659552</td>
+      <td>-2.580036</td>
     </tr>
     <tr>
       <th>28</th>
-      <td>20401</td>
-      <td>1.375250</td>
-      <td>-3.150916</td>
-      <td>-0.842319</td>
-      <td>1.060090</td>
-      <td>May</td>
       <td>Group A</td>
+      <td>-0.845824</td>
+      <td>May</td>
+      <td>0.441650</td>
+      <td>-0.335586</td>
+      <td>1.324607</td>
     </tr>
     <tr>
       <th>29</th>
-      <td>24927</td>
-      <td>-1.885277</td>
-      <td>-1.824083</td>
-      <td>-0.368665</td>
-      <td>-0.636261</td>
-      <td>Jun</td>
       <td>Group B</td>
+      <td>0.221365</td>
+      <td>Jun</td>
+      <td>2.093856</td>
+      <td>-0.656918</td>
+      <td>1.813717</td>
     </tr>
     <tr>
       <th>30</th>
-      <td>27535</td>
-      <td>0.379140</td>
-      <td>4.224249</td>
-      <td>-1.415238</td>
-      <td>1.940782</td>
-      <td>Jul</td>
       <td>Group C</td>
+      <td>-1.075979</td>
+      <td>Jul</td>
+      <td>-1.432219</td>
+      <td>-1.286806</td>
+      <td>4.906245</td>
     </tr>
     <tr>
       <th>31</th>
-      <td>28809</td>
-      <td>0.427183</td>
-      <td>9.419918</td>
-      <td>-0.730669</td>
-      <td>-1.345587</td>
-      <td>Aug</td>
       <td>Group D</td>
+      <td>0.055312</td>
+      <td>Aug</td>
+      <td>0.988241</td>
+      <td>-2.928589</td>
+      <td>1.871635</td>
     </tr>
     <tr>
       <th>32</th>
-      <td>42130</td>
-      <td>1.671549</td>
-      <td>3.501617</td>
-      <td>-2.043236</td>
-      <td>1.939640</td>
-      <td>Sep</td>
       <td>Group A</td>
+      <td>1.595664</td>
+      <td>Sep</td>
+      <td>-0.297481</td>
+      <td>-0.684245</td>
+      <td>-1.049538</td>
     </tr>
     <tr>
       <th>33</th>
-      <td>43074</td>
-      <td>0.933478</td>
-      <td>-0.262629</td>
-      <td>-0.523070</td>
-      <td>-0.551311</td>
-      <td>Oct</td>
       <td>Group B</td>
+      <td>-0.624568</td>
+      <td>Oct</td>
+      <td>-0.294577</td>
+      <td>-0.629722</td>
+      <td>0.291384</td>
     </tr>
     <tr>
       <th>34</th>
-      <td>37342</td>
-      <td>-0.986482</td>
-      <td>-1.544095</td>
-      <td>-1.795220</td>
-      <td>-0.523349</td>
-      <td>Nov</td>
       <td>Group C</td>
+      <td>-1.882894</td>
+      <td>Nov</td>
+      <td>-1.199973</td>
+      <td>-0.202688</td>
+      <td>-0.051015</td>
     </tr>
     <tr>
       <th>35</th>
-      <td>16932</td>
-      <td>-0.121223</td>
-      <td>4.431819</td>
-      <td>-0.554931</td>
-      <td>-1.387899</td>
-      <td>Dec</td>
       <td>Group D</td>
+      <td>-1.238447</td>
+      <td>Dec</td>
+      <td>-0.142682</td>
+      <td>-2.619512</td>
+      <td>3.522920</td>
     </tr>
     <tr>
       <th>36</th>
-      <td>46045</td>
-      <td>-0.121785</td>
-      <td>3.704645</td>
-      <td>-0.555530</td>
-      <td>-0.610390</td>
-      <td>Jan</td>
       <td>Group A</td>
+      <td>0.580960</td>
+      <td>Jan</td>
+      <td>-1.746777</td>
+      <td>-0.219328</td>
+      <td>-7.415294</td>
     </tr>
     <tr>
       <th>37</th>
-      <td>13717</td>
-      <td>-1.303516</td>
-      <td>-3.525625</td>
-      <td>-0.268351</td>
-      <td>0.220075</td>
-      <td>Feb</td>
       <td>Group B</td>
+      <td>-0.094435</td>
+      <td>Feb</td>
+      <td>-0.437626</td>
+      <td>-0.141427</td>
+      <td>0.805884</td>
     </tr>
     <tr>
       <th>38</th>
-      <td>26979</td>
-      <td>0.167418</td>
-      <td>1.754883</td>
-      <td>-0.570240</td>
-      <td>-0.258519</td>
-      <td>Mar</td>
       <td>Group C</td>
+      <td>0.821534</td>
+      <td>Mar</td>
+      <td>-1.205166</td>
+      <td>-0.493761</td>
+      <td>-0.105672</td>
     </tr>
     <tr>
       <th>39</th>
-      <td>32178</td>
-      <td>0.379428</td>
-      <td>-2.980751</td>
-      <td>-1.046118</td>
-      <td>-1.266934</td>
-      <td>Apr</td>
       <td>Group D</td>
+      <td>1.428968</td>
+      <td>Apr</td>
+      <td>-0.610066</td>
+      <td>-0.397653</td>
+      <td>-1.842630</td>
     </tr>
     <tr>
       <th>40</th>
-      <td>22586</td>
-      <td>1.528444</td>
-      <td>3.847906</td>
-      <td>-0.564254</td>
-      <td>0.168995</td>
-      <td>May</td>
       <td>Group A</td>
+      <td>-0.890143</td>
+      <td>May</td>
+      <td>-0.203453</td>
+      <td>-0.151268</td>
+      <td>2.323542</td>
     </tr>
     <tr>
       <th>41</th>
-      <td>30676</td>
-      <td>0.579101</td>
-      <td>1.481665</td>
-      <td>-2.000617</td>
-      <td>-1.136057</td>
-      <td>Jun</td>
       <td>Group B</td>
+      <td>0.437110</td>
+      <td>Jun</td>
+      <td>0.085310</td>
+      <td>-0.002376</td>
+      <td>-2.053241</td>
     </tr>
     <tr>
       <th>42</th>
-      <td>12145</td>
-      <td>-0.512085</td>
-      <td>-5.800311</td>
-      <td>-0.703269</td>
-      <td>1.309943</td>
-      <td>Jul</td>
       <td>Group C</td>
+      <td>1.141289</td>
+      <td>Jul</td>
+      <td>1.853726</td>
+      <td>-1.035302</td>
+      <td>-5.176661</td>
     </tr>
     <tr>
       <th>43</th>
-      <td>33851</td>
-      <td>0.329299</td>
-      <td>-4.168787</td>
-      <td>-1.832158</td>
-      <td>2.626034</td>
-      <td>Aug</td>
       <td>Group D</td>
+      <td>-1.391369</td>
+      <td>Aug</td>
+      <td>-0.614827</td>
+      <td>-0.626213</td>
+      <td>1.266392</td>
     </tr>
     <tr>
       <th>44</th>
-      <td>20004</td>
-      <td>1.761672</td>
-      <td>6.218044</td>
-      <td>-0.903584</td>
-      <td>0.052300</td>
-      <td>Sep</td>
       <td>Group A</td>
+      <td>-1.145177</td>
+      <td>Sep</td>
+      <td>0.091151</td>
+      <td>-0.054092</td>
+      <td>-5.721601</td>
     </tr>
     <tr>
       <th>45</th>
-      <td>48903</td>
-      <td>-0.391426</td>
-      <td>3.600225</td>
-      <td>-0.390644</td>
-      <td>-1.282138</td>
-      <td>Oct</td>
       <td>Group B</td>
+      <td>-0.880138</td>
+      <td>Oct</td>
+      <td>0.367027</td>
+      <td>-2.530850</td>
+      <td>1.929861</td>
     </tr>
     <tr>
       <th>46</th>
-      <td>11760</td>
-      <td>-0.153558</td>
-      <td>0.022388</td>
-      <td>-0.882584</td>
-      <td>0.461477</td>
-      <td>Nov</td>
       <td>Group C</td>
+      <td>-0.487270</td>
+      <td>Nov</td>
+      <td>0.337290</td>
+      <td>-1.736722</td>
+      <td>3.160379</td>
     </tr>
     <tr>
       <th>47</th>
-      <td>21061</td>
-      <td>-0.765411</td>
-      <td>-1.856080</td>
-      <td>-0.967070</td>
-      <td>-0.169594</td>
-      <td>Dec</td>
       <td>Group D</td>
+      <td>0.416363</td>
+      <td>Dec</td>
+      <td>-2.403575</td>
+      <td>-0.879869</td>
+      <td>1.846666</td>
     </tr>
     <tr>
       <th>48</th>
-      <td>18232</td>
-      <td>-1.983058</td>
-      <td>3.544743</td>
-      <td>-1.246127</td>
-      <td>1.408816</td>
-      <td>Jan</td>
       <td>Group A</td>
+      <td>-0.151296</td>
+      <td>Jan</td>
+      <td>-1.008465</td>
+      <td>-0.556609</td>
+      <td>-0.148862</td>
     </tr>
     <tr>
       <th>49</th>
-      <td>29927</td>
-      <td>-0.017905</td>
-      <td>-6.803385</td>
-      <td>-0.043450</td>
-      <td>-0.192027</td>
-      <td>Feb</td>
       <td>Group B</td>
+      <td>0.645674</td>
+      <td>Feb</td>
+      <td>-0.352184</td>
+      <td>-1.424446</td>
+      <td>5.654610</td>
     </tr>
     <tr>
       <th>50</th>
-      <td>30740</td>
-      <td>-0.772090</td>
-      <td>0.826426</td>
-      <td>-0.875306</td>
-      <td>0.074382</td>
-      <td>Mar</td>
       <td>Group C</td>
+      <td>1.014516</td>
+      <td>Mar</td>
+      <td>0.598030</td>
+      <td>-1.804494</td>
+      <td>-2.689915</td>
     </tr>
     <tr>
       <th>51</th>
-      <td>41741</td>
-      <td>-1.017919</td>
-      <td>4.670395</td>
-      <td>-0.080428</td>
-      <td>0.408054</td>
-      <td>Apr</td>
       <td>Group D</td>
+      <td>-1.349427</td>
+      <td>Apr</td>
+      <td>0.573027</td>
+      <td>-1.235840</td>
+      <td>1.372438</td>
     </tr>
     <tr>
       <th>52</th>
-      <td>45287</td>
-      <td>1.721927</td>
-      <td>7.581574</td>
-      <td>-0.395787</td>
-      <td>0.114241</td>
-      <td>May</td>
       <td>Group A</td>
+      <td>0.513536</td>
+      <td>May</td>
+      <td>0.215652</td>
+      <td>-1.683723</td>
+      <td>4.065310</td>
     </tr>
     <tr>
       <th>53</th>
-      <td>39581</td>
-      <td>-0.860012</td>
-      <td>3.638375</td>
-      <td>-0.530987</td>
-      <td>0.019394</td>
-      <td>Jun</td>
       <td>Group B</td>
+      <td>-2.234853</td>
+      <td>Jun</td>
+      <td>-0.436220</td>
+      <td>-1.280547</td>
+      <td>-2.193357</td>
     </tr>
     <tr>
       <th>54</th>
-      <td>19179</td>
-      <td>0.441536</td>
-      <td>3.921498</td>
-      <td>-0.001505</td>
-      <td>0.373191</td>
-      <td>Jul</td>
       <td>Group C</td>
+      <td>1.269432</td>
+      <td>Jul</td>
+      <td>0.209028</td>
+      <td>-1.326379</td>
+      <td>-0.720595</td>
     </tr>
     <tr>
       <th>55</th>
-      <td>17116</td>
-      <td>0.604572</td>
-      <td>2.716440</td>
-      <td>-0.580509</td>
-      <td>-0.157461</td>
-      <td>Aug</td>
       <td>Group D</td>
+      <td>-0.807231</td>
+      <td>Aug</td>
+      <td>0.406017</td>
+      <td>-0.503970</td>
+      <td>0.221715</td>
     </tr>
     <tr>
       <th>56</th>
-      <td>34913</td>
-      <td>1.635415</td>
-      <td>2.587376</td>
-      <td>-0.463056</td>
-      <td>-0.189674</td>
-      <td>Sep</td>
       <td>Group A</td>
+      <td>0.917287</td>
+      <td>Sep</td>
+      <td>-0.112333</td>
+      <td>-1.935414</td>
+      <td>3.377393</td>
     </tr>
     <tr>
       <th>57</th>
-      <td>13794</td>
-      <td>0.623878</td>
-      <td>-5.834247</td>
-      <td>-1.710010</td>
-      <td>-0.232304</td>
-      <td>Oct</td>
       <td>Group B</td>
+      <td>-0.406160</td>
+      <td>Oct</td>
+      <td>0.341139</td>
+      <td>-0.292610</td>
+      <td>2.775356</td>
     </tr>
     <tr>
       <th>58</th>
-      <td>28453</td>
-      <td>-0.349846</td>
-      <td>-0.703319</td>
-      <td>-1.094846</td>
-      <td>-0.238145</td>
-      <td>Nov</td>
       <td>Group C</td>
+      <td>0.707101</td>
+      <td>Nov</td>
+      <td>-1.435777</td>
+      <td>-0.330216</td>
+      <td>-3.183457</td>
     </tr>
     <tr>
       <th>59</th>
-      <td>25158</td>
-      <td>0.097128</td>
-      <td>-3.303646</td>
-      <td>-0.508852</td>
-      <td>0.112469</td>
-      <td>Dec</td>
       <td>Group D</td>
+      <td>0.927546</td>
+      <td>Dec</td>
+      <td>0.719249</td>
+      <td>-0.388752</td>
+      <td>-2.281663</td>
     </tr>
   </tbody>
 </table>
@@ -1139,11 +1073,9 @@ This creates a table (pandas DataFrame object) with 6 columns and an index which
 
 
 ```python
-analyze(
-    df['One'], 
-    name='Column One', 
-    title='Distribution from pandas'
-)
+analyze(df['One'], 
+        name='Column One', 
+        title='Distribution from pandas')
 ```
 
 
@@ -1156,26 +1088,26 @@ analyze(
     ----------
     
     n         =  60
-    Mean      = -0.0035
-    Std Dev   =  0.9733
-    Std Error =  0.1257
-    Skewness  = -0.1472
-    Kurtosis  = -0.2412
-    Maximum   =  1.8537
-    75%       =  0.5745
-    50%       =  0.0882
-    25%       = -0.6113
+    Mean      = -0.0562
+    Std Dev   =  1.0779
+    Std Error =  0.1392
+    Skewness  =  0.1879
+    Kurtosis  = -0.5109
+    Maximum   =  2.2466
+    75%       =  0.5793
+    50%       = -0.0228
+    25%       = -0.9999
     Minimum   = -2.4036
-    IQR       =  1.1858
-    Range     =  4.2573
+    IQR       =  1.5792
+    Range     =  4.6501
     
     
     Shapiro-Wilk test for normality
     -------------------------------
     
     alpha   =  0.0500
-    W value =  0.9804
-    p value =  0.4460
+    W value =  0.9796
+    p value =  0.4131
     
     H0: Data is normally distributed
     
@@ -1187,13 +1119,10 @@ By passing two array-like arguments to the ``analyze()`` function, the correlati
 
 
 ```python
-analyze(
-    df['One'], 
-    df['Three'], 
-    xname='Column One', 
-    yname='Column Three', 
-    title='Bivariate Analysis between Column One and Column Three'
-)
+analyze(df['One'], df['Three'], 
+        xname='Column One', 
+        yname='Column Three', 
+        title='Bivariate Analysis between Column One and Column Three')
 ```
 
 
@@ -1206,12 +1135,12 @@ analyze(
     -----------------
     
     n         =  60
-    Slope     =  0.0281
-    Intercept = -0.9407
-    r         =  0.0449
-    r^2       =  0.0020
-    Std Err   =  0.0820
-    p value   =  0.7332
+    Slope     = -0.1807
+    Intercept = -0.9249
+    r         = -0.2742
+    r^2       =  0.0752
+    Std Err   =  0.0832
+    p value   =  0.0340
     
     
     
@@ -1219,8 +1148,8 @@ analyze(
     --------------------------------
     
     alpha   =  0.0500
-    r value =  0.0316
-    p value =  0.8105
+    r value = -0.2289
+    p value =  0.0785
     
     H0: There is no significant relationship between predictor and response
     
@@ -1230,15 +1159,12 @@ Since there isn't a correlation between columns **One** and **Three**, it might 
 
 
 ```python
-analyze(
-    df['One'], 
-    df['Three'], 
-    xname='Column One', 
-    yname='Column Three',
-    contours=True,
-    fit=False,
-    title='Bivariate Analysis between Column One and Column Three'
-)
+analyze(df['One'], df['Three'], 
+        xname='Column One', 
+        yname='Column Three',
+        contours=True,
+        fit=False,
+        title='Bivariate Analysis between Column One and Column Three')
 ```
 
 
@@ -1251,12 +1177,12 @@ analyze(
     -----------------
     
     n         =  60
-    Slope     =  0.0281
-    Intercept = -0.9407
-    r         =  0.0449
-    r^2       =  0.0020
-    Std Err   =  0.0820
-    p value   =  0.7332
+    Slope     = -0.1807
+    Intercept = -0.9249
+    r         = -0.2742
+    r^2       =  0.0752
+    Std Err   =  0.0832
+    p value   =  0.0340
     
     
     
@@ -1264,27 +1190,22 @@ analyze(
     --------------------------------
     
     alpha   =  0.0500
-    r value =  0.0316
-    p value =  0.8105
+    r value = -0.2289
+    p value =  0.0785
     
     H0: There is no significant relationship between predictor and response
     
 
 
-With a few point below -2.0, it might be useful to know which data point they are. This can be done by passing the **ID** column to the `labels` argument and then selecting which labels to highlight with the `highlight` argument: 
+To check whether an individual **Condition** correlates between Column **One** and Column **Three**, the same analysis can be done, but this time by passing the **Condition** column to the groups argument. For example:
 
 
 ```python
-analyze(
-    df['One'], 
-    df['Three'], 
-    labels=df['ID'],
-    highlight=df[df['Three'] < -2.0]['ID'],
-    fit=False,
-    xname='Column One', 
-    yname='Column Three', 
-    title='Bivariate Analysis between Column One and Column Three'
-)
+analyze(df['One'], df['Three'],
+        xname='Column One',
+        yname='Column Three',
+        groups=df['Condition'],
+        title='Bivariate Analysis between Column One and Column Three')
 ```
 
 
@@ -1296,39 +1217,38 @@ analyze(
     Linear Regression
     -----------------
     
-    n         =  60
-    Slope     =  0.0281
-    Intercept = -0.9407
-    r         =  0.0449
-    r^2       =  0.0020
-    Std Err   =  0.0820
-    p value   =  0.7332
-    
+    n             Slope         Intercept     r^2           Std Err       p value       Group         
+    --------------------------------------------------------------------------------------------------
+    15            -0.2738       -0.8880        0.1246        0.2012        0.1968       Group A       
+    15             0.0303       -0.8172        0.0020        0.1883        0.8745       Group B       
+    15            -0.2615       -1.0552        0.2950        0.1121        0.0364       Group C       
+    15            -0.1697       -0.8938        0.0578        0.1900        0.3879       Group D       
     
     
     Spearman Correlation Coefficient
     --------------------------------
     
-    alpha   =  0.0500
-    r value =  0.0316
-    p value =  0.8105
-    
-    H0: There is no significant relationship between predictor and response
-    
+    n             r value       p value       Group         
+    --------------------------------------------------------
+    15            -0.4107        0.1283       Group A       
+    15             0.1857        0.5075       Group B       
+    15            -0.4500        0.0924       Group C       
+    15            -0.1679        0.5499       Group D       
 
 
-To check whether an individual **Condition** correlates between Column **One** and Column **Three**, the same analysis can be done, but this time by passing the **Condition** column to the groups argument. For example:
+The borders of the graph have boxplots for all the data points on the x-axis and y-axis, regardless of which group they belong to. The borders can be removed by adding the argument ``boxplot_borders=False``.
+
+According to the Spearman Correlation, there is no significant correlation among the groups. Group C appears to be the closest to showing a significant correlation, but it can be difficult to see the data points for Group C with so many colors on the graph. The Group C data points can be highlighted by using the argument ``highlight=['Group C']``. In fact, any number of groups can be highlighted by passing a list of the group names using the ``highlight`` argument.
 
 
 ```python
-analyze(
-    df['One'], 
-    df['Three'],
-    xname='Column One',
-    yname='Column Three',
-    groups=df['Condition'],
-    title='Bivariate Analysis between Column One and Column Three'
-)
+analyze(df['One'], df['Three'],
+        xname='Column One',
+        yname='Column Three',
+        groups=df['Condition'],
+        boxplot_borders=False,
+        highlight=['Group C'],
+        title='Bivariate Analysis between Column One and Column Three')
 ```
 
 
@@ -1342,10 +1262,10 @@ analyze(
     
     n             Slope         Intercept     r^2           Std Err       p value       Group         
     --------------------------------------------------------------------------------------------------
-    15             0.1113       -1.1181        0.0487        0.1364        0.4293       Group A       
-    15            -0.2586       -0.9348        0.1392        0.1784        0.1708       Group B       
-    15             0.3688       -1.0182        0.1869        0.2134        0.1076       Group C       
-    15             0.0611       -0.7352        0.0075        0.1952        0.7591       Group D       
+    15            -0.2738       -0.8880        0.1246        0.2012        0.1968       Group A       
+    15             0.0303       -0.8172        0.0020        0.1883        0.8745       Group B       
+    15            -0.2615       -1.0552        0.2950        0.1121        0.0364       Group C       
+    15            -0.1697       -0.8938        0.0578        0.1900        0.3879       Group D       
     
     
     Spearman Correlation Coefficient
@@ -1353,56 +1273,10 @@ analyze(
     
     n             r value       p value       Group         
     --------------------------------------------------------
-    15             0.1357        0.6296       Group A       
-    15            -0.3643        0.1819       Group B       
-    15             0.3714        0.1728       Group C       
-    15             0.1786        0.5243       Group D       
-
-
-The borders of the graph have boxplots for all the data points on the x-axis and y-axis, regardless of which group they belong to. The borders can be removed by adding the argument ``boxplot_borders=False``.
-
-According to the Spearman Correlation, there is no significant correlation among the groups. Group B is the only group with a negative slope, but it can be difficult to see the data points for Group B with so many colors on the graph. The Group B data points can be highlighted by using the argument ``highlight=['Group B']``. In fact, any number of groups can be highlighted by passing a list of the group names using the ``highlight`` argument.
-
-
-```python
-analyze(
-    df['One'], 
-    df['Three'],
-    xname='Column One',
-    yname='Column Three',
-    groups=df['Condition'],
-    boxplot_borders=False,
-    highlight=['Group B'],
-    title='Bivariate Analysis between Column One and Column Three'
-)
-```
-
-
-![png](./img/sci_analysis_main_47_0.png)
-
-
-    
-    
-    Linear Regression
-    -----------------
-    
-    n             Slope         Intercept     r^2           Std Err       p value       Group         
-    --------------------------------------------------------------------------------------------------
-    15             0.1113       -1.1181        0.0487        0.1364        0.4293       Group A       
-    15            -0.2586       -0.9348        0.1392        0.1784        0.1708       Group B       
-    15             0.3688       -1.0182        0.1869        0.2134        0.1076       Group C       
-    15             0.0611       -0.7352        0.0075        0.1952        0.7591       Group D       
-    
-    
-    Spearman Correlation Coefficient
-    --------------------------------
-    
-    n             r value       p value       Group         
-    --------------------------------------------------------
-    15             0.1357        0.6296       Group A       
-    15            -0.3643        0.1819       Group B       
-    15             0.3714        0.1728       Group C       
-    15             0.1786        0.5243       Group D       
+    15            -0.4107        0.1283       Group A       
+    15             0.1857        0.5075       Group B       
+    15            -0.4500        0.0924       Group C       
+    15            -0.1679        0.5499       Group D       
 
 
 Performing a location test on data in a pandas DataFrame requires some explanation. A location test can be performed with stacked or unstacked data. One method will be easier than the other depending on how the data to be analyzed is stored. In the example DataFrame used so far, to perform a location test between the groups in the **Condition** column, the stacked method will be easier to use. 
@@ -1411,13 +1285,72 @@ Let's start with an example. The following code will perform a location test usi
 
 
 ```python
-analyze(
-    df['Two'], 
-    groups=df['Condition'],
-    categories='Condition',
-    name='Column Two',
-    title='Oneway from pandas'
-)
+analyze(df['Two'], 
+        groups=df['Condition'],
+        categories='Condition',
+        name='Column Two',
+        title='Oneway from pandas')
+```
+
+
+![png](./img/sci_analysis_main_47_0.png)
+
+
+    
+    
+    Overall Statistics
+    ------------------
+    
+    Number of Groups =  4
+    Total            =  60
+    Grand Mean       =  0.2740
+    Pooled Std Dev   =  3.1385
+    Grand Median     =  0.0853
+    
+    
+    Group Statistics
+    ----------------
+    
+    n             Mean          Std Dev       Min           Median        Max           Group         
+    --------------------------------------------------------------------------------------------------
+    15            -0.3873        3.2660       -7.4153       -0.1489        4.0653       Group A       
+    15             0.7406        2.4806       -3.0538        0.9879        5.6546       Group B       
+    15             0.9334        3.9554       -5.9492       -0.0510        5.2850       Group C       
+    15            -0.1906        2.6335       -5.6558        0.2217        3.5229       Group D       
+    
+    
+    Bartlett Test
+    -------------
+    
+    alpha   =  0.0500
+    T value =  3.7931
+    p value =  0.2847
+    
+    H0: Variances are equal
+    
+    
+    
+    Oneway ANOVA
+    ------------
+    
+    alpha   =  0.0500
+    f value =  0.6628
+    p value =  0.5784
+    
+    H0: Group means are matched
+    
+
+
+From the graph, there are four groups: Group A, Group B, Group C and Group D in Column **Two**. The analysis shows that the variances are equal and there is no significant difference in the means. Noting the tests that are being performed, the Bartlett test is being used to check for equal variance because all four groups are normally distributed, and the Oneway ANOVA is being used to test if all means are equal because all four groups are normally distributed and the variances are equal. However, if not all the groups are normally distributed, the Levene Test will be used to check for equal variance instead of the Bartlett Test. Also, if the groups are not normally distributed or the variances are not equal, the Kruskal-Wallis test will be used instead of the Oneway ANOVA.
+
+If instead the four columns **One**, **Two**, **Three** and **Four** are to be analyzed, the easier way to perform the analysis is with the unstacked method. The following code will perform a location test of the four columns:
+
+
+```python
+analyze([df['One'], df['Two'], df['Three'], df['Four']], 
+        groups=['One', 'Two', 'Three', 'Four'],
+        categories='Columns',
+        title='Unstacked Oneway')
 ```
 
 
@@ -1430,10 +1363,10 @@ analyze(
     ------------------
     
     Number of Groups =  4
-    Total            =  60
-    Grand Mean       =  0.4456
-    Pooled Std Dev   =  3.6841
-    Grand Median     =  0.5138
+    Total            =  240
+    Grand Mean       = -0.1994
+    Pooled Std Dev   =  1.7536
+    Grand Median     = -0.0572
     
     
     Group Statistics
@@ -1441,46 +1374,41 @@ analyze(
     
     n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    15             1.2712        3.7471       -5.1767        2.5874        7.5816       Group A       
-    15            -0.3616        3.2792       -6.8034        0.2217        3.6384       Group B       
-    15            -0.1135        3.7338       -7.4153        0.0224        4.2242       Group C       
-    15             0.9864        3.9441       -4.1688        0.8059        9.4199       Group D       
+    60            -0.1006        0.9761       -2.2349       -0.0917        1.6386       Four          
+    60            -0.0562        1.0779       -2.4036       -0.0228        2.2466       One           
+    60            -0.9148        0.7104       -2.9286       -0.6900       -0.0024       Three         
+    60             0.2740        3.1115       -7.4153        0.3968        5.6546       Two           
     
     
-    Bartlett Test
-    -------------
-    
-    alpha   =  0.0500
-    T value =  0.4868
-    p value =  0.9218
-    
-    H0: Variances are equal
-    
-    
-    
-    Oneway ANOVA
-    ------------
+    Levene Test
+    -----------
     
     alpha   =  0.0500
-    f value =  0.7140
-    p value =  0.5477
+    W value =  44.7814
+    p value =  0.0000
     
-    H0: Group means are matched
+    HA: Variances are not equal
+    
+    
+    
+    Kruskal-Wallis
+    --------------
+    
+    alpha   =  0.0500
+    h value =  24.0538
+    p value =  0.0000
+    
+    HA: Group means are not matched
     
 
 
-From the graph, there are four groups: Group A, Group B, Group C and Group D in Column **Two**. The analysis shows that the variances are equal and there is no significant difference in the means. Noting the tests that are being performed, the Bartlett test is being used to check for equal variance because all four groups are normally distributed, and the Oneway ANOVA is being used to test if all means are equal because all four groups are normally distributed and the variances are equal. However, if not all the groups are normally distributed, the Levene Test will be used to check for equal variance instead of the Bartlett Test. Also, if the groups are not normally distributed or the variances are not equal, the Kruskal-Wallis test will be used instead of the Oneway ANOVA.
-
-If instead the four columns **One**, **Two**, **Three** and **Four** are to be analyzed, the easier way to perform the analysis is with the unstacked method. The following code will perform a location test of the four columns:
+To perform a location test using the unstacked method, the columns to be analyzed are passed in a list or tuple, and the groups argument needs to be a list or tuple of the group names. One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:
 
 
 ```python
-analyze(
-    [df['One'], df['Two'], df['Three'], df['Four']], 
-    groups=['One', 'Two', 'Three', 'Four'],
-    categories='Columns',
-    title='Unstacked Oneway'
-)
+analyze({'One': df['One'], 'Two': df['Two'], 'Three': df['Three'], 'Four': df['Four']}, 
+        categories='Columns',
+        title='Unstacked Oneway Using a Dictionary Comp')
 ```
 
 
@@ -1494,9 +1422,9 @@ analyze(
     
     Number of Groups =  4
     Total            =  240
-    Grand Mean       = -0.0995
-    Pooled Std Dev   =  1.9859
-    Grand Median     =  0.0752
+    Grand Mean       = -0.1994
+    Pooled Std Dev   =  1.7536
+    Grand Median     = -0.0572
     
     
     Group Statistics
@@ -1504,17 +1432,17 @@ analyze(
     
     n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    60             0.1007        1.0294       -2.2349        0.0621        3.4087       Four          
-    60            -0.0035        0.9815       -2.4036        0.0882        1.8537       One           
-    60            -0.9408        0.6133       -2.4177       -0.8318       -0.0015       Three         
-    60             0.4456        3.6572       -7.4153        0.5138        9.4199       Two           
+    60            -0.1006        0.9761       -2.2349       -0.0917        1.6386       Four          
+    60            -0.0562        1.0779       -2.4036       -0.0228        2.2466       One           
+    60            -0.9148        0.7104       -2.9286       -0.6900       -0.0024       Three         
+    60             0.2740        3.1115       -7.4153        0.3968        5.6546       Two           
     
     
     Levene Test
     -----------
     
     alpha   =  0.0500
-    W value =  64.7684
+    W value =  44.7814
     p value =  0.0000
     
     HA: Variances are not equal
@@ -1525,67 +1453,7 @@ analyze(
     --------------
     
     alpha   =  0.0500
-    h value =  33.8441
-    p value =  0.0000
-    
-    HA: Group means are not matched
-    
-
-
-To perform a location test using the unstacked method, the columns to be analyzed are passed in a list or tuple, and the groups argument needs to be a list or tuple of the group names. One thing to note is that the groups argument was used to explicitly define the group names. This will only work if the group names and order are known in advance. If they are unknown, a dictionary comprehension can be used instead of a list comprehension to to get the group names along with the data:
-
-
-```python
-analyze(
-    {'One': df['One'], 'Two': df['Two'], 'Three': df['Three'], 'Four': df['Four']}, 
-    categories='Columns',
-    title='Unstacked Oneway Using a Dictionary'
-)
-```
-
-
-![png](./img/sci_analysis_main_53_0.png)
-
-
-    
-    
-    Overall Statistics
-    ------------------
-    
-    Number of Groups =  4
-    Total            =  240
-    Grand Mean       = -0.0995
-    Pooled Std Dev   =  1.9859
-    Grand Median     =  0.0752
-    
-    
-    Group Statistics
-    ----------------
-    
-    n             Mean          Std Dev       Min           Median        Max           Group         
-    --------------------------------------------------------------------------------------------------
-    60             0.1007        1.0294       -2.2349        0.0621        3.4087       Four          
-    60            -0.0035        0.9815       -2.4036        0.0882        1.8537       One           
-    60            -0.9408        0.6133       -2.4177       -0.8318       -0.0015       Three         
-    60             0.4456        3.6572       -7.4153        0.5138        9.4199       Two           
-    
-    
-    Levene Test
-    -----------
-    
-    alpha   =  0.0500
-    W value =  64.7684
-    p value =  0.0000
-    
-    HA: Variances are not equal
-    
-    
-    
-    Kruskal-Wallis
-    --------------
-    
-    alpha   =  0.0500
-    h value =  33.8441
+    h value =  24.0538
     p value =  0.0000
     
     HA: Group means are not matched
@@ -1623,17 +1491,15 @@ Using the new function is simple. The same techniques from previous examples are
 quarters = ('Q1', 'Q2', 'Q3', 'Q4')
 df2 = df.groupby(df['Month']).apply(set_quarter)
 data = {quarter: data['Two'] for quarter, data in df2.groupby(df2['Quarter'])}
-analyze(
-    [data[quarter] for quarter in quarters],
-    groups=quarters,
-    categories='Quarters',
-    name='Column Two',
-    title='Oneway of Annual Quarters'
-)
+analyze([data[quarter] for quarter in quarters],
+        groups=quarters,
+        categories='Quarters',
+        name='Column Two',
+        title='Oneway of Annual Quarters')
 ```
 
 
-![png](./img/sci_analysis_main_57_0.png)
+![png](./img/sci_analysis_main_55_0.png)
 
 
     
@@ -1643,9 +1509,9 @@ analyze(
     
     Number of Groups =  4
     Total            =  60
-    Grand Mean       =  0.4456
-    Pooled Std Dev   =  3.6815
-    Grand Median     =  0.4141
+    Grand Mean       =  0.2740
+    Pooled Std Dev   =  3.1561
+    Grand Median     =  0.5138
     
     
     Group Statistics
@@ -1653,18 +1519,18 @@ analyze(
     
     n             Mean          Std Dev       Min           Median        Max           Group         
     --------------------------------------------------------------------------------------------------
-    15            -0.3956        3.6190       -7.4153       -0.0510        3.7046       Q1            
-    15             1.0271        3.4028       -3.1509        0.8059        7.5816       Q2            
-    15             1.2577        4.4120       -5.8003        2.5874        9.4199       Q3            
-    15            -0.1067        3.1736       -5.8342        0.0224        4.4318       Q4            
+    15             0.9138        3.7034       -7.4153        0.8059        5.6546       Q1            
+    15             0.0122        2.5243       -5.6558        1.1374        4.0653       Q2            
+    15             0.4987        3.4778       -5.7216        0.2217        5.2850       Q3            
+    15            -0.3286        2.7681       -5.9492       -0.0537        3.5229       Q4            
     
     
     Bartlett Test
     -------------
     
     alpha   =  0.0500
-    T value =  1.7209
-    p value =  0.6323
+    T value =  2.6544
+    p value =  0.4480
     
     H0: Variances are equal
     
@@ -1674,8 +1540,8 @@ analyze(
     ------------
     
     alpha   =  0.0500
-    f value =  0.7416
-    p value =  0.5318
+    f value =  0.4474
+    p value =  0.7201
     
     H0: Group means are matched
     

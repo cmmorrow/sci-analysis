@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: sci-analysis
-Version: 2.1.1
+Version: 2.2.0rc1
 Summary: An easy to use and powerful python-based data exploration and analysis tool
 Home-page: https://github.com/cmmorrow/sci-analysis
 Author: chris morrow
@@ -10,7 +10,7 @@ Description: # sci-analysis
         An easy to use and powerful python-based data exploration and analysis tool
         
         ## Current Version:
-        2.1 --- Released March 30, 2018
+        2.2 --- Released January 5, 2019
         
         [![PyPI](https://img.shields.io/pypi/v/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
         [![PyPI](https://img.shields.io/pypi/format/sci_analysis.svg)](https://pypi.python.org/pypi/sci_analysis)
@@ -21,16 +21,14 @@ Description: # sci-analysis
         ### What is sci-analysis?
         sci-analysis is a python package for quickly performing statistical data analysis. It provides a graphical representation of the supplied data as well as the statistical analysis. sci-analysis is smart enough to determine the correct analysis and tests to perform based on the shape of the data you provide, as well as how the data is distributed.
         
-        The types of analysis that can be performed are histograms of numeric or categorical data, bivariate analysis of two numeric data vectors, and one-way analysis of variance.
+        The types of analysis that can be performed are histograms of numeric or categorical data, bi-variate analysis of two numeric data vectors, and one-way analysis of variance.
         
-        ### What's new in sci-analysis version 2.1?
+        ### What's new in sci-analysis version 2.2?
         
-        * Version 2.1 makes improvements to Statistical output and plots.
-        * Tukey-Kramer circles were added to the Oneway analysis plot.
-        * Grand Mean and Grand Median were added to the Oneway analysis plot.
-        * Overall Statistics were added to Oneway analysis.
-        * Overall Statistics were added to Categorical analysis.
-        * The Categorical analysis graph was changed to improve the appearance.
+        * Version 2.2 adds the ability to add data labels to scatter plots.
+        * The default behavior of the histogram and statistics was changed from assuming a sample, to assuming a population.
+        * Fixed a bug involving the Mann Whitney U test, where the minimum size was set incorrectly.
+        * Verified compatibility with python 3.7.
         
         ### Getting started with sci-analysis
         The documentation on how to install and use sci-analysis can be found here:
@@ -40,7 +38,7 @@ Description: # sci-analysis
         
         ### Requirements
         * Packages: pandas, numpy, scipy, matplotlib, six
-        * Supports python 2.7, 3.5 and 3.6
+        * Supports python 2.7, 3.5, 3.6, and 3.7
         
         Bugs can be reported here:
         
@@ -65,5 +63,6 @@ Classifier: Programming Language :: Python :: 2.7
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.5
 Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
 Requires-Python: >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, >=3.5
 Description-Content-Type: text/markdown

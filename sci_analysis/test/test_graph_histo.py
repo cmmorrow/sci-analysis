@@ -157,7 +157,7 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(GraphHisto(input_array,
                                    mean=mean,
                                    std_dev=std,
-                                   sample=False,
+                                   sample=True,
                                    save_to='{}test_histo_114'.format(self.save_path)))
 
     def test_115_distribution(self):

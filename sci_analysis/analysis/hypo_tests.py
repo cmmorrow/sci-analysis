@@ -209,7 +209,7 @@ class MannWhitney(Test):
     _statistic_name = 'u value'
     _h0 = "H0: Locations are matched"
     _ha = "HA: Locations are not matched"
-    _min_size = 30
+    _min_size = 20
 
     def __init__(self, a, b=None, alpha=None, display=True):
         """
@@ -237,7 +237,7 @@ class MannWhitney(Test):
         args = self._data.groups.values()
         if len(args) <= 1:
             raise NoDataError("At least one of the inputs is empty or non-numeric.")
-        u_value, p_value = mannwhitneyu(*args)
+        u_value, p_value = mannwhitneyu(*args, alternative='less')
         self._results.update({self._statistic_name: u_value, 'p value': p_value * 2, 'alpha': self._alpha})
 
     @property
