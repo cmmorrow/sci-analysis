@@ -39,8 +39,8 @@ class CategoricalGraph(Graph):
 
 class GraphFrequency(CategoricalGraph):
 
-    _xsize = 9
-    _ysize = 6
+    _xsize = 8.5
+    _ysize = 5.5
 
     def __init__(self, data, **kwargs):
 

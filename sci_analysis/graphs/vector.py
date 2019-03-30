@@ -59,8 +59,8 @@ class GraphHisto(VectorGraph):
     box plot.
     """
 
-    _xsize = 7
-    _ysize = 6
+    _xsize = 5
+    _ysize = 4
 
     def __init__(self, data, **kwargs):
         """GraphHisto constructor.
@@ -155,11 +155,11 @@ class GraphHisto(VectorGraph):
         h_ratios = [histo_span]
         p = []
         if self._box_plot:
-            self._ysize += 1
+            self._ysize += 0.5
             self._nrows += 1
             h_ratios.insert(0, box_plot_span)
         if self._cdf:
-            self._ysize += 4
+            self._ysize += 2
             self._nrows += 1
             h_ratios.insert(0, cdf_span)
 
@@ -255,8 +255,8 @@ class GraphScatter(VectorGraph):
 
     _nrows = 1
     _ncols = 1
-    _xsize = 8
-    _ysize = 7
+    _xsize = 6
+    _ysize = 5
 
     def __init__(self, xdata, ydata=None, **kwargs):
         """GraphScatter constructor.
@@ -356,8 +356,9 @@ class GraphScatter(VectorGraph):
         # Setup the figure and gridspec
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
-            self._xsize, self._ysize = 8.5, 7.5
-            h_ratio, w_ratio = (2, 5), (5, 2)
+            self._xsize = self._xsize + 0.5
+            self._ysize = self._ysize + 0.5
+            h_ratio, w_ratio = (1.5, 5.5), (5.5, 1.5)
             main_plot = 2
         else:
             main_plot = 0
@@ -402,7 +403,7 @@ class GraphScatter(VectorGraph):
         if self._points:
             # A 2-D array needs to be passed to prevent matplotlib from applying the default cmap if the size < 4.
             color = (self.get_color(0),)
-            alpha_trans = 0.8
+            alpha_trans = 0.7
             if self._highlight is not None:
                 # Find index of the labels which are in the highlight list
                 labelmask = self._data.labels.isin(self._highlight)
@@ -412,7 +413,7 @@ class GraphScatter(VectorGraph):
                 y_labels = y.loc[labelmask]
                 x_nolabels = x.loc[~labelmask]
                 y_nolabels = y.loc[~labelmask]
-                ax2.scatter(x_labels, y_labels, c=color, marker='o', linewidths=0, alpha=.8, zorder=1)  
+                ax2.scatter(x_labels, y_labels, c=color, marker='o', linewidths=0, alpha=alpha_trans, zorder=1)
                 ax2.scatter(x_nolabels, y_nolabels, c=color, marker='o', linewidths=0, alpha=.2, zorder=1)
                 for k in self._data.labels[labelmask].index:
                     ax2.annotate(self._data.labels[k], xy=(x[k], y[k]), alpha=1, color=color[0])
@@ -457,8 +458,8 @@ class GraphGroupScatter(VectorGraph):
 
     _nrows = 1
     _ncols = 1
-    _xsize = 8
-    _ysize = 7
+    _xsize = 6
+    _ysize = 5
 
     def __init__(self, xdata, ydata=None, groups=None, **kwargs):
         """GraphScatter constructor.
@@ -533,8 +534,9 @@ class GraphGroupScatter(VectorGraph):
         # Setup the figure and gridspec
         if self._boxplot_borders:
             self._nrows, self._ncols = 2, 2
-            self._xsize, self._ysize = 8.5, 7.5
-            h_ratio, w_ratio = (2, 5), (5, 2)
+            self._xsize = self._xsize + 0.5
+            self._ysize = self._ysize + 0.5
+            h_ratio, w_ratio = (1.5, 5.5), (5.5, 1.5)
             main_plot = 2
         else:
             main_plot = 0
@@ -683,8 +685,8 @@ class GraphBoxplot(VectorGraph):
 
     _nrows = 1
     _ncols = 1
-    _xsize = 7.5
-    _ysize = 6
+    _xsize = 5.75
+    _ysize = 5
     _default_alpha = 0.05
 
     def __init__(self, *args, **kwargs):
@@ -810,7 +812,7 @@ class GraphBoxplot(VectorGraph):
             ax1.axhline(float(self.grand_mean(data)), c='k', linestyle='--', alpha=0.4)
         if self._gmedian:
             ax1.axhline(float(self.grand_median(data)), c='k', linestyle=':', alpha=0.4)
-        if any([True if len(str(g)) > 10 else False for g in groups]) or len(groups) > 5:
+        if any([True if len(str(g)) > 9 else False for g in groups]) or len(groups) > 5:
             xticks(rotation=60)
         subplots_adjust(bottom=0.2)
         ylabel(self._yname)

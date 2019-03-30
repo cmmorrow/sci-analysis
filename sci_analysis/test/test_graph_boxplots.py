@@ -390,7 +390,7 @@ class MyTestCase(TestWarnings):
         input_5_array = st.norm.rvs(size=100)
         self.assertTrue(GraphBoxplot(input_1_array, input_2_array, input_3_array, input_4_array, input_5_array,
                                      title='Horizontal labels test',
-                                     groups=['1111111111', '2222222222', '3333333333', '4444444444', '5555555555'],
+                                     groups=['111111111', '222222222', '333333333', '444444444', '555555555'],
                                      save_to='{}test_box_133'.format(self.save_path)))
 
     def test_134_boxplot_vertical_labels_length(self):
@@ -612,6 +612,19 @@ class MyTestCase(TestWarnings):
                            gmedian=False,
                            save_to='{}test_box_151'.format(self.save_path))
         self.assertTrue(res)
+
+    def test_152_boxplot_2_no_nqp_no_circles(self):
+        """Generate a boxplot graph with no nqp and no circles."""
+        np.random.seed(self._seed)
+        input_1_array = st.norm.rvs(size=2000)
+        input_2_array = st.norm.rvs(1, size=2000)
+        self.assertWarnsCrossCompatible(FutureWarning,
+                                        lambda: GraphBoxplot(input_1_array,
+                                                             input_2_array,
+                                                             nqp=False,
+                                                             circles=False,
+                                                             save_to='{}test_box_152'.format(self.save_path)),
+                                        message='multiple arguments')
 
 
 if __name__ == '__main__':
