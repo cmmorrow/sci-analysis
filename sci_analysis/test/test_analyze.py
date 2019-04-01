@@ -463,7 +463,14 @@ class MyTestCase(TestWarnings):
         df['groups'] = np.random.choice(list('ABC'), len(df)).tolist()
         df.at[24, 'groups'] = "D"
         self.assertEqual(
-            analyze(df['x'], df['y'], df['groups'], debug=True), ['Group Bivariate']
+            analyze(
+                df['x'],
+                df['y'],
+                df['groups'],
+                debug=True,
+                save_to='{}test_analyze_141'.format(self.save_path)
+            ),
+            ['Group Bivariate']
         )
 
 
