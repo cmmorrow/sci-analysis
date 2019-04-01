@@ -205,7 +205,7 @@ class Numeric(Data):
     @property
     def paired_groups(self):
         groups = self._values.groupby(self._grp)
-        return {grp: (df[self._ind].values, df[self._dep].values) for grp, df in groups if not df.empty}
+        return {grp: (df[self._ind], df[self._dep]) for grp, df in groups if not df.empty}
 
     @property
     def group_labels(self):
