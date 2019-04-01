@@ -222,9 +222,6 @@ class GroupComparison(Analysis):
             vector = Vector(xdata, other=ydata, groups=groups)
         if vector.is_empty():
             raise NoDataError("Cannot perform test because there is no data")
-        for grp, seq in vector.groups.items():
-            if len(seq) <= self._min_size:
-                raise MinimumSizeError("length of {} is less than the minimum size {}".format(grp, self._min_size))
         super(GroupComparison, self).__init__(vector, display=display)
         self._alpha = alpha or self._default_alpha
         self.logic()
@@ -251,6 +248,9 @@ class GroupCorrelation(GroupComparison):
 
     def run(self):
         out = []
+        # Remove any groups that are less than or equal to the minimum value from analysis.
+        small_grps = [grp for grp, seq in self.data.groups.items() if len(seq) <= self._min_size]
+        self.data.drop_groups(small_grps)
         if NormTest(*self.data.flatten(), display=False, alpha=self._alpha).p_value > self._alpha:
             r = "pearson"
             func = pearsonr
@@ -308,6 +308,9 @@ class GroupLinearRegression(GroupComparison):
 
     def run(self):
         out = []
+        # Remove any groups that are less than or equal to the minimum value from analysis.
+        small_grps = [grp for grp, seq in self.data.groups.items() if len(seq) <= self._min_size]
+        self.data.drop_groups(small_grps)
         for grp, pairs in self.data.paired_groups.items():
             slope, intercept, r, p_value, std_err = linregress(*pairs)
             count = len(pairs[0])
@@ -321,6 +324,8 @@ class GroupLinearRegression(GroupComparison):
                 self._p_value: p_value,
                 self._group_name: str(grp)
             })
+        if not out:
+            raise NoDataError
         self._results = DataFrame(out).sort_values(self._group_name).to_dict(orient='records')
 
     def __str__(self):

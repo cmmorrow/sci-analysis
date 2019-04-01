@@ -151,8 +151,8 @@ n             Slope         Intercept     r^2           Std Err       p value   
         exp = GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c'], display=False)
         self.assertEqual(str(exp), output)
 
-    def test_minimum_size_error(self):
-        """Test the case where the supplied data is less than the minimum size."""
+    def test_all_below_minimum_size(self):
+        """Test the case where all the supplied data is less than the minimum size."""
         np.random.seed(987654321)
         input_1 = st.norm.rvs(size=1), st.norm.rvs(size=1)
         input_2 = st.norm.rvs(size=1), st.norm.rvs(size=1)
@@ -162,8 +162,34 @@ n             Slope         Intercept     r^2           Std Err       p value   
         cs_y = np.concatenate((input_1[1], input_2[1], input_3[1], input_4[1]))
         grp = [1, 2, 3, 4]
         input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
-        self.assertRaises(MinimumSizeError,
-                          lambda: GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c']))
+        self.assertRaises(
+            NoDataError,
+            lambda: GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c'])
+        )
+
+    def test_below_minimum_size(self):
+        """Test the case where a group is less than the minimum size."""
+        np.random.seed(987654321)
+        input_1 = st.norm.rvs(size=10), st.norm.rvs(size=10)
+        input_2 = st.norm.rvs(size=10), st.norm.rvs(size=10)
+        input_3 = st.norm.rvs(size=1), st.norm.rvs(size=1)
+        input_4 = st.norm.rvs(size=10), st.norm.rvs(size=10)
+        cs_x = np.concatenate((input_1[0], input_2[0], input_3[0], input_4[0]))
+        cs_y = np.concatenate((input_1[1], input_2[1], input_3[1], input_4[1]))
+        grp = [1] * 10 + [2] * 10 + [3] + [4] * 10
+        input_array = pd.DataFrame({'a': cs_x, 'b': cs_y, 'c': grp})
+        output = """
+
+Linear Regression
+-----------------
+
+n             Slope         Intercept     r^2           Std Err       p value       Group         
+--------------------------------------------------------------------------------------------------
+10             0.4268       -0.2032        0.2877        0.2374        0.1100       1             
+10             0.1214       -0.6475        0.0393        0.2123        0.5832       2             
+10             0.2367        0.2525        0.1131        0.2343        0.3419       4             """
+        exp = GroupLinearRegression(input_array['a'], input_array['b'], groups=input_array['c'])
+        self.assertEqual(output, str(exp))
 
     def test_vector_no_data(self):
         """Test the case where there's no data with a vector as input."""
