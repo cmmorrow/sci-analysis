@@ -4,7 +4,7 @@ import numpy as np
 
 # Import from local
 from .data import Data, is_data
-from .data_operations import flatten
+from .data_operations import flatten, is_iterable
 
 
 class EmptyVectorError(Exception):
@@ -143,7 +143,7 @@ class Numeric(Data):
 
         Returns
         -------
-        arr : pandas.DataFrame
+        arr : pandas.Series
             A copy of the Numeric object's internal Series with all NaN values removed.
         """
         return self._values.dropna(how='any', subset=[self._ind])
@@ -156,9 +156,30 @@ class Numeric(Data):
         Returns
         -------
         arr : pandas.DataFrame
-            A tuple of numpy Arrays corresponding to the internal Vector and seq with all nan values removed.
+            A copy of the Numeric object's internal DataFrame with all nan values removed.
         """
         return self._values.dropna(how='any', subset=[self._ind, self._dep])
+
+    def drop_groups(self, grps):
+        """Drop the specified group name from the Numeric object.
+
+        Parameters
+        ----------
+        grps : str|int|list[str]|list[int]
+            The name of the group to remove.
+
+        Returns
+        -------
+        arr : pandas.DataFrame
+            A copy of the Numeric object's internal DataFrame with all records belonging to the specified group removed.
+
+        """
+        if not is_iterable(grps):
+            grps = [grps]
+        dropped = self._values.query("{} not in {}".format(self._grp, grps)).copy()
+        dropped[self._grp] = dropped[self._grp].cat.remove_categories(grps)
+        self._values = dropped
+        return dropped
 
     @property
     def data_type(self):
@@ -184,7 +205,7 @@ class Numeric(Data):
     @property
     def paired_groups(self):
         groups = self._values.groupby(self._grp)
-        return {grp: (df[self._ind], df[self._dep]) for grp, df in groups if not df.empty}
+        return {grp: (df[self._ind].values, df[self._dep].values) for grp, df in groups if not df.empty}
 
     @property
     def group_labels(self):

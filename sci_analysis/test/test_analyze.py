@@ -457,6 +457,15 @@ class MyTestCase(TestWarnings):
             ), ['Bivariate']
         )
 
+    def test_141_scatter_groups_one_below_min_size(self):
+        np.random.seed(self._seed)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['groups'] = np.random.choice(list('ABC'), len(df)).tolist()
+        df.at[24, 'groups'] = "D"
+        self.assertEqual(
+            analyze(df['x'], df['y'], df['groups'], debug=True), ['Group Bivariate']
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
