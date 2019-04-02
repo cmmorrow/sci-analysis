@@ -92,7 +92,7 @@ Rank          Frequency     Percent       Category
 2             5              10.0000      abcdefg       
 2             5              10.0000      abcdefghijk   
 3             4              8.0000       abcdefgh      
-3             4              8.0000        nan          
+3             4              8.0000       nan           
 4             3              6.0000       a             
 4             3              6.0000       ab            
 4             3              6.0000       abcdefghij    
@@ -111,7 +111,7 @@ Rank          Frequency     Percent       Category
                                                {'Frequency': 5, 'Category': 'abcdefg', 'Rank': 2, 'Percent': 10.0},
                                                {'Frequency': 5, 'Category': 'abcdefghijk', 'Rank': 2, 'Percent': 10.0},
                                                {'Frequency': 4, 'Category': 'abcdefgh', 'Rank': 3, 'Percent': 8.0},
-                                               {'Frequency': 4, 'Category': nan, 'Rank': 3, 'Percent': 8.0},
+                                               {'Frequency': 4, 'Category': 'nan', 'Rank': 3, 'Percent': 8.0},
                                                {'Frequency': 3, 'Category': 'a', 'Rank': 4, 'Percent': 6.0},
                                                {'Frequency': 3, 'Category': 'ab', 'Rank': 4, 'Percent': 6.0},
                                                {'Frequency': 3, 'Category': 'abcdefghij', 'Rank': 4, 'Percent': 6.0},
@@ -147,7 +147,7 @@ Statistics
 
 Rank          Frequency     Percent       Category      
 --------------------------------------------------------
-1             6              100.0000      nan          
+1             6              100.0000     nan           
 2             0              0.0000       z             
 2             0              0.0000       y             
 2             0              0.0000       x             
@@ -155,7 +155,7 @@ Rank          Frequency     Percent       Category
         test = CategoricalStatistics(input_array, order=['z', 'y', 'x', 'w'], display=False)
         self.assertEqual(str(test), output)
         self.assertDictEqual(test.results[0], {'Total': 6, 'Number of Groups': 5})
-        self.assertListEqual(test.results[1], [{'Rank': 1, 'Frequency': 6, 'Percent': 100, 'Category': nan},
+        self.assertListEqual(test.results[1], [{'Rank': 1, 'Frequency': 6, 'Percent': 100, 'Category': 'nan'},
                                                {'Rank': 2, 'Frequency': 0, 'Percent': 0, 'Category': 'z'},
                                                {'Rank': 2, 'Frequency': 0, 'Percent': 0, 'Category': 'y'},
                                                {'Rank': 2, 'Frequency': 0, 'Percent': 0, 'Category': 'x'},
@@ -176,10 +176,10 @@ Statistics
 
 Rank          Frequency     Percent       Category      
 --------------------------------------------------------
-1             6              100.0000      nan          """
+1             6              100.0000     nan           """
         test = CategoricalStatistics(input_array, order=order, display=False)
         self.assertEqual(str(test), output)
-        self.assertListEqual(test.results, [{'Frequency': 6, 'Category': nan, 'Rank': 1, 'Percent': 100.0}])
+        self.assertListEqual(test.results, [{'Frequency': 6, 'Category': 'nan', 'Rank': 1, 'Percent': 100.0}])
         order = 'c'
         output = """
 
@@ -192,6 +192,75 @@ Rank          Frequency     Percent       Category
         test = CategoricalStatistics(input_array, order=order, display=False, dropna=True)
         self.assertEqual(str(test), output)
         self.assertListEqual(test.results, [{'Frequency': 2, 'Category': 'c', 'Rank': 1, 'Percent': 100.0}])
+
+    def test_107_numeric_group_name(self):
+        input_array = [1., 2., 1., 3., 3., 4.]
+        output = """
+
+Overall Statistics
+------------------
+
+Total            =  6
+Number of Groups =  4
+
+
+Statistics
+----------
+
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             2              33.3333      1             
+1             2              33.3333      3             
+2             1              16.6667      2             
+2             1              16.6667      4             """
+        exp = CategoricalStatistics(input_array, display=False)
+        self.assertEqual(str(exp), output)
+
+    def test_108_year_group_name(self):
+        input_array = [2015, 2016, 2017, 2018, 2019]
+        exp = CategoricalStatistics(input_array, display=False)
+        output = """
+
+Overall Statistics
+------------------
+
+Total            =  5
+Number of Groups =  5
+
+
+Statistics
+----------
+
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             1              20.0000      2015          
+1             1              20.0000      2016          
+1             1              20.0000      2017          
+1             1              20.0000      2018          
+1             1              20.0000      2019          """
+        self.assertEqual(str(exp), output)
+
+    def test_109_float_group_name(self):
+        input_array = [.123, .456, .789]
+        exp = CategoricalStatistics(input_array, display=True)
+        output = """
+
+Overall Statistics
+------------------
+
+Total            =  3
+Number of Groups =  3
+
+
+Statistics
+----------
+
+Rank          Frequency     Percent       Category      
+--------------------------------------------------------
+1             1              33.3333      0.123         
+1             1              33.3333      0.456         
+1             1              33.3333      0.789         """
+        self.assertEqual(str(exp), output)
 
 
 if __name__ == '__main__':

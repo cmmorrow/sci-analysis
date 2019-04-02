@@ -90,7 +90,16 @@ class Categorical(Data):
                 'ranks': counts.rank(method='dense', na_option='bottom', ascending=False).astype('int'),
                 'percents': (counts / counts.sum() * 100) if not all(counts == 0) else 0.0
             })
-            self._summary['categories'] = self._summary.index.to_series()
+            # Try to convert numeric categories to str.
+            try:
+                self._summary['categories'] = self._summary.index.to_series().astype(int)
+                # Backtrack if the categories were originally all floats.
+                if not any(self._summary['categories']):
+                    self._summary['categories'] = self._summary.index.to_series()
+            except ValueError:
+                self._summary['categories'] = self._summary.index.to_series()
+            self._summary['categories'] = self._summary['categories'].astype(str)
+
             if order is not None:
                 self._summary.sort_index(level=self._order, inplace=True, axis=0, na_position='last')
             else:
