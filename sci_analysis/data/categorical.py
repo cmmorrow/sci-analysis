@@ -67,12 +67,21 @@ class Categorical(Data):
             self._summary = sequence.summary
         else:
             self._name = name
+            self._values = pd.Series(sequence)
             try:
-                self._values = pd.Series(sequence).astype('category')
+                self._values.astype('category')
             except TypeError:
-                self._values = pd.Series(flatten(sequence)).astype('category')
+                self._values = pd.Series(flatten(sequence))
             except ValueError:
                 self._values = pd.Series([])
+            # Try to preserve the original dtype of the categories.
+            try:
+                if not any(self._values % 1):
+                    self._values = self._values.astype(int)
+            except TypeError:
+                pass
+            self._values = self._values.astype('category')
+
             if order is not None:
                 if not is_iterable(order):
                     order = [order]
@@ -90,15 +99,7 @@ class Categorical(Data):
                 'ranks': counts.rank(method='dense', na_option='bottom', ascending=False).astype('int'),
                 'percents': (counts / counts.sum() * 100) if not all(counts == 0) else 0.0
             })
-            # Try to convert numeric categories to str.
-            try:
-                self._summary['categories'] = self._summary.index.to_series().astype(int)
-                # Backtrack if the categories were originally all floats.
-                if not any(self._summary['categories']):
-                    self._summary['categories'] = self._summary.index.to_series()
-            except ValueError:
-                self._summary['categories'] = self._summary.index.to_series()
-            self._summary['categories'] = self._summary['categories'].astype(str)
+            self._summary['categories'] = self._summary.index.to_series()
 
             if order is not None:
                 self._summary.sort_index(level=self._order, inplace=True, axis=0, na_position='last')
