@@ -11,7 +11,7 @@ from matplotlib.patches import Circle
 
 # Numpy imports
 from numpy import (
-    polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, reshape, std, sum, mean, median
+    polyfit, polyval, sort, arange, array, linspace, mgrid, vstack, std, sum, mean, median
 )
 
 # Scipy imports
@@ -317,7 +317,7 @@ class GraphScatter(VectorGraph):
         kernel = gaussian_kde(values)
         _x, _y = mgrid[xmin:xmax:100j, ymin:ymax:100j]
         positions = vstack([_x.ravel(), _y.ravel()])
-        _z = reshape(kernel(positions).T, _x.shape)
+        _z = kernel.evaluate(positions).T.reshape(_x.shape)
         return _x, _y, _z, arange(_z.min(), _z.max(), (_z.max() - _z.min()) / self._contour_props[0])
 
     def calc_fit(self):
