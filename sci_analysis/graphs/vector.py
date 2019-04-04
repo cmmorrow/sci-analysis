@@ -771,13 +771,7 @@ class GraphBoxplot(VectorGraph):
         return tuple(zip(xbar, radii))
 
     def draw(self):
-        """
-        Draws the boxplots based on the set parameters.
-
-        Returns
-        -------
-        pass
-        """
+        """Draws the boxplots based on the set parameters."""
 
         # Setup the grid variables
         w_ratio = [1]
@@ -787,7 +781,9 @@ class GraphBoxplot(VectorGraph):
         if self._nqp:
             w_ratio.append(4 if self._circles else 1)
             self._ncols += 1
-        groups, data = zip(*[(g, v['ind'].reset_index(drop=True)) for g, v in self._data.values.groupby('grp')])
+        groups, data = zip(*[
+            (g, v['ind'].reset_index(drop=True)) for g, v in self._data.values.groupby('grp') if not v.empty]
+        )
 
         # Create the quantile plot arrays
         prob = [probplot(v) for v in data]
