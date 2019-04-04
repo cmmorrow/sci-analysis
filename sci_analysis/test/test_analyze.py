@@ -473,6 +473,19 @@ class MyTestCase(TestWarnings):
             ['Group Bivariate']
         )
 
+    def test_142_stacked_oneway_missing_groups(self):
+        np.random.seed(self._seed)
+        size = 100
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(0, 0.75, size=size), 'group': ['Group 1'] * size})
+        input_2_array = pd.DataFrame({'input': [np.nan] * size, 'group': ['Group 2'] * size})
+        input_3_array = pd.DataFrame({'input': st.norm.rvs(0.5, size=size), 'group': ['Group 3'] * size})
+        input_4_array = pd.DataFrame({'input': [np.nan] * size, 'group': ['Group 4'] * size})
+        df = pd.concat([input_1_array, input_2_array, input_3_array, input_4_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_142'.format(self.save_path)),
+                         ['Stacked Oneway', 'TTest'])
+
 
 if __name__ == '__main__':
     unittest.main()
