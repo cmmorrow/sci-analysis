@@ -486,6 +486,33 @@ class MyTestCase(TestWarnings):
                                  save_to='{}test_analyze_142'.format(self.save_path)),
                          ['Stacked Oneway', 'TTest'])
 
+    def test_143_categorical_ordered(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            order=['one', 'two', 'three'],
+            debug=True,
+            save_to='{}test_analyze_143'.format(self.save_path)
+        ), ['Frequencies'])
+
+    def test_144_categorical_no_labels(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            labels=False,
+            debug=True,
+            save_to='{}test_analyze_144'.format(self.save_path)
+        ), ['Frequencies'])
+
+    def test_145_categorical_with_grid(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            grid=True,
+            debug=True,
+            save_to='{}test_analyze_145'.format(self.save_path)
+        ), ['Frequencies'])
+
 
 if __name__ == '__main__':
     unittest.main()
