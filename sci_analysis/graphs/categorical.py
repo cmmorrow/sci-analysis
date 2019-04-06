@@ -17,6 +17,8 @@ class CategoricalGraph(Graph):
         seq_name = kwargs['name'] if 'name' in kwargs else None
         data = list()
         for d in args:
+            if not d:
+                raise NoDataError('Cannot draw graph because there is no data.')
             new = d if is_categorical(d) else Categorical(d, name=seq_name, order=order, dropna=dropna)
             if new.is_empty():
                 raise NoDataError('Cannot draw graph because there is no data.')
@@ -39,7 +41,7 @@ class CategoricalGraph(Graph):
 
 class GraphFrequency(CategoricalGraph):
 
-    _xsize = 8.5
+    _xsize = 7
     _ysize = 5.5
 
     def __init__(self, data, **kwargs):

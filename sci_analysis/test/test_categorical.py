@@ -441,6 +441,54 @@ class MyTestCase(TestWarnings):
         self.assertTrue(input_array.data.equals(ref_array))
         self.assertTrue(input_array.is_empty())
 
+    def test_124_create_categorical_from_empty_list(self):
+        """Create an empty Categorical object from an empty list"""
+        input_array = Categorical([])
+        self.assertTrue(is_categorical(input_array))
+        self.assertEqual(len(input_array.data), 0)
+        self.assertEqual(len(input_array.counts), 0)
+        self.assertEqual(len(input_array.percents), 0)
+        self.assertEqual(len(input_array.ranks), 0)
+        self.assertEqual(len(input_array.categories), 0)
+        self.assertEqual(input_array.total, 0)
+        self.assertEqual(input_array.num_of_groups, 0)
+        self.assertTrue(input_array.summary.empty)
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertTrue(input_array.is_empty)
+
+    def test_125_create_categorical_from_empty_set(self):
+        """Create an empty Categorical object from an empty set"""
+        input_array = Categorical({})
+        self.assertTrue(is_categorical(input_array))
+        self.assertEqual(len(input_array.data), 0)
+        self.assertEqual(len(input_array.counts), 0)
+        self.assertEqual(len(input_array.percents), 0)
+        self.assertEqual(len(input_array.ranks), 0)
+        self.assertEqual(len(input_array.categories), 0)
+        self.assertEqual(input_array.total, 0)
+        self.assertEqual(input_array.num_of_groups, 0)
+        self.assertTrue(input_array.summary.empty)
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertTrue(input_array.is_empty)
+
+    def test_104_create_categorical_from_empty_array(self):
+        """Create an empty Categorical object from an empty array"""
+        input_array = Categorical(27)
+        self.assertTrue(is_categorical(input_array))
+        self.assertEqual(len(input_array.data), 0)
+        self.assertEqual(len(input_array.counts), 0)
+        self.assertEqual(len(input_array.percents), 0)
+        self.assertEqual(len(input_array.ranks), 0)
+        self.assertEqual(len(input_array.categories), 0)
+        self.assertEqual(input_array.total, 0)
+        self.assertEqual(input_array.num_of_groups, 0)
+        self.assertTrue(input_array.summary.empty)
+        self.assertIsNone(input_array.order)
+        self.assertIsNone(input_array.name)
+        self.assertTrue(input_array.is_empty)
+
 
 if __name__ == '__main__':
     unittest.main()
