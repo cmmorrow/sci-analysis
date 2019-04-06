@@ -20,8 +20,6 @@ class CategoricalGraph(Graph):
             if not d:
                 raise NoDataError('Cannot draw graph because there is no data.')
             new = d if is_categorical(d) else Categorical(d, name=seq_name, order=order, dropna=dropna)
-            if new.is_empty():
-                raise NoDataError('Cannot draw graph because there is no data.')
             if len(new) <= self._min_size:
                 raise MinimumSizeError('Length of data is less than the minimum size {}.'.format(self._min_size))
             data.append(new)
