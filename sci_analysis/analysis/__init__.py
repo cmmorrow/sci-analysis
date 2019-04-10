@@ -183,9 +183,11 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
                 TTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TTest')
             elif len(xdata[0]) > 20 and len(xdata[1]) > 20:
+                EqualVariance(xdata[0], xdata[1], alpha=alpha)
                 MannWhitney(xdata[0], xdata[1], alpha=alpha)
                 tested.append('MannWhitney')
             else:
+                EqualVariance(xdata[0], xdata[1], alpha=alpha)
                 TwoSampleKSTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TwoSampleKSTest')
         else:
@@ -240,10 +242,12 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
                 TTest(*group_data)
                 tested.append('TTest')
             elif len(group_data[0]) > 20 and len(group_data[1]) > 20:
-                MannWhitney(*group_data)
+                EqualVariance(*group_data, alpha=alpha)
+                MannWhitney(*group_data, alpha=alpha)
                 tested.append('MannWhitney')
             else:
-                TwoSampleKSTest(*group_data)
+                EqualVariance(*group_data, alpha=alpha)
+                TwoSampleKSTest(*group_data, alpha=alpha)
                 tested.append('TwoSampleKSTest')
         else:
             e = EqualVariance(*group_data, alpha=alpha)
