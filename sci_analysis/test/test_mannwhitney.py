@@ -16,7 +16,7 @@ class TestMannWhitney(unittest.TestCase):
         x_input = st.weibull_min.rvs(*x_parms, size=100)
         y_input = st.weibull_min.rvs(*y_parms, size=100)
         alpha = 0.05
-        exp = MannWhitney(x_input, y_input, alpha=alpha, display=True)
+        exp = MannWhitney(x_input, y_input, alpha=alpha, display=False)
         output = """
 
 Mann Whitney U Test
@@ -24,14 +24,40 @@ Mann Whitney U Test
 
 alpha   =  0.0500
 u value =  5024.0000
-p value =  1.0477
+p value =  0.9542
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
         self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
         self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertEqual(str(exp), output)
+
+    def test_MannWhitney_unmatched_large_sample(self):
+        """Test the MannWhitney U test with a large unmatched sample."""
+        np.random.seed(987654321)
+        x_parms = [50, 17]
+        y_parms = [40, 17]
+        x_input = st.norm.rvs(*x_parms, size=10000)
+        y_input = st.norm.rvs(*y_parms, size=10000)
+        alpha = 0.05
+        exp = MannWhitney(x_input, y_input, alpha=alpha, display=False)
+        output = """
+
+Mann Whitney U Test
+-------------------
+
+alpha   =  0.0500
+u value =  66315268.0000
+p value =  0.0000
+
+HA: Locations are not matched
+"""
+
+        self.assertAlmostEqual(exp.statistic, 66315268.0, delta=0.0001)
+        self.assertAlmostEqual(exp.u_value, 66315268.0, delta=0.0001)
+        self.assertAlmostEqual(exp.p_value, 0.0, delta=0.0001)
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_unmatched(self):
@@ -76,7 +102,7 @@ Mann Whitney U Test
 
 alpha   =  0.0500
 u value =  222.0000
-p value =  1.0401
+p value =  0.9799
 
 H0: Locations are matched
 """
@@ -137,7 +163,7 @@ H0: Locations are matched
         y_input = st.weibull_min.rvs(*y_parms, size=100)
         vector = Vector(x_input).append(Vector(y_input))
         alpha = 0.05
-        exp = MannWhitney(vector, alpha=alpha, display=True)
+        exp = MannWhitney(vector, alpha=alpha, display=False)
         output = """
 
 Mann Whitney U Test
@@ -145,14 +171,14 @@ Mann Whitney U Test
 
 alpha   =  0.0500
 u value =  5024.0000
-p value =  1.0477
+p value =  0.9542
 
 H0: Locations are matched
 """
         self.assertGreater(exp.p_value, alpha, "FAIL: MannWhitney Type I error")
         self.assertAlmostEqual(exp.statistic, 5024.0, delta=0.0001, msg="FAIL: MannWhitney statistic incorrect")
         self.assertAlmostEqual(exp.u_value, 5024.0, delta=0.0001, msg="FAIL: MannWhitney u_value incorrect")
-        self.assertAlmostEqual(exp.p_value, 1.0477, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
+        self.assertAlmostEqual(exp.p_value, 0.9542, delta=0.0001, msg="FAIL: MannWhitney p_value incorrect")
         self.assertEqual(str(exp), output)
 
     def test_MannWhitney_missing_second_arg(self):
