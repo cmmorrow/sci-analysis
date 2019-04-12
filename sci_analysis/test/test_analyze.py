@@ -457,6 +457,62 @@ class MyTestCase(TestWarnings):
             ), ['Bivariate']
         )
 
+    def test_141_scatter_groups_one_below_min_size(self):
+        np.random.seed(self._seed)
+        df = pd.DataFrame(np.random.randn(100, 2), columns=list('xy'))
+        df['groups'] = np.random.choice(list('ABC'), len(df)).tolist()
+        df.at[24, 'groups'] = "D"
+        self.assertEqual(
+            analyze(
+                df['x'],
+                df['y'],
+                df['groups'],
+                debug=True,
+                save_to='{}test_analyze_141'.format(self.save_path)
+            ),
+            ['Group Bivariate']
+        )
+
+    def test_142_stacked_oneway_missing_groups(self):
+        np.random.seed(self._seed)
+        size = 100
+        input_1_array = pd.DataFrame({'input': st.norm.rvs(0, 0.75, size=size), 'group': ['Group 1'] * size})
+        input_2_array = pd.DataFrame({'input': [np.nan] * size, 'group': ['Group 2'] * size})
+        input_3_array = pd.DataFrame({'input': st.norm.rvs(0.5, size=size), 'group': ['Group 3'] * size})
+        input_4_array = pd.DataFrame({'input': [np.nan] * size, 'group': ['Group 4'] * size})
+        df = pd.concat([input_1_array, input_2_array, input_3_array, input_4_array])
+        self.assertEqual(analyze(df['input'], groups=df['group'],
+                                 debug=True,
+                                 save_to='{}test_analyze_142'.format(self.save_path)),
+                         ['Stacked Oneway', 'TTest'])
+
+    def test_143_categorical_ordered(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            order=['one', 'two', 'three'],
+            debug=True,
+            save_to='{}test_analyze_143'.format(self.save_path)
+        ), ['Frequencies'])
+
+    def test_144_categorical_no_labels(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            labels=False,
+            debug=True,
+            save_to='{}test_analyze_144'.format(self.save_path)
+        ), ['Frequencies'])
+
+    def test_145_categorical_with_grid(self):
+        input_array = ['one', 'two', 'one', 'three', 'one', 'three', 'three', 'one']
+        self.assertEqual(analyze(
+            input_array,
+            grid=True,
+            debug=True,
+            save_to='{}test_analyze_145'.format(self.save_path)
+        ), ['Frequencies'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,9 +17,9 @@ class CategoricalGraph(Graph):
         seq_name = kwargs['name'] if 'name' in kwargs else None
         data = list()
         for d in args:
-            new = d if is_categorical(d) else Categorical(d, name=seq_name, order=order, dropna=dropna)
-            if new.is_empty():
+            if not d:
                 raise NoDataError('Cannot draw graph because there is no data.')
+            new = d if is_categorical(d) else Categorical(d, name=seq_name, order=order, dropna=dropna)
             if len(new) <= self._min_size:
                 raise MinimumSizeError('Length of data is less than the minimum size {}.'.format(self._min_size))
             data.append(new)
@@ -39,8 +39,8 @@ class CategoricalGraph(Graph):
 
 class GraphFrequency(CategoricalGraph):
 
-    _xsize = 9
-    _ysize = 6
+    _xsize = 7
+    _ysize = 5.5
 
     def __init__(self, data, **kwargs):
 

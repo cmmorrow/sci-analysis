@@ -8,12 +8,11 @@ python:
 - '3.6'
 - '3.7'
 before_install:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- sleep 3
 - sudo apt-get install libatlas-base-dev gfortran
 - mkdir $HOME/.matplotlib
 - 'echo ''backend: TkAgg'' > $HOME/.matplotlib/matplotlibrc'
+services:
+  - xvfb
 install:
 - pip install scipy
 - pip install pandas

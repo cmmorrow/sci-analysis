@@ -8,7 +8,7 @@ from .comparison import LinearRegression, Correlation, GroupCorrelation, GroupLi
 from .stats import VectorStatistics, GroupStatistics, GroupStatisticsStacked, CategoricalStatistics
 
 
-def determine_analysis_type(data, other=None, groups=None, labels=None):
+def determine_analysis_type(data, other=None, groups=None, labels=None, order=None, dropna=None):
     """Attempts to determine the type of data and returns the corresponding sci_analysis Data object.
 
     Parameters
@@ -21,6 +21,10 @@ def determine_analysis_type(data, other=None, groups=None, labels=None):
         The group names to include if data is determined to be a Vector.
     labels : array-like or None
         The sequence of data point labels.
+    order : array-like
+        The order that categories in sequence should appear.
+    dropna : bool
+        Remove all occurances of numpy NaN.
 
     Returns
     -------
@@ -61,10 +65,10 @@ def determine_analysis_type(data, other=None, groups=None, labels=None):
                 else:
                     return Vector(data, labels=labels)
         else:
-            return Categorical(data)
+            return Categorical(data, order=order, dropna=dropna)
 
 
-def analyse(xdata, ydata=None, groups=None, labels=None, **kwargs):
+def analyse(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None, dropna=None, **kwargs):
     """
     Alias for analyze.
 
@@ -80,6 +84,10 @@ def analyse(xdata, ydata=None, groups=None, labels=None, **kwargs):
         The sequence of data point labels.
     alpha : float
         The sensitivity to use for hypothesis tests.
+    order : array-like
+        The order that categories in sequence should appear.
+    dropna : bool
+        Remove all occurances of numpy NaN.
 
     Returns
     -------
@@ -97,10 +105,10 @@ def analyse(xdata, ydata=None, groups=None, labels=None, **kwargs):
     xdata : dict(array-like(num)), ydata : None --- Location Test(unstacked)
     xdata : array-like(num), ydata : None, groups : array-like --- Location Test(stacked)
     """
-    return analyze(xdata, ydata=ydata, groups=groups, labels=labels, **kwargs)
+    return analyze(xdata, ydata=ydata, groups=groups, labels=labels, alpha=alpha, order=order, dropna=dropna, **kwargs)
 
 
-def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
+def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None, dropna=None, **kwargs):
     """
     Automatically performs a statistical analysis based on the input arguments.
 
@@ -116,6 +124,10 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
         The sequence of data point labels.
     alpha : float
         The sensitivity to use for hypothesis tests.
+    order : array-like
+        The order that categories in sequence should appear.
+    dropna : bool
+        Remove all occurances of numpy NaN.
 
     Returns
     -------
@@ -171,9 +183,11 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
                 TTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TTest')
             elif len(xdata[0]) > 20 and len(xdata[1]) > 20:
+                EqualVariance(xdata[0], xdata[1], alpha=alpha)
                 MannWhitney(xdata[0], xdata[1], alpha=alpha)
                 tested.append('MannWhitney')
             else:
+                EqualVariance(xdata[0], xdata[1], alpha=alpha)
                 TwoSampleKSTest(xdata[0], xdata[1], alpha=alpha)
                 tested.append('TwoSampleKSTest')
         else:
@@ -190,9 +204,9 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
         return tested if debug else None
 
     if ydata is not None:
-        _data = determine_analysis_type(xdata, other=ydata, groups=groups, labels=labels)
+        _data = determine_analysis_type(xdata, other=ydata, groups=groups, labels=labels, order=order, dropna=dropna)
     else:
-        _data = determine_analysis_type(xdata, groups=groups, labels=labels)
+        _data = determine_analysis_type(xdata, groups=groups, labels=labels, order=order, dropna=dropna)
 
     if is_vector(_data) and not _data.other.empty:
         # Correlation and Linear Regression
@@ -228,10 +242,12 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
                 TTest(*group_data)
                 tested.append('TTest')
             elif len(group_data[0]) > 20 and len(group_data[1]) > 20:
-                MannWhitney(*group_data)
+                EqualVariance(*group_data, alpha=alpha)
+                MannWhitney(*group_data, alpha=alpha)
                 tested.append('MannWhitney')
             else:
-                TwoSampleKSTest(*group_data)
+                EqualVariance(*group_data, alpha=alpha)
+                TwoSampleKSTest(*group_data, alpha=alpha)
                 tested.append('TwoSampleKSTest')
         else:
             e = EqualVariance(*group_data, alpha=alpha)
@@ -273,8 +289,10 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, **kwargs):
             return tested if debug else None
         else:
             tested.append('Frequencies')
+            if labels is None:
+                labels = True
 
             # Show the histogram and stats
-            GraphFrequency(_data, **kwargs)
+            GraphFrequency(_data, labels=labels, **kwargs)
             CategoricalStatistics(xdata, **kwargs)
             return tested if debug else None

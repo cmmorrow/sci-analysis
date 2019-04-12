@@ -454,6 +454,48 @@ class MyTestCase(unittest.TestCase):
         labels[5] = 'hi'
         self.assertTrue(Vector(input_array_1, labels=labels).has_labels)
 
+    def test_162_vector_drop_group(self):
+        """Test the normal use case for dropping a group from the Vector."""
+        np.random.seed(987654321)
+        input_array_1 = st.norm.rvs(size=100)
+        input_array_2 = st.norm.rvs(size=100)
+        input_array_3 = st.norm.rvs(size=100)
+        input_array_4 = st.norm.rvs(size=4)
+        vec1 = (
+            Vector(input_array_1)
+            .append(Vector(input_array_2))
+            .append((Vector(input_array_3)))
+            .append(Vector(input_array_4))
+        )
+        self.assertEqual(len(vec1.drop_groups(4)), 300)
+        self.assertEqual(len(vec1.drop_groups(2)), 200)
+        self.assertListEqual([1, 3], vec1.values['grp'].cat.categories.tolist())
+        vec1_1 = (
+            Vector(input_array_1)
+                .append(Vector(input_array_2))
+                .append((Vector(input_array_3)))
+                .append(Vector(input_array_4))
+        )
+        self.assertEqual(len(vec1_1.drop_groups([2, 4])), 200)
+        self.assertListEqual([1, 3], vec1_1.values['grp'].cat.categories.tolist())
+        vec2 = (
+            Vector(input_array_1, groups=['a'] * 100)
+            .append(Vector(input_array_2, groups=['b'] * 100))
+            .append((Vector(input_array_3, groups=['c'] * 100)))
+            .append(Vector(input_array_4, groups=['d'] * 4))
+        )
+        self.assertEqual(len(vec2.drop_groups('b')), 204)
+        self.assertEqual(len(vec2.drop_groups('d')), 200)
+        self.assertListEqual(['a', 'c'], vec2.values['grp'].cat.categories.tolist())
+        vec2_1 = (
+            Vector(input_array_1, groups=['a'] * 100)
+                .append(Vector(input_array_2, groups=['b'] * 100))
+                .append((Vector(input_array_3, groups=['c'] * 100)))
+                .append(Vector(input_array_4, groups=['d'] * 4))
+        )
+        self.assertEqual(len(vec2_1.drop_groups(['b', 'd'])), 200)
+        self.assertListEqual(['a', 'c'], vec2_1.values['grp'].cat.categories.tolist())
+
 
 if __name__ == '__main__':
     unittest.main()
