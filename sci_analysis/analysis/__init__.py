@@ -277,11 +277,11 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
                     ),
                     distro,
                 )
-                parms = distro_class.fit(_data)
-                fit = KSTest(_data, distribution=distro, parms=parms, alpha=alpha, display=False)
+                parms = distro_class.fit(_data.data)
+                fit = KSTest(_data.data, distribution=distro, parms=parms, alpha=alpha, display=False)
                 tested.append('KSTest')
             else:
-                fit = NormTest(_data, alpha=alpha, display=False)
+                fit = NormTest(_data.data, alpha=alpha, display=False)
                 tested.append('NormTest')
             GraphHisto(_data, mean=out_stats.mean, std_dev=out_stats.std_dev, **kwargs)
             print(out_stats)
@@ -294,5 +294,5 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
 
             # Show the histogram and stats
             GraphFrequency(_data, labels=labels, **kwargs)
-            CategoricalStatistics(_data, **kwargs)
+            CategoricalStatistics(_data.data, **kwargs)
             return tested if debug else None
