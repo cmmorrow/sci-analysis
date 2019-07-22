@@ -4,3 +4,4 @@ numpy
 pandas
 scipy
 six
+sphinx>=1.4.3

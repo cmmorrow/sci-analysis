@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    # 'sphinx.ext.imgmath',
+    'sphinx.ext.imgmath',
     'm2r',
 ]
 
