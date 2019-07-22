@@ -14,11 +14,12 @@ before_install:
 services:
   - xvfb
 install:
-- pip install scipy
-- pip install pandas
-- pip install matplotlib
-- pip install six
-- pip install pytest
+- pip install -r requirements.txt
+- pip install scipy==1.3.0
+- pip install pandas==0.24.2
+- pip install matplotlib==3.1.0
+- pip install six==1.12.0
+- pip install pytest==5.0.1
 - pip install pytest-pep8
 - pip install pytest-cov
 - pip install coveralls
