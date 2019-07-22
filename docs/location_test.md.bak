@@ -410,8 +410,6 @@ The Group Statistics list summary statistics for each group in a table. The summ
 
 The remaining two statistics are both [Hypothesis Tests](https://en.wikipedia.org/wiki/Statistical_hypothesis_testing). The first test attempts to determine if the variances of each group are matched or not. The second test attempts to determine if the locations of each group are matched or not. Each hypothesis test shows the [significance level](https://en.wikipedia.org/wiki/Statistical_significance) (alpha), test statistic, and [p-value](https://en.wikipedia.org/wiki/P-value). The hypothesis test used depends on a few different factors. The test for equal variance is fairly simple and depends on whether the all the data points in the dataset are normally distributed or not. If normally distributed, the [Bartlett Test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bartlett.html#scipy.stats.bartlett) is used, otherwise the [Levene Test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.levene.html#scipy.stats.levene) is used.
 
-![png](img/variance_test_tree.png)
-
 The logic for determining which hypothesis test to use for checking location is more complex and depends on the number of groups, whether the data points in the dataset are normally distributed, and the size of the smallest group.
 
 ![png](img/location_test_tree.png)
