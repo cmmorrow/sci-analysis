@@ -65,7 +65,7 @@ def determine_analysis_type(data, other=None, groups=None, labels=None, order=No
                 else:
                     return Vector(data, labels=labels)
         else:
-            return Categorical(data, order=order, dropna=dropna)
+            return Categorical(data.astype(str), order=order, dropna=dropna)
 
 
 def analyse(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None, dropna=None, **kwargs):
@@ -277,11 +277,11 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
                     ),
                     distro,
                 )
-                parms = distro_class.fit(xdata)
-                fit = KSTest(xdata, distribution=distro, parms=parms, alpha=alpha, display=False)
+                parms = distro_class.fit(_data.data)
+                fit = KSTest(_data.data, distribution=distro, parms=parms, alpha=alpha, display=False)
                 tested.append('KSTest')
             else:
-                fit = NormTest(xdata, alpha=alpha, display=False)
+                fit = NormTest(_data.data, alpha=alpha, display=False)
                 tested.append('NormTest')
             GraphHisto(_data, mean=out_stats.mean, std_dev=out_stats.std_dev, **kwargs)
             print(out_stats)
@@ -294,5 +294,5 @@ def analyze(xdata, ydata=None, groups=None, labels=None, alpha=0.05, order=None,
 
             # Show the histogram and stats
             GraphFrequency(_data, labels=labels, **kwargs)
-            CategoricalStatistics(xdata, **kwargs)
+            CategoricalStatistics(_data.data, **kwargs)
             return tested if debug else None

@@ -513,6 +513,15 @@ class MyTestCase(TestWarnings):
             save_to='{}test_analyze_145'.format(self.save_path)
         ), ['Frequencies'])
 
+    def test_146_categorical_from_bool_series(self):
+        input_array = pd.Series([True, False, True, False, True, False, False, True, True, True])
+        self.assertEqual(analyze(
+            input_array,
+            debug=True,
+            save_to='{}test_analyze_146'.format(self.save_path)
+        ), ['Frequencies'])
+        self.assertEqual(input_array.dtype, bool)
+
 
 if __name__ == '__main__':
     unittest.main()
